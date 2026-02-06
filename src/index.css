@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Midnight & Gold Theme */
+    --color-midnight: #191970;
+    --color-gold: #F7E7CE;
+    
+    /* iOS Sequoia Radii */
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: var(--color-midnight);
+    color: white;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* iOS Safe Area Support */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Custom Scrollbar - Light on dark */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* iOS-style input focus */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(247, 231, 206, 0.3);
+  }
+
+  /* Smooth transitions */
+  button,
+  a,
+  input,
+  textarea {
+    transition: all 0.2s ease;
+  }
+}
+
+@layer utilities {
+  /* iOS Sequoia Border Radius */
+  .rounded-ios {
+    border-radius: var(--radius-md);
+  }
+
+  .rounded-ios-sm {
+    border-radius: var(--radius-sm);
+  }
+
+  .rounded-ios-lg {
+    border-radius: var(--radius-lg);
+  }
+
+  .rounded-ios-xl {
+    border-radius: var(--radius-xl);
+  }
+
+  /* iOS Sequoia Shadows on Midnight */
+  .shadow-ios {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .shadow-ios-md {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .shadow-ios-lg {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Backdrop blur - iOS Sequoia */
+  .backdrop-blur-ios {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  /* Glass effect for Gold cards */
+  .glass-gold {
+    background: rgba(247, 231, 206, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  /* Touch-friendly */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* iOS Sequoia Spring Animation */
+  @keyframes spring {
+    0% {
+      transform: scale(0.96);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.01);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-spring {
+    animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  /* Subtle hover lift - iOS Sequoia */
+  @keyframes lift {
+    to {
+      transform: translateY(-2px);
+    }
+  }
+
+  .hover-lift:hover {
+    animation: lift 0.2s ease forwards;
+  }
+}

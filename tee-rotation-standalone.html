@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#F2F2F7">
+    <title>Tee Rotation ☕</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        ios: {
+                            bg: '#F2F2F7',
+                            card: '#FFFFFF',
+                            border: '#E5E5EA',
+                            label: '#000000',
+                            secondary: '#8E8E93',
+                            blue: '#007AFF',
+                            green: '#34C759',
+                            orange: '#FF9500',
+                            red: '#FF3B30',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            overscroll-behavior: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        .slide-up {
+            animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .fade-in {
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        input[type="range"] {
+            accent-color: #007AFF;
+        }
+    </style>
+</head>
+<body class="bg-ios-bg font-sans">
+    <div id="app"></div>
+
+    <script type="module">
+        // Tea Types and Constants
+        const TEA_TYPES = {
+            schwarz: { label: 'Schwarztee', color: '#8B4513', temp: 100 },
+            grün: { label: 'Grüntee', color: '#4CAF50', temp: 80 },
+            oolong: { label: 'Oolong', color: '#DAA520', temp: 90 },
+            chai: { label: 'Chai', color: '#A0522D', temp: 90 }
+        };
+
+        const VORRAT_STATUS = {
+            voll: { label: 'Voll', icon: '●', color: 'text-ios-green' },
+            fastLeer: { label: 'Fast leer', icon: '◐', color: 'text-ios-orange' },
+            leer: { label: 'Leer', icon: '○', color: 'text-ios-red' }
+        };
+
+        // Storage Functions
+        const STORAGE_KEY = 'tee-rotation-data';
+
+        function loadData() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                return stored ? JSON.parse(stored) : { teas: [], queue: [] };
+            } catch {
+                return { teas: [], queue: [] };
+            }
+        }
+
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function generateId() {
+            return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        }
+
+        // SVG Icons
+        const icons = {
+            coffee: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>',
+            home: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+            list: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>',
+            plus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
+            thermometer: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>',
+            package: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+            edit: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+            trash: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
+            x: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+            minus: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>',
+            sparkles: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>'
+        };
+
+        // App State
+        let state = {
+            activeTab: 'heute',
+            teas: [],
+            queue: [],
+            isFormOpen: false,
+            editingTea: null
+        };
+
+        // Initialize
+        function init() {
+            const data = loadData();
+            state.teas = data.teas;
+            state.queue = data.queue.length > 0 ? data.queue : data.teas.map(t => t.id);
+            render();
+        }
+
+        function setState(updates) {
+            state = { ...state, ...updates };
+            if (state.teas.length > 0 || state.queue.length > 0) {
+                saveData({ teas: state.teas, queue: state.queue });
+            }
+            render();
+        }
+
+        // Actions
+        function addTea(teaData) {
+            const newTea = { ...teaData, id: generateId() };
+            setState({
+                teas: [...state.teas, newTea],
+                queue: [...state.queue, newTea.id],
+                isFormOpen: false,
+                editingTea: null
+            });
+        }
+
+        function updateTea(teaData) {
+            const updatedTeas = state.teas.map(t =>
+                t.id === state.editingTea.id ? { ...teaData, id: state.editingTea.id } : t
+            );
+            setState({
+                teas: updatedTeas,
+                isFormOpen: false,
+                editingTea: null
+            });
+        }
+
+        function deleteTea(id) {
+            if (confirm('Tee wirklich löschen?')) {
+                setState({
+                    teas: state.teas.filter(t => t.id !== id),
+                    queue: state.queue.filter(qId => qId !== id)
+                });
+            }
+        }
+
+        function drinkTea(id) {
+            const updatedTeas = state.teas.map(t =>
+                t.id === id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t
+            );
+            const newQueue = state.queue.filter(qId => qId !== id);
+            newQueue.push(id);
+            setState({ teas: updatedTeas, queue: newQueue });
+        }
+
+        function getCurrentTea() {
+            if (state.queue.length === 0) return null;
+            return state.teas.find(t => t.id === state.queue[0]);
+        }
+
+        // Components
+        function TeaCardHero(tea) {
+            const teaType = TEA_TYPES[tea.teeArt];
+            const status = VORRAT_STATUS[tea.statusVorrat];
+            
+            return `
+                <div class="w-full max-w-md mx-auto fade-in">
+                    <div class="glass rounded-3xl p-8 shadow-lg border border-ios-border">
+                        <div class="flex items-center justify-center mb-6">
+                            <div class="px-6 py-2 rounded-full text-white font-medium text-sm tracking-wide"
+                                 style="background-color: ${teaType.color}">
+                                ${teaType.label}
+                            </div>
+                        </div>
+                        
+                        <h1 class="text-4xl font-bold text-center mb-2 text-ios-label">
+                            ${tea.name}
+                        </h1>
+                        
+                        ${tea.hersteller ? `
+                            <p class="text-center text-ios-secondary text-lg mb-8">
+                                ${tea.hersteller}
+                            </p>
+                        ` : ''}
+                        
+                        <div class="flex items-center justify-center mb-8">
+                            <div class="bg-ios-bg rounded-2xl px-8 py-6 flex items-center gap-3">
+                                <span class="text-ios-blue">${icons.thermometer}</span>
+                                <span class="text-5xl font-bold text-ios-label">${tea.bruehgrad}°</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-center gap-2 mb-8">
+                            <span class="text-ios-secondary">${icons.package}</span>
+                            <span class="text-2xl ${status.color}">${status.icon}</span>
+                            <span class="text-ios-secondary text-lg capitalize">${status.label}</span>
+                        </div>
+                        
+                        <button onclick="drinkTea('${tea.id}')"
+                                class="w-full bg-ios-green hover:bg-opacity-90 text-white font-semibold text-xl py-5 rounded-2xl shadow-lg transition-all active:scale-95">
+                            Getrunken
+                        </button>
+                        
+                        <p class="text-center text-ios-secondary text-sm mt-4">
+                            Deine Tee-Regentin weiß Bescheid ☕
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function TeaCardList(tea) {
+            const teaType = TEA_TYPES[tea.teeArt];
+            const status = VORRAT_STATUS[tea.statusVorrat];
+            
+            return `
+                <div class="glass rounded-2xl p-4 shadow border border-ios-border mb-3 fade-in">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-3 h-3 rounded-full" style="background-color: ${teaType.color}"></div>
+                                <h3 class="font-semibold text-ios-label text-lg">${tea.name}</h3>
+                            </div>
+                            
+                            ${tea.hersteller ? `<p class="text-ios-secondary text-sm mb-2">${tea.hersteller}</p>` : ''}
+                            
+                            <div class="flex items-center gap-4 text-sm">
+                                <div class="flex items-center gap-1 text-ios-secondary">
+                                    ${icons.thermometer}
+                                    <span>${tea.bruehgrad}°C</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-ios-secondary">${icons.package}</span>
+                                    <span class="${status.color}">${status.icon}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <button onclick='openEditForm(${JSON.stringify(tea)})'
+                                    class="p-2 hover:bg-ios-bg rounded-xl transition-colors active:scale-90">
+                                <span class="text-ios-blue">${icons.edit}</span>
+                            </button>
+                            <button onclick="deleteTea('${tea.id}')"
+                                    class="p-2 hover:bg-ios-bg rounded-xl transition-colors active:scale-90">
+                                <span class="text-ios-red">${icons.trash}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function TeaForm() {
+            const tea = state.editingTea;
+            const formData = tea || {
+                name: '',
+                hersteller: '',
+                teeArt: 'schwarz',
+                bruehgrad: 100,
+                statusVorrat: 'voll'
+            };
+
+            return `
+                <div class="fixed inset-0 z-50" style="display: ${state.isFormOpen ? 'block' : 'none'}">
+                    <div class="fixed inset-0 bg-black/20 backdrop-blur-sm" onclick="closeForm()"></div>
+                    
+                    <div class="fixed inset-x-0 bottom-0 bg-ios-bg rounded-t-3xl shadow-2xl max-h-[90vh] overflow-hidden slide-up">
+                        <div class="flex justify-center pt-3 pb-2">
+                            <div class="w-10 h-1 bg-ios-secondary/30 rounded-full"></div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between px-6 pb-4 border-b border-ios-border">
+                            <h2 class="text-2xl font-bold text-ios-label">
+                                ${tea ? 'Tee bearbeiten' : 'Neuer Tee'}
+                            </h2>
+                            <button onclick="closeForm()" class="p-2 hover:bg-white/50 rounded-full transition-colors">
+                                ${icons.x}
+                            </button>
+                        </div>
+                        
+                        <form id="teaForm" onsubmit="handleFormSubmit(event)" class="overflow-y-auto max-h-[calc(90vh-80px)]">
+                            <div class="p-6 space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-ios-secondary mb-2">Tee Name *</label>
+                                    <input type="text" id="teaName" value="${formData.name}" required
+                                           placeholder="z.B. Darjeeling FTGFOP1"
+                                           class="w-full px-4 py-3 bg-white rounded-xl border border-ios-border focus:ring-2 focus:ring-ios-blue outline-none text-ios-label">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-ios-secondary mb-2">Hersteller (optional)</label>
+                                    <input type="text" id="teaHersteller" value="${formData.hersteller || ''}"
+                                           placeholder="z.B. Teekampagne"
+                                           class="w-full px-4 py-3 bg-white rounded-xl border border-ios-border focus:ring-2 focus:ring-ios-blue outline-none text-ios-label">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-ios-secondary mb-2">Tee-Art</label>
+                                    <div class="grid grid-cols-2 gap-2 bg-white p-2 rounded-xl border border-ios-border">
+                                        ${Object.entries(TEA_TYPES).map(([key, type]) => `
+                                            <button type="button" data-type="${key}"
+                                                    class="tea-type-btn py-2 px-4 rounded-xl font-medium transition-all ${formData.teeArt === key ? 'bg-ios-blue text-white' : 'text-ios-label hover:bg-ios-bg'}"
+                                                    onclick="selectTeaType('${key}', ${type.temp})">
+                                                ${type.label}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-ios-secondary mb-2">Brühtemperatur</label>
+                                    <div class="bg-white rounded-xl border border-ios-border p-4">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button type="button" onclick="changeBruehgrad(-5)"
+                                                    class="w-10 h-10 flex items-center justify-center bg-ios-bg hover:bg-ios-border rounded-full transition-colors">
+                                                ${icons.minus}
+                                            </button>
+                                            <span id="bruehgradDisplay" class="text-4xl font-bold text-ios-label">${formData.bruehgrad}°C</span>
+                                            <button type="button" onclick="changeBruehgrad(5)"
+                                                    class="w-10 h-10 flex items-center justify-center bg-ios-bg hover:bg-ios-border rounded-full transition-colors">
+                                                ${icons.plus}
+                                            </button>
+                                        </div>
+                                        <input type="range" id="bruehgradSlider" min="70" max="100" step="5" value="${formData.bruehgrad}"
+                                               oninput="updateBruehgrad(this.value)" class="w-full">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-ios-secondary mb-2">Vorrat</label>
+                                    <div class="grid grid-cols-3 gap-2 bg-white p-2 rounded-xl border border-ios-border">
+                                        ${Object.entries(VORRAT_STATUS).map(([key, status]) => `
+                                            <button type="button" data-vorrat="${key}"
+                                                    class="vorrat-btn py-2 px-4 rounded-xl font-medium transition-all capitalize ${formData.statusVorrat === key ? 'bg-ios-blue text-white' : 'text-ios-label hover:bg-ios-bg'}"
+                                                    onclick="selectVorrat('${key}')">
+                                                ${status.label}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                
+                                <button type="submit"
+                                        class="w-full bg-ios-blue hover:bg-opacity-90 text-white font-semibold text-lg py-4 rounded-2xl shadow-lg transition-all active:scale-98">
+                                    ${tea ? 'Änderungen speichern' : 'Tee hinzufügen'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render
+        function render() {
+            const currentTea = getCurrentTea();
+            
+            const html = `
+                <header class="glass border-b border-ios-border sticky top-0 z-20">
+                    <div class="max-w-3xl mx-auto px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-yellow-600 rounded-xl flex items-center justify-center text-white">
+                                ${icons.coffee}
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-bold text-ios-label">Tee Rotation</h1>
+                                <p class="text-xs text-ios-secondary">Dein persönlicher Tee-Begleiter</p>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="max-w-3xl mx-auto px-6 py-6 pb-24">
+                    ${state.activeTab === 'heute' ? `
+                        <div class="fade-in">
+                            ${currentTea ? `
+                                <div class="space-y-6">
+                                    <div class="flex items-center gap-2 justify-center mb-4">
+                                        <span class="text-ios-blue">${icons.sparkles}</span>
+                                        <h2 class="text-lg font-semibold text-ios-secondary">Heute empfohlen</h2>
+                                    </div>
+                                    ${TeaCardHero(currentTea)}
+                                </div>
+                            ` : `
+                                <div class="flex flex-col items-center justify-center py-20">
+                                    <div class="w-20 h-20 bg-ios-border rounded-full flex items-center justify-center mb-4 text-ios-secondary">
+                                        ${icons.coffee}
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-ios-label mb-2">Keine Tees vorhanden</h3>
+                                    <p class="text-ios-secondary text-center mb-6">Füge deinen ersten Tee hinzu, um zu beginnen.</p>
+                                    <button onclick="setState({ activeTab: 'new', isFormOpen: true })"
+                                            class="bg-ios-blue text-white px-6 py-3 rounded-2xl font-medium active:scale-95 transition-transform">
+                                        Ersten Tee hinzufügen
+                                    </button>
+                                </div>
+                            `}
+                        </div>
+                    ` : ''}
+
+                    ${state.activeTab === 'list' ? `
+                        <div class="fade-in">
+                            <div class="mb-4">
+                                <h2 class="text-xl font-bold text-ios-label mb-1">Meine Tees</h2>
+                                <p class="text-sm text-ios-secondary">
+                                    ${state.teas.length} ${state.teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
+                                </p>
+                            </div>
+
+                            ${state.teas.length === 0 ? `
+                                <div class="flex flex-col items-center justify-center py-20">
+                                    <div class="w-20 h-20 bg-ios-border rounded-full flex items-center justify-center mb-4 text-ios-secondary">
+                                        ${icons.coffee}
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-ios-label mb-2">Noch keine Tees</h3>
+                                    <p class="text-ios-secondary text-center mb-6">Beginne deine Tee-Sammlung</p>
+                                    <button onclick="setState({ activeTab: 'new', isFormOpen: true })"
+                                            class="bg-ios-blue text-white px-6 py-3 rounded-2xl font-medium active:scale-95 transition-transform">
+                                        Tee hinzufügen
+                                    </button>
+                                </div>
+                            ` : `
+                                <div class="space-y-3">
+                                    ${state.queue.map(teaId => {
+                                        const tea = state.teas.find(t => t.id === teaId);
+                                        return tea ? TeaCardList(tea) : '';
+                                    }).join('')}
+                                </div>
+                            `}
+                        </div>
+                    ` : ''}
+                </main>
+
+                ${TeaForm()}
+
+                <nav class="fixed bottom-0 left-0 right-0 z-30 glass border-t border-ios-border">
+                    <div class="max-w-3xl mx-auto px-4">
+                        <div class="flex items-center justify-around py-2">
+                            ${['heute', 'list', 'new'].map(tab => {
+                                const isActive = state.activeTab === tab;
+                                const tabConfig = {
+                                    heute: { icon: icons.home, label: 'Heute' },
+                                    list: { icon: icons.list, label: 'Meine Tees' },
+                                    new: { icon: icons.plus, label: 'Neu' }
+                                };
+                                const config = tabConfig[tab];
+                                
+                                return `
+                                    <button onclick="setState({ activeTab: '${tab}', isFormOpen: ${tab === 'new'} })"
+                                            class="flex flex-col items-center justify-center py-2 px-6 relative min-w-[80px] transition-all active:scale-95">
+                                        <span class="${isActive ? 'text-ios-blue scale-110' : 'text-ios-secondary'}">
+                                            ${config.icon}
+                                        </span>
+                                        <span class="text-xs mt-1 font-medium ${isActive ? 'text-ios-blue' : 'text-ios-secondary'}">
+                                            ${config.label}
+                                        </span>
+                                        ${isActive ? '<div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-ios-blue rounded-full"></div>' : ''}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </nav>
+            `;
+            
+            document.getElementById('app').innerHTML = html;
+        }
+
+        // Form Handlers
+        let currentBruehgrad = 100;
+        let currentTeaType = 'schwarz';
+        let currentVorrat = 'voll';
+
+        window.selectTeaType = function(type, defaultTemp) {
+            currentTeaType = type;
+            currentBruehgrad = defaultTemp;
+            document.querySelectorAll('.tea-type-btn').forEach(btn => {
+                btn.className = btn.dataset.type === type
+                    ? 'tea-type-btn py-2 px-4 rounded-xl font-medium transition-all bg-ios-blue text-white'
+                    : 'tea-type-btn py-2 px-4 rounded-xl font-medium transition-all text-ios-label hover:bg-ios-bg';
+            });
+            updateBruehgrad(defaultTemp);
+        };
+
+        window.selectVorrat = function(status) {
+            currentVorrat = status;
+            document.querySelectorAll('.vorrat-btn').forEach(btn => {
+                btn.className = btn.dataset.vorrat === status
+                    ? 'vorrat-btn py-2 px-4 rounded-xl font-medium transition-all capitalize bg-ios-blue text-white'
+                    : 'vorrat-btn py-2 px-4 rounded-xl font-medium transition-all capitalize text-ios-label hover:bg-ios-bg';
+            });
+        };
+
+        window.updateBruehgrad = function(value) {
+            currentBruehgrad = parseInt(value);
+            const display = document.getElementById('bruehgradDisplay');
+            const slider = document.getElementById('bruehgradSlider');
+            if (display) display.textContent = `${value}°C`;
+            if (slider) slider.value = value;
+        };
+
+        window.changeBruehgrad = function(delta) {
+            const newValue = Math.max(70, Math.min(100, currentBruehgrad + delta));
+            updateBruehgrad(newValue);
+        };
+
+        window.handleFormSubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('teaName').value.trim();
+            const hersteller = document.getElementById('teaHersteller').value.trim();
+            
+            if (!name) return;
+            
+            const teaData = {
+                name,
+                hersteller: hersteller || undefined,
+                teeArt: currentTeaType,
+                bruehgrad: currentBruehgrad,
+                statusVorrat: currentVorrat
+            };
+            
+            if (state.editingTea) {
+                updateTea(teaData);
+            } else {
+                addTea(teaData);
+            }
+        };
+
+        window.closeForm = function() {
+            setState({
+                isFormOpen: false,
+                editingTea: null,
+                activeTab: state.activeTab === 'new' ? 'heute' : state.activeTab
+            });
+        };
+
+        window.openEditForm = function(tea) {
+            currentTeaType = tea.teeArt;
+            currentBruehgrad = tea.bruehgrad;
+            currentVorrat = tea.statusVorrat;
+            setState({
+                editingTea: tea,
+                isFormOpen: true,
+                activeTab: 'new'
+            });
+        };
+
+        // Export to window
+        window.setState = setState;
+        window.drinkTea = drinkTea;
+        window.deleteTea = deleteTea;
+
+        // Start app
+        init();
+    </script>
+</body>
+</html>
