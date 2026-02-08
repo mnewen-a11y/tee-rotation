@@ -20,11 +20,11 @@ export const RoyalTeaLogo = ({ className = '', size = 'md' }: RoyalTeaLogoProps)
     >
       <defs>
         <style>
-          {`.word { fill: #1d2646; font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', serif; font-weight: 700; letter-spacing: 0.02em; }`}
+          {`.word { fill: #ffffff; font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', serif; font-weight: 700; letter-spacing: 0.02em; }`}
         </style>
       </defs>
       {/* Tea leaf above the hyphen */}
-      <g transform="translate(600,220)">
+      <g transform="translate(600,160)">
         {/* Leaf body */}
         <path 
           d="M 0 -70 C 28 -60, 56 -28, 56 0 C 56 42, 20 78, 0 96 C -20 78, -56 42, -56 0 C -56 -28, -28 -60, 0 -70 Z"
@@ -54,8 +54,8 @@ export const RoyalTeaLogo = ({ className = '', size = 'md' }: RoyalTeaLogoProps)
           opacity="0.5"
         />
       </g>
-      {/* Wordmark */}
-      <text className="word" x="50%" y="380" fontSize="140" textAnchor="middle">
+      {/* Wordmark - moved down significantly for more spacing */}
+      <text className="word" x="50%" y="450" fontSize="140" textAnchor="middle">
         ROYAL-TEA
       </text>
     </svg>

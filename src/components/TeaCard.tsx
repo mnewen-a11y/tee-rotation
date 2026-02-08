@@ -40,7 +40,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
           </div>
 
           {/* Tea Name */}
-          <h1 className="text-4xl font-bold text-center mb-2 text-gold-text">
+          <h1 className="text-4xl font-bold text-center mb-2 text-gold-text font-serif">
             {tea.name}
           </h1>
 
@@ -55,11 +55,11 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="bg-midnight/10 rounded-ios-lg px-6 py-4 flex flex-col items-center">
               <Thermometer className="w-6 h-6 mb-1" style={{ color: TEA_TYPE_COLORS[tea.teeArt] }} />
-              <span className="text-3xl font-bold text-gold-text">{tea.bruehgrad}°</span>
+              <span className="text-3xl font-bold text-gold-text font-serif">{tea.bruehgrad}°</span>
             </div>
             <div className="bg-midnight/10 rounded-ios-lg px-6 py-4 flex flex-col items-center">
               <Package className="w-6 h-6 mb-1" style={{ color: TEA_TYPE_COLORS[tea.teeArt] }} />
-              <span className="text-3xl font-bold text-gold-text">{tea.grammAnzahl}g</span>
+              <span className="text-3xl font-bold text-gold-text font-serif">{tea.grammAnzahl}g</span>
             </div>
           </div>
 

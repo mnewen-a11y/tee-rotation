@@ -95,7 +95,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 pb-4 border-b border-white/10">
-              <h2 className="text-2xl font-bold text-white text-white">
+              <h2 className="text-2xl font-bold font-serif text-white text-white font-serif">
                 {editTea ? 'Tee bearbeiten' : 'Neuer Tee'}
               </h2>
               <button
@@ -175,7 +175,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       >
                         <Minus className="w-5 h-5 text-white text-white" />
                       </button>
-                      <span className="text-4xl font-bold text-white text-white">{bruehgrad}°C</span>
+                      <span className="text-4xl font-bold text-white text-white font-serif">{bruehgrad}°C</span>
                       <button
                         type="button"
                         onClick={() => setBruehgrad(Math.min(100, bruehgrad + 5))}
@@ -210,7 +210,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       >
                         <Minus className="w-5 h-5 text-white text-white" />
                       </button>
-                      <span className="text-4xl font-bold text-white text-white">{grammAnzahl}g</span>
+                      <span className="text-4xl font-bold text-white text-white font-serif">{grammAnzahl}g</span>
                       <button
                         type="button"
                         onClick={() => setGrammAnzahl(Math.min(20, grammAnzahl + 1))}
@@ -242,13 +242,13 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                   </label>
                   <div className="bg-white bg-white/10 rounded-ios border border-ios-border border-white/20 p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-4xl font-bold text-white text-white">{fuellstand}%</span>
+                      <span className="text-4xl font-bold text-white text-white font-serif">{fuellstand}%</span>
                       <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
                         fuellstand > 70 ? 'bg-ios-green' :
                         fuellstand > 30 ? 'bg-ios-orange' :
                         'bg-ios-red'
                       }`}>
-                        <span className="text-2xl font-bold text-white">{fuellstand}</span>
+                        <span className="text-2xl font-bold font-serif text-white font-serif">{fuellstand}</span>
                       </div>
                     </div>
                     <input

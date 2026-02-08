@@ -1,7 +1,8 @@
 # ☕ Tee Rotation App
 
 **Version:** 0.9.0  
-**Design:** Royal  
+**Release:** R001  
+**Design:** Royal-Tea  
 **Status:** Beta
 
 Dein persönlicher Tee-Begleiter mit intelligentem Rotations-System.
