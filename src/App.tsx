@@ -230,7 +230,7 @@ function App() {
                     <div className="w-20 h-20 bg-ios-border bg-white/10 rounded-full flex items-center justify-center mb-4">
                       <Coffee className="w-10 h-10 text-white/60" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white text-white mb-2 font-serif">
+                    <h3 className="text-xl font-semibold text-white mb-2 font-serif">
                       Keine Tees vorhanden
                     </h3>
                     <p className="text-white/60 text-center mb-6">
@@ -358,7 +358,7 @@ function App() {
                     {/* Backlog Section - Zuletzt verwendet */}
                     <div className="mt-12 pt-8 border-t border-white/10">
                       <div className="flex items-center gap-2 mb-6">
-                        <h2 className="text-xl font-bold font-serif text-white text-white font-serif">
+                        <h2 className="text-xl font-bold font-serif text-white font-serif">
                           Zuletzt verwendet
                         </h2>
                         <span className="text-sm text-white/60">
@@ -412,7 +412,7 @@ function App() {
                 transition={{ duration: 0.2 }}
               >
                 <div className="mb-4">
-                  <h2 className="text-xl font-bold font-serif text-white text-white mb-1 font-serif">Meine Tees</h2>
+                  <h2 className="text-xl font-bold font-serif text-white mb-1 font-serif">Meine Tees</h2>
                   <p className="text-sm text-white/60">
                     {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
                   </p>
@@ -423,7 +423,7 @@ function App() {
                     <div className="w-20 h-20 bg-ios-border bg-white/10 rounded-full flex items-center justify-center mb-4">
                       <Coffee className="w-10 h-10 text-white/60" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white text-white mb-2 font-serif">
+                    <h3 className="text-xl font-semibold text-white mb-2 font-serif">
                       Noch keine Tees
                     </h3>
                     <p className="text-white/60 text-center mb-6">

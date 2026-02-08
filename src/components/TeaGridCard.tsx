@@ -77,7 +77,7 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
         </div>
 
         {/* Tea Name */}
-        <h3 className="font-bold text-base mb-1 line-clamp-2 text-gold-text">
+        <h3 className="font-bold text-base mb-1 line-clamp-2 text-gold-text font-serif">
           {tea.name}
         </h3>
 

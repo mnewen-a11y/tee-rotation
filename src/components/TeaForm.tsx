@@ -95,7 +95,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 pb-4 border-b border-white/10">
-              <h2 className="text-2xl font-bold font-serif text-white text-white font-serif">
+              <h2 className="text-2xl font-bold font-serif text-white font-serif">
                 {editTea ? 'Tee bearbeiten' : 'Neuer Tee'}
               </h2>
               <button
@@ -119,7 +119,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="z.B. Darjeeling FTGFOP1"
-                    className="w-full px-4 py-3 bg-white bg-white/10 rounded-ios border border-ios-border border-white/20 focus:ring-2 focus:ring-ios-blue focus:border-transparent outline-none transition-all text-white text-white"
+                    className="w-full px-4 py-3 bg-white/10 rounded-ios border border-ios-border border-white/20 focus:ring-2 focus:ring-ios-blue focus:border-transparent outline-none transition-all text-white"
                     required
                   />
                 </div>
@@ -134,7 +134,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                     value={hersteller}
                     onChange={(e) => setHersteller(e.target.value)}
                     placeholder="z.B. Teekampagne"
-                    className="w-full px-4 py-3 bg-white bg-white/10 rounded-ios border border-ios-border border-white/20 focus:ring-2 focus:ring-ios-blue focus:border-transparent outline-none transition-all text-white text-white"
+                    className="w-full px-4 py-3 bg-white/10 rounded-ios border border-ios-border border-white/20 focus:ring-2 focus:ring-ios-blue focus:border-transparent outline-none transition-all text-white"
                   />
                 </div>
 
@@ -143,7 +143,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                   <label className="block text-sm font-medium text-white/60 mb-2">
                     Tee-Art
                   </label>
-                  <div className="grid grid-cols-2 gap-2 bg-white bg-white/10 p-2 rounded-ios border border-ios-border border-white/20">
+                  <div className="grid grid-cols-2 gap-2 bg-white/10 p-2 rounded-ios border border-ios-border border-white/20">
                     {(Object.keys(TEA_TYPE_LABELS) as TeaType[]).map((type) => (
                       <button
                         key={type}
@@ -152,7 +152,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                         className={`py-2 px-4 rounded-ios font-medium transition-all ${
                           teeArt === type
                             ? 'bg-gold text-gold-text shadow-ios'
-                            : 'text-white text-white hover:bg-ios-bg dark:hover:bg-gray-600'
+                            : 'text-white hover:bg-ios-bg dark:hover:bg-gray-600'
                         }`}
                       >
                         {TEA_TYPE_LABELS[type]}
@@ -166,22 +166,22 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                   <label className="block text-sm font-medium text-white/60 mb-2">
                     Brühtemperatur
                   </label>
-                  <div className="bg-white bg-white/10 rounded-ios border border-ios-border border-white/20 p-4">
+                  <div className="bg-white/10 rounded-ios border border-ios-border border-white/20 p-4">
                     <div className="flex items-center justify-between mb-3">
                       <button
                         type="button"
                         onClick={() => setBruehgrad(Math.max(70, bruehgrad - 5))}
                         className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                       >
-                        <Minus className="w-5 h-5 text-white text-white" />
+                        <Minus className="w-5 h-5 text-white" />
                       </button>
-                      <span className="text-4xl font-bold text-white text-white font-serif">{bruehgrad}°C</span>
+                      <span className="text-4xl font-bold text-white font-serif">{bruehgrad}°C</span>
                       <button
                         type="button"
                         onClick={() => setBruehgrad(Math.min(100, bruehgrad + 5))}
                         className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                       >
-                        <Plus className="w-5 h-5 text-white text-white" />
+                        <Plus className="w-5 h-5 text-white" />
                       </button>
                     </div>
                     <input
@@ -201,22 +201,22 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                   <label className="block text-sm font-medium text-white/60 mb-2">
                     Gramm pro Kanne
                   </label>
-                  <div className="bg-white bg-white/10 rounded-ios border border-ios-border border-white/20 p-4">
+                  <div className="bg-white/10 rounded-ios border border-ios-border border-white/20 p-4">
                     <div className="flex items-center justify-between mb-3">
                       <button
                         type="button"
                         onClick={() => setGrammAnzahl(Math.max(2, grammAnzahl - 1))}
                         className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                       >
-                        <Minus className="w-5 h-5 text-white text-white" />
+                        <Minus className="w-5 h-5 text-white" />
                       </button>
-                      <span className="text-4xl font-bold text-white text-white font-serif">{grammAnzahl}g</span>
+                      <span className="text-4xl font-bold text-white font-serif">{grammAnzahl}g</span>
                       <button
                         type="button"
                         onClick={() => setGrammAnzahl(Math.min(20, grammAnzahl + 1))}
                         className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                       >
-                        <Plus className="w-5 h-5 text-white text-white" />
+                        <Plus className="w-5 h-5 text-white" />
                       </button>
                     </div>
                     <input
@@ -240,9 +240,9 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                   <label className="block text-sm font-medium text-white/60 mb-2">
                     Füllstand
                   </label>
-                  <div className="bg-white bg-white/10 rounded-ios border border-ios-border border-white/20 p-4">
+                  <div className="bg-white/10 rounded-ios border border-ios-border border-white/20 p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-4xl font-bold text-white text-white font-serif">{fuellstand}%</span>
+                      <span className="text-4xl font-bold text-white font-serif">{fuellstand}%</span>
                       <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
                         fuellstand > 70 ? 'bg-ios-green' :
                         fuellstand > 30 ? 'bg-ios-orange' :

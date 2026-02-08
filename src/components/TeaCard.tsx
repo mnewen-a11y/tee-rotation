@@ -106,7 +106,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: TEA_TYPE_COLORS[tea.teeArt] }}
             />
-            <h3 className="font-semibold text-gold-text text-lg">{tea.name}</h3>
+            <h3 className="font-semibold text-gold-text text-lg font-serif">{tea.name}</h3>
           </div>
           
           {tea.hersteller && (
