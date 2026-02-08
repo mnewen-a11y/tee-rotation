@@ -12,7 +12,7 @@ export default {
       },
       colors: {
         midnight: '#1d2646',
-        gold: '#d4ba79',
+        gold: '#c6b975',
         'gold-text': '#242b46',
         ios: {
           bg: '#F2F2F7',
