@@ -9,6 +9,7 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
+import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'heute' | 'list' | 'new'>('heute');
@@ -180,7 +181,7 @@ function App() {
         <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
           <div className="max-w-3xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              <RoyalTeaLogo size="md" showText={true} />
+              <RoyalTeaLogo size="sm" className="opacity-90" />
 
               {/* Settings Buttons */}
               <div className="flex items-center gap-2">

@@ -1,162 +1,63 @@
-import React from 'react';
-
 interface RoyalTeaLogoProps {
+  className?: string;
   size?: 'sm' | 'md' | 'lg';
-  showText?: boolean;
 }
 
-export const RoyalTeaLogo: React.FC<RoyalTeaLogoProps> = ({ 
-  size = 'md',
-  showText = true 
-}) => {
-  const dimensions = {
-    sm: { icon: 32, text: 'text-sm' },
-    md: { icon: 40, text: 'text-base' },
-    lg: { icon: 56, text: 'text-xl' }
+export const RoyalTeaLogo = ({ className = '', size = 'md' }: RoyalTeaLogoProps) => {
+  const sizes = {
+    sm: 'w-32 h-16',
+    md: 'w-48 h-24',
+    lg: 'w-64 h-32',
   };
 
-  const { icon, text } = dimensions[size];
-
   return (
-    <div className="flex items-center gap-3">
-      {/* Rolex-Style Crown Logo */}
-      <svg
-        width={icon}
-        height={icon}
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Crown Base Circle - Gold */}
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 1200 600" 
+      role="img" 
+      aria-label="Royal-Tea Logo"
+      className={`${sizes[size]} ${className}`}
+    >
+      <defs>
+        <style>
+          {`.word { fill: #1d2646; font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', serif; font-weight: 700; letter-spacing: 0.02em; }`}
+        </style>
+      </defs>
+      {/* Tea leaf above the hyphen */}
+      <g transform="translate(600,220)">
+        {/* Leaf body */}
+        <path 
+          d="M 0 -70 C 28 -60, 56 -28, 56 0 C 56 42, 20 78, 0 96 C -20 78, -56 42, -56 0 C -56 -28, -28 -60, 0 -70 Z"
           fill="#c6b975"
-          stroke="#242b46"
-          strokeWidth="2"
         />
-        
-        {/* Inner Circle - Darker Gold */}
-        <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="#b8a665"
-          opacity="0.3"
+        {/* Central vein */}
+        <path 
+          d="M 0 -60 L 0 80" 
+          stroke="#a99e61" 
+          strokeWidth="4" 
+          strokeLinecap="round" 
+          opacity="0.7"
         />
-        
-        {/* Crown - Rolex Style */}
-        <g transform="translate(50, 50)">
-          {/* Center Peak */}
-          <path
-            d="M 0,-25 L 6,-10 L -6,-10 Z"
-            fill="#242b46"
-            stroke="#242b46"
-            strokeWidth="1"
-            strokeLinejoin="round"
-          />
-          
-          {/* Left Peak */}
-          <path
-            d="M -15,-20 L -9,-10 L -21,-10 Z"
-            fill="#242b46"
-            stroke="#242b46"
-            strokeWidth="1"
-            strokeLinejoin="round"
-          />
-          
-          {/* Right Peak */}
-          <path
-            d="M 15,-20 L 21,-10 L 9,-10 Z"
-            fill="#242b46"
-            stroke="#242b46"
-            strokeWidth="1"
-            strokeLinejoin="round"
-          />
-          
-          {/* Crown Base */}
-          <rect
-            x="-24"
-            y="-10"
-            width="48"
-            height="8"
-            fill="#242b46"
-            rx="1"
-          />
-          
-          {/* Tea Cup */}
-          <g transform="translate(0, 8)">
-            {/* Cup Body */}
-            <path
-              d="M -12,0 L -10,12 L 10,12 L 12,0 Z"
-              fill="#242b46"
-              stroke="#242b46"
-              strokeWidth="1"
-            />
-            
-            {/* Cup Handle */}
-            <path
-              d="M 12,3 Q 18,6 18,9 Q 18,12 12,9"
-              fill="none"
-              stroke="#242b46"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            
-            {/* Steam Lines - Elegant */}
-            <path
-              d="M -5,-4 Q -5,-8 -3,-8"
-              fill="none"
-              stroke="#242b46"
-              strokeWidth="1"
-              strokeLinecap="round"
-              opacity="0.6"
-            />
-            <path
-              d="M 0,-5 Q 0,-9 2,-9"
-              fill="none"
-              stroke="#242b46"
-              strokeWidth="1"
-              strokeLinecap="round"
-              opacity="0.6"
-            />
-            <path
-              d="M 5,-4 Q 5,-8 7,-8"
-              fill="none"
-              stroke="#242b46"
-              strokeWidth="1"
-              strokeLinecap="round"
-              opacity="0.6"
-            />
-          </g>
-        </g>
-        
-        {/* Outer Ring Decoration - Rolex Style */}
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          stroke="#242b46"
-          strokeWidth="1"
-          opacity="0.3"
+        {/* Side veins */}
+        <path 
+          d="M 0 -24 C 18 -16, 30 -6, 42 10" 
+          stroke="#a99e61" 
+          strokeWidth="3" 
+          fill="none" 
+          opacity="0.5"
         />
-      </svg>
-
-      {/* Text - Rolex Typography Style */}
-      {showText && (
-        <div className="flex flex-col leading-tight">
-          <span className={`font-bold tracking-wider ${text} text-white`}
-                style={{ fontFamily: "'Playfair Display', 'Georgia', serif" }}>
-            ROYAL-TEE
-          </span>
-          <span className="text-xs text-white/60 tracking-widest"
-                style={{ fontFamily: "'Playfair Display', 'Georgia', serif" }}>
-            SINCE 2026
-          </span>
-        </div>
-      )}
-    </div>
+        <path 
+          d="M 0 8 C -16 16, -28 28, -40 46" 
+          stroke="#a99e61" 
+          strokeWidth="3" 
+          fill="none" 
+          opacity="0.5"
+        />
+      </g>
+      {/* Wordmark */}
+      <text className="word" x="50%" y="380" fontSize="140" textAnchor="middle">
+        ROYAL-TEA
+      </text>
+    </svg>
   );
 };
