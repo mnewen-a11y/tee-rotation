@@ -9,7 +9,6 @@ import { SwipeCard } from '@/components/SwipeCard';
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
-import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'heute' | 'list' | 'new'>('heute');
