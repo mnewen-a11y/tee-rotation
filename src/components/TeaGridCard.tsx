@@ -77,24 +77,24 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
         </div>
 
         {/* Tea Name */}
-        <h3 className="font-bold text-base mb-1 line-clamp-2 text-midnight">
+        <h3 className="font-bold text-base mb-1 line-clamp-2 text-gold-text">
           {tea.name}
         </h3>
 
         {/* Hersteller */}
         {tea.hersteller && (
-          <p className="text-xs text-midnight/60 line-clamp-1 mb-2">
+          <p className="text-xs text-gold-text/60 line-clamp-1 mb-2">
             {tea.hersteller}
           </p>
         )}
 
         {/* Temperature Badge */}
-        <div className="inline-flex items-center gap-1 px-2 py-1 bg-midnight/10 rounded-lg text-xs font-medium text-midnight">
+        <div className="inline-flex items-center gap-1 px-2 py-1 bg-midnight/10 rounded-lg text-xs font-medium text-gold-text">
           <span>{tea.bruehgrad}°</span>
         </div>
 
         {/* Gramm */}
-        <div className="absolute bottom-3 left-3 text-xs font-medium text-midnight/60">
+        <div className="absolute bottom-3 left-3 text-xs font-medium text-gold-text/60">
           {tea.grammAnzahl}g
         </div>
       </div>

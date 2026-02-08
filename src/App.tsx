@@ -181,7 +181,7 @@ function App() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gold rounded-ios flex items-center justify-center">
-                  <Coffee className="w-6 h-6 text-midnight" />
+                  <Coffee className="w-6 h-6 text-gold-text" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-white">Tee Rotation</h1>
@@ -245,7 +245,7 @@ function App() {
                     </p>
                     <button
                       onClick={() => setActiveTab('new')}
-                      className="bg-gold text-midnight px-6 py-3 rounded-ios-lg font-medium"
+                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium"
                     >
                       Ersten Tee hinzufügen
                     </button>
@@ -332,7 +332,7 @@ function App() {
                                       setSwipeStack([...queue].slice(0, 3));
                                     }
                                   }}
-                                  className="bg-gold text-midnight px-6 py-3 rounded-ios-lg font-medium"
+                                  className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium"
                                 >
                                   {queue.filter(id => {
                                     const tea = getTeaById(id);
@@ -438,7 +438,7 @@ function App() {
                     </p>
                     <button
                       onClick={() => setActiveTab('new')}
-                      className="bg-gold text-midnight px-6 py-3 rounded-ios-lg font-medium"
+                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium"
                     >
                       Tee hinzufügen
                     </button>

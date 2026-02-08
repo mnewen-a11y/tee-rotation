@@ -11,8 +11,9 @@ export default {
         sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       colors: {
-        midnight: '#191970',
-        gold: '#F7E7CE',
+        midnight: '#1d2646',
+        gold: '#d4ba79',
+        'gold-text': '#242b46',
         ios: {
           bg: '#F2F2F7',
           card: '#FFFFFF',

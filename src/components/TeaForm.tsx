@@ -151,7 +151,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                         onClick={() => handleTeaTypeChange(type)}
                         className={`py-2 px-4 rounded-ios font-medium transition-all ${
                           teeArt === type
-                            ? 'bg-gold text-midnight shadow-ios'
+                            ? 'bg-gold text-gold-text shadow-ios'
                             : 'text-white text-white hover:bg-ios-bg dark:hover:bg-gray-600'
                         }`}
                       >

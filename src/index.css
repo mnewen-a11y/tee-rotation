@@ -5,8 +5,8 @@
 @layer base {
   :root {
     /* Midnight & Gold Theme */
-    --color-midnight: #191970;
-    --color-gold: #F7E7CE;
+    --color-midnight: #1d2646;
+    --color-gold: #d4ba79;
     
     /* iOS Sequoia Radii */
     --radius-sm: 12px;
@@ -21,7 +21,7 @@
 
   body {
     @apply font-sans antialiased;
-    background-color: var(--color-midnight);
+    background-color: #1d2646;
     color: white;
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
@@ -57,7 +57,7 @@
   textarea:focus,
   select:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(247, 231, 206, 0.3);
+    box-shadow: 0 0 0 3px rgba(212, 186, 121, 0.3);
   }
 
   /* Smooth transitions */
@@ -108,7 +108,7 @@
 
   /* Glass effect for Gold cards */
   .glass-gold {
-    background: rgba(247, 231, 206, 0.95);
+    background: rgba(212, 186, 121, 0.95);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
   }
