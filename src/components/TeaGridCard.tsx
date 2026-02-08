@@ -59,7 +59,7 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
       )}
       
       {/* Fuellstand Bar */}
-      <div className="absolute top-3 right-3 w-1.5 h-16 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="absolute top-3 right-3 w-1.5 h-16 bg-gray-200 bg-white/10 rounded-full overflow-hidden">
         <div 
           className={`${fuellstandColor} w-full absolute bottom-0 transition-all`}
           style={{ height: `${tea.fuellstand}%` }}

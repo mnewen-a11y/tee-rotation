@@ -234,18 +234,18 @@ function App() {
               >
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-ios-border dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-ios-secondary dark:text-gray-400" />
+                    <div className="w-20 h-20 bg-ios-border bg-white/10 rounded-full flex items-center justify-center mb-4">
+                      <Coffee className="w-10 h-10 text-white/60" />
                     </div>
-                    <h3 className="text-xl font-semibold text-ios-label dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-white text-white mb-2">
                       Keine Tees vorhanden
                     </h3>
-                    <p className="text-ios-secondary dark:text-gray-400 text-center mb-6">
+                    <p className="text-white/60 text-center mb-6">
                       Füge deinen ersten Tee hinzu, um zu beginnen.
                     </p>
                     <button
                       onClick={() => setActiveTab('new')}
-                      className="bg-ios-blue text-white px-6 py-3 rounded-ios-lg font-medium"
+                      className="bg-gold text-midnight px-6 py-3 rounded-ios-lg font-medium"
                     >
                       Ersten Tee hinzufügen
                     </button>
@@ -257,8 +257,8 @@ function App() {
                       {selectionMode === 'grid' ? (
                         <div className="space-y-6">
                           <div className="flex items-center gap-2 justify-center mb-4">
-                            <Sparkles className="w-5 h-5 text-ios-blue dark:text-blue-400" />
-                            <h2 className="text-lg font-semibold text-ios-secondary dark:text-gray-400">
+                            <Sparkles className="w-5 h-5 text-gold" />
+                            <h2 className="text-lg font-semibold text-white/60">
                               Wähle deinen Tee
                             </h2>
                           </div>
@@ -285,10 +285,10 @@ function App() {
                             return tea && !tea.zuletztGetrunken;
                           }).length === 0 && (
                             <div className="text-center py-12">
-                              <p className="text-ios-secondary dark:text-gray-400 mb-2">
+                              <p className="text-white/60 mb-2">
                                 Alle Tees wurden verwendet! 🎉
                               </p>
-                              <p className="text-sm text-ios-secondary dark:text-gray-400 mb-4">
+                              <p className="text-sm text-white/60 mb-4">
                                 Klicke unten auf einen Tee um ihn erneut zu verwenden
                               </p>
                             </div>
@@ -297,8 +297,8 @@ function App() {
                       ) : (
                         <div className="space-y-6">
                           <div className="flex items-center gap-2 justify-center mb-4">
-                            <Sparkles className="w-5 h-5 text-ios-blue dark:text-blue-400" />
-                            <h2 className="text-lg font-semibold text-ios-secondary dark:text-gray-400">
+                            <Sparkles className="w-5 h-5 text-gold" />
+                            <h2 className="text-lg font-semibold text-white/60">
                               Swipe für deinen Tee
                             </h2>
                           </div>
@@ -309,7 +309,7 @@ function App() {
                               return tea && !tea.zuletztGetrunken;
                             }).length === 0 && (
                               <div className="text-center">
-                                <p className="text-ios-secondary dark:text-gray-400 mb-4">
+                                <p className="text-white/60 mb-4">
                                   {queue.filter(id => {
                                     const tea = getTeaById(id);
                                     return tea && !tea.zuletztGetrunken;
@@ -332,7 +332,7 @@ function App() {
                                       setSwipeStack([...queue].slice(0, 3));
                                     }
                                   }}
-                                  className="bg-ios-blue text-white px-6 py-3 rounded-ios-lg font-medium"
+                                  className="bg-gold text-midnight px-6 py-3 rounded-ios-lg font-medium"
                                 >
                                   {queue.filter(id => {
                                     const tea = getTeaById(id);
@@ -363,19 +363,19 @@ function App() {
                     </div>
 
                     {/* Backlog Section - Zuletzt verwendet */}
-                    <div className="mt-12 pt-8 border-t border-ios-border dark:border-gray-700">
+                    <div className="mt-12 pt-8 border-t border-white/10">
                       <div className="flex items-center gap-2 mb-6">
-                        <h2 className="text-xl font-bold text-ios-label dark:text-white">
+                        <h2 className="text-xl font-bold text-white text-white">
                           Zuletzt verwendet
                         </h2>
-                        <span className="text-sm text-ios-secondary dark:text-gray-400">
+                        <span className="text-sm text-white/60">
                           ({teas.filter(t => t.zuletztGetrunken).length})
                         </span>
                       </div>
                       
                       {teas.filter(t => t.zuletztGetrunken).length === 0 ? (
                         <div className="text-center py-8">
-                          <p className="text-ios-secondary dark:text-gray-400">
+                          <p className="text-white/60">
                             Noch keine Tees verwendet. Wähle einen Tee oben aus!
                           </p>
                         </div>
@@ -399,7 +399,7 @@ function App() {
                               ))}
                           </div>
                           
-                          <p className="text-center text-sm text-ios-secondary dark:text-gray-400 italic">
+                          <p className="text-center text-sm text-white/60 italic">
                             💡 Tipp: Klicke auf einen Tee um ihn erneut zu verwenden
                           </p>
                         </>
@@ -419,26 +419,26 @@ function App() {
                 transition={{ duration: 0.2 }}
               >
                 <div className="mb-4">
-                  <h2 className="text-xl font-bold text-ios-label dark:text-white mb-1">Meine Tees</h2>
-                  <p className="text-sm text-ios-secondary dark:text-gray-400">
+                  <h2 className="text-xl font-bold text-white text-white mb-1">Meine Tees</h2>
+                  <p className="text-sm text-white/60">
                     {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
                   </p>
                 </div>
 
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-ios-border dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-ios-secondary dark:text-gray-400" />
+                    <div className="w-20 h-20 bg-ios-border bg-white/10 rounded-full flex items-center justify-center mb-4">
+                      <Coffee className="w-10 h-10 text-white/60" />
                     </div>
-                    <h3 className="text-xl font-semibold text-ios-label dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-white text-white mb-2">
                       Noch keine Tees
                     </h3>
-                    <p className="text-ios-secondary dark:text-gray-400 text-center mb-6">
+                    <p className="text-white/60 text-center mb-6">
                       Beginne deine Tee-Sammlung
                     </p>
                     <button
                       onClick={() => setActiveTab('new')}
-                      className="bg-ios-blue text-white px-6 py-3 rounded-ios-lg font-medium"
+                      className="bg-gold text-midnight px-6 py-3 rounded-ios-lg font-medium"
                     >
                       Tee hinzufügen
                     </button>

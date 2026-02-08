@@ -28,7 +28,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
         animate={{ scale: 1, opacity: 1 }}
         className="w-full max-w-md mx-auto"
       >
-        <div className="bg-white/80 dark:bg-gray-800/90 backdrop-blur-ios rounded-ios-xl p-8 shadow-ios-lg border border-ios-border dark:border-gray-700">
+        <div className="bg-white/80 bg-midnight/90 backdrop-blur-ios rounded-ios-xl p-8 shadow-ios-lg border border-white/10">
           {/* Tea Type Badge */}
           <div className="flex items-center justify-center mb-6">
             <div
@@ -40,36 +40,36 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
           </div>
 
           {/* Tea Name */}
-          <h1 className="text-4xl font-bold text-center mb-2 text-ios-label dark:text-white">
+          <h1 className="text-4xl font-bold text-center mb-2 text-white text-white">
             {tea.name}
           </h1>
 
           {/* Hersteller */}
           {tea.hersteller && (
-            <p className="text-center text-ios-secondary dark:text-gray-400 text-lg mb-8">
+            <p className="text-center text-white/60 text-lg mb-8">
               {tea.hersteller}
             </p>
           )}
 
           {/* Temperature & Gramm Display */}
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="bg-ios-bg dark:bg-gray-700 rounded-ios-lg px-6 py-4 flex flex-col items-center">
-              <Thermometer className="w-6 h-6 text-ios-blue dark:text-blue-400 mb-1" />
-              <span className="text-3xl font-bold text-ios-label dark:text-white">{tea.bruehgrad}°</span>
+            <div className="bg-ios-bg bg-white/10 rounded-ios-lg px-6 py-4 flex flex-col items-center">
+              <Thermometer className="w-6 h-6 text-gold mb-1" />
+              <span className="text-3xl font-bold text-white text-white">{tea.bruehgrad}°</span>
             </div>
-            <div className="bg-ios-bg dark:bg-gray-700 rounded-ios-lg px-6 py-4 flex flex-col items-center">
-              <Package className="w-6 h-6 text-ios-blue dark:text-blue-400 mb-1" />
-              <span className="text-3xl font-bold text-ios-label dark:text-white">{tea.grammAnzahl}g</span>
+            <div className="bg-ios-bg bg-white/10 rounded-ios-lg px-6 py-4 flex flex-col items-center">
+              <Package className="w-6 h-6 text-gold mb-1" />
+              <span className="text-3xl font-bold text-white text-white">{tea.grammAnzahl}g</span>
             </div>
           </div>
 
           {/* Füllstand Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-ios-secondary dark:text-gray-400">Füllstand</span>
+              <span className="text-sm font-medium text-white/60">Füllstand</span>
               <span className={`text-sm font-bold ${fuellstandColor}`}>{tea.fuellstand}%</span>
             </div>
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-3 bg-gray-200 bg-white/10 rounded-full overflow-hidden">
               <div 
                 className={`h-full ${fuellstandBgColor} transition-all rounded-full`}
                 style={{ width: `${tea.fuellstand}%` }}
@@ -88,7 +88,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
             </motion.button>
           )}
 
-          <p className="text-center text-ios-secondary dark:text-gray-400 text-sm mt-4">
+          <p className="text-center text-white/60 text-sm mt-4">
             Deine Tee-Regentin weiß Bescheid ☕
           </p>
         </div>
@@ -101,7 +101,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -100 }}
-      className="bg-white/80 dark:bg-gray-800/90 backdrop-blur-ios rounded-ios-lg p-4 shadow-ios border border-ios-border dark:border-gray-700 mb-3"
+      className="bg-white/80 bg-midnight/90 backdrop-blur-ios rounded-ios-lg p-4 shadow-ios border border-white/10 mb-3"
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
@@ -110,19 +110,19 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: TEA_TYPE_COLORS[tea.teeArt] }}
             />
-            <h3 className="font-semibold text-ios-label dark:text-white text-lg">{tea.name}</h3>
+            <h3 className="font-semibold text-white text-white text-lg">{tea.name}</h3>
           </div>
           
           {tea.hersteller && (
-            <p className="text-ios-secondary dark:text-gray-400 text-sm mb-2">{tea.hersteller}</p>
+            <p className="text-white/60 text-sm mb-2">{tea.hersteller}</p>
           )}
 
           <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1 text-ios-secondary dark:text-gray-400">
+            <div className="flex items-center gap-1 text-white/60">
               <Thermometer className="w-4 h-4" />
               <span>{tea.bruehgrad}°C</span>
             </div>
-            <div className="flex items-center gap-1 text-ios-secondary dark:text-gray-400">
+            <div className="flex items-center gap-1 text-white/60">
               <Package className="w-4 h-4" />
               <span>{tea.grammAnzahl}g</span>
             </div>
@@ -139,7 +139,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
               onClick={onEdit}
               className="p-2 hover:bg-ios-bg dark:hover:bg-gray-700 rounded-ios transition-colors"
             >
-              <Edit3 className="w-5 h-5 text-ios-blue dark:text-blue-400" />
+              <Edit3 className="w-5 h-5 text-gold" />
             </motion.button>
           )}
           {onDelete && (

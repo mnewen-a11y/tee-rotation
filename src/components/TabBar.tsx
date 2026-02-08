@@ -14,7 +14,7 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-ios border-t border-ios-border dark:border-gray-700 safe-area-bottom">
+    <div className="fixed bottom-0 left-0 right-0 z-30 bg-midnight/95 backdrop-blur-ios border-t border-white/10 safe-area-bottom">
       <div className="max-w-3xl mx-auto px-4">
         <div className="flex items-center justify-around py-2">
           {tabs.map((tab) => {
@@ -35,13 +35,13 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
                 >
                   <Icon
                     className={`w-6 h-6 transition-colors ${
-                      isActive ? 'text-ios-blue dark:text-blue-400' : 'text-ios-secondary dark:text-gray-400'
+                      isActive ? 'text-gold' : 'text-white/60'
                     }`}
                   />
                 </motion.div>
                 <span
                   className={`text-xs mt-1 font-medium transition-colors ${
-                    isActive ? 'text-ios-blue dark:text-blue-400' : 'text-ios-secondary dark:text-gray-400'
+                    isActive ? 'text-gold' : 'text-white/60'
                   }`}
                 >
                   {tab.label}
@@ -49,7 +49,7 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-ios-blue dark:bg-blue-400 rounded-full"
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-gold rounded-full"
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   />
                 )}
