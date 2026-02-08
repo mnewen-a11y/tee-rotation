@@ -8,6 +8,7 @@ import { TeaGridCard } from '@/components/TeaGridCard';
 import { SwipeCard } from '@/components/SwipeCard';
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar } from '@/components/TabBar';
+import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'heute' | 'list' | 'new'>('heute');
@@ -179,15 +180,7 @@ function App() {
         <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
           <div className="max-w-3xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gold rounded-ios flex items-center justify-center">
-                  <Coffee className="w-6 h-6 text-gold-text" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-white">Tee Rotation</h1>
-                  <p className="text-xs text-white/60">Dein persönlicher Tee-Begleiter</p>
-                </div>
-              </div>
+              <RoyalTeaLogo size="md" showText={true} />
 
               {/* Settings Buttons */}
               <div className="flex items-center gap-2">
