@@ -9,6 +9,15 @@ Dein persönlicher Tee-Begleiter mit intelligentem Rotations-System.
 
 ---
 
+## 📚 Dokumentation
+
+- 🚀 **[Feature Roadmap](./ROYAL-TEA-ROADMAP.md)** - Komplette Feature-Planung (v0.9 - v1.2)
+- 🎨 **[Style Guide](./ROYAL-TEA-STYLE-GUIDE.md)** - Design System & Komponenten
+- 📦 **[Releases](./RELEASES.md)** - Release History & Changelogs
+- 🔄 **[Native App Guide](./NATIVE-APP-TRANSFORMATION.md)** - Native Feel Improvements
+
+---
+
 ## 🎨 Corporate Design "Royal-Tea"
 
 ### Farbschema
@@ -62,49 +71,29 @@ Inspiriert von königlicher Eleganz und iOS Sequoia:
 
 ## 🚀 Roadmap
 
-### 📋 Epic 1: Apple Ecosystem Integration
-**Ziel:** Hey Siri für Tee-Einpflege nutzen
+**Siehe:** [📋 ROYAL-TEA-ROADMAP.md](./ROYAL-TEA-ROADMAP.md) für die komplette Feature-Planung.
 
-**Stories:**
-- [ ] Apple Shortcuts erstellen
-- [ ] iCloud Drive Integration  
-- [ ] Siri-Abkürzungen
+### Nächste Releases
 
-**Tech:** Apple Shortcuts, iCloud Drive API, JSON-Schema
+#### v0.9.5 - Native Feel (März 2026)
+- Native App Feeling (Scrollbars weg, iOS Scrolling, Bottom Sheets)
+- UX Improvements (Suche, Filter, Sortierung)
 
----
+#### v1.0.0 - Apple Integration (April 2026)  
+- Apple Shortcuts & Siri
+- iCloud Multi-Device Sync
+- Rating-System (1-5⭐)
+- Merkliste
 
-### ☁️ Epic 2: Multi-User Datenspeicherung
-**Ziel:** Textdatei im Apple Ökosystem, Zugriff von mehreren Personen
+#### v1.1.0 - Insights (Mai 2026)
+- Notizen & Fotos
+- Bestellhistorie
+- Statistiken
 
-**Stories:**
-- [ ] iCloud Shared Drive
-- [ ] Simple Text Format
-- [ ] Sync-Logic
-
-**Tech:** iCloud Drive, Shared Notes, oder Google Sheets
-
----
-
-### ⭐ Epic 3: Rating-System
-**Ziel:** Bewertung der Tees (1-5 Sterne)
-
-**Stories:**
-- [ ] Rating hinzufügen
-- [ ] Rating anzeigen
-- [ ] Sortierung nach Rating
-- [ ] Rating-Verlauf
-
----
-
-### 📌 Epic 4: Merkliste & Bestellsystem
-**Ziel:** Wissen welchen Tee nachbestellen
-
-**Stories:**
-- [ ] "Merken" Button
-- [ ] Merkliste Tab
-- [ ] Auto-Merken bei niedrigem Füllstand
-- [ ] Export-Funktion
+#### v1.2.0 - PWA (Juli 2026)
+- Installierbare App
+- Push Notifications
+- Offline-Modus
 
 ---
 
