@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Sparkles, ChevronDown, Info, RefreshCw } from 'lucide-react';
+import { ChevronDown, Info, RefreshCw } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
+// TeaGridCard nur noch in Meine Tees Tab
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
 import { RatingPage } from '@/components/RatingPage';
-import { SkeletonGrid } from '@/components/SkeletonCard';
+import { HeuteScreen } from '@/components/HeuteScreen';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useTabDirection } from '@/hooks/useTabDirection';
 
@@ -75,7 +76,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'new') { setIsFormOpen(true); setEditingTea(undefined); }
+    if (activeTab === 'new' && !editingTea) {
+      setIsFormOpen(true);
+    }
   }, [activeTab]);
 
   const toggleCategory = (type: TeaType) =>
@@ -116,8 +119,19 @@ function App() {
     setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
   };
 
+  const handleSkipTea = (id: string) => {
+    haptic('light');
+    setQueue(prev => {
+      const q = prev.filter(q => q !== id);
+      q.push(id);
+      return q;
+    });
+  };
+
   const handleEditTea = (tea: Tea) => {
-    setEditingTea(tea); setIsFormOpen(true); setActiveTab('new');
+    setEditingTea(tea);
+    setIsFormOpen(true);
+    // KEIN setActiveTab('new') — das würde editingTea via useEffect zurücksetzen
   };
 
   const getTeaById = (id: string) => teas.find(t => t.id === id);
@@ -223,123 +237,28 @@ function App() {
         </header>
 
         {/* CONTENT */}
-        <main className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)]"
-          style={{ backgroundColor: '#FFFFF0' }}>
+        <main
+          className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)] transition-colors duration-300"
+          style={{ backgroundColor: activeTab === 'heute' ? '#1d2646' : '#FFFFF0' }}>
           <AnimatePresence mode="wait" custom={slideDir}>
 
-            {/* TAB: HEUTE */}
+            {/* TAB: HEUTE — ein Screen, eine Entscheidung */}
             {activeTab === 'heute' && (
               <motion.div key="heute"
                 custom={slideDir}
                 initial={{ opacity: 0, x: slideDir * 40 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: slideDir * -40 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
-                {teas.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-midnight/40" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Keine Tees vorhanden</h3>
-                    <p className="text-midnight/60 text-center mb-6">Füge deinen ersten Tee hinzu.</p>
-                    <button onClick={() => setActiveTab('new')}
-                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">
-                      Ersten Tee hinzufügen
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    {/* Verfügbare Tees nach Kategorie */}
-                    <div className="mb-8">
-                      <div className="flex items-center gap-2 mb-5">
-                        <Sparkles className="w-5 h-5 text-gold" aria-hidden="true" />
-                        <h2 className="text-lg font-semibold font-serif text-midnight/70">Wähle deinen Tee</h2>
-                      </div>
-
-                      {availableTeas.length === 0 ? (
-                        <div className="text-center py-12">
-                          <p className="text-midnight/60 mb-2">Alle Tees wurden verwendet! 🎉</p>
-                          <p className="text-sm text-midnight/40">Klicke unten auf einen Tee um ihn erneut zu verwenden</p>
-                        </div>
-                      ) : isLoading ? (
-                        <SkeletonGrid count={4} />
-                      ) : (
-                        <div className="space-y-2">
-                          {TEA_CATEGORY_ORDER.map(type => {
-                            const catTeas = teasByCategory[type];
-                            if (catTeas.length === 0) return null;
-                            const isOpen = openCategories[type];
-                            return (
-                              <div key={type} className="rounded-ios-xl overflow-hidden border border-midnight/10 shadow-sm">
-                                <button
-                                  onClick={() => toggleCategory(type)}
-                                  aria-expanded={isOpen}
-                                  aria-controls={`cat-${type}`}
-                                  className="w-full flex items-center justify-between px-4 py-3 bg-midnight/5 hover:bg-midnight/10 transition-colors">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full flex-shrink-0"
-                                      style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }}
-                                      aria-hidden="true" />
-                                    <span className="font-serif font-semibold text-midnight text-base">
-                                      {TEA_CATEGORY_LABELS[type]}
-                                    </span>
-                                    <span className="text-sm text-midnight/40 font-sans">({catTeas.length})</span>
-                                  </div>
-                                  <motion.div animate={{ rotate: isOpen ? 0 : -90 }} transition={{ duration: 0.2 }}>
-                                    <ChevronDown className="w-5 h-5 text-midnight/40" aria-hidden="true" />
-                                  </motion.div>
-                                </button>
-                                <AnimatePresence initial={false}>
-                                  {isOpen && (
-                                    <motion.div id={`cat-${type}`} key="body"
-                                      initial={{ height: 0, opacity: 0 }}
-                                      animate={{ height: 'auto', opacity: 1 }}
-                                      exit={{ height: 0, opacity: 0 }}
-                                      transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                      className="overflow-hidden">
-                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-3"
-                                        style={{ backgroundColor: 'rgba(255,255,240,0.8)' }}>
-                                        {catTeas.map((tea, i) => (
-                                          <TeaGridCard key={tea.id} tea={tea}
-                                            onSelect={() => handleSelectTea(tea.id)}
-                                            onEdit={() => handleEditTea(tea)}
-                                            onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
-                                            index={i} />
-                                        ))}
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Zuletzt verwendet */}
-                    {usedTeas.length > 0 && (
-                      <div className="mt-8 pt-8 border-t border-midnight/10">
-                        <div className="flex items-center gap-2 mb-4">
-                          <h2 className="text-xl font-bold font-serif text-midnight">Zuletzt verwendet</h2>
-                          <span className="text-sm text-midnight/50 font-sans">({usedTeas.length})</span>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
-                          {usedTeas.map((tea, i) => (
-                            <TeaGridCard key={tea.id} tea={{ ...tea, isSelected: true }}
-                              onSelect={() => handleUnselectTea(tea.id)}
-                              onEdit={() => handleEditTea(tea)}
-                              onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
-                              index={i} />
-                          ))}
-                        </div>
-                        <p className="text-center text-sm text-midnight/40 italic font-sans">
-                          💡 Klicke auf einen Tee um ihn erneut zu verwenden
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="flex flex-col"
+                style={{ minHeight: 'calc(100vh - 180px)' }}
+              >
+                <HeuteScreen
+                  queue={availableTeas}
+                  onSelect={handleSelectTea}
+                  onSkip={handleSkipTea}
+                  isLoading={isLoading}
+                />
               </motion.div>
             )}
 
