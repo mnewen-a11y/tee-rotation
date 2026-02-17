@@ -162,7 +162,20 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             </div>
 
             {/* Scrollable Body */}
-            <div ref={scrollRef} className="overflow-y-auto flex-1 overscroll-contain rounded-b-ios-xl" style={{ overflow: 'auto' }}>
+            <div
+              ref={scrollRef}
+              className="overflow-y-auto flex-1 overscroll-contain"
+              onPointerDown={(e) => {
+                // Nur wenn ganz oben gescrollt → Drag erlauben
+                const el = scrollRef.current;
+                if (el && el.scrollTop === 0) {
+                  // Bubble zum motion.div → startet Sheet-Drag
+                } else {
+                  // Mitten im Scroll → Drag unterdrücken
+                  e.stopPropagation();
+                }
+              }}
+            >
               <form onSubmit={handleSubmit}>
                 <div className="p-6 space-y-5">
 
