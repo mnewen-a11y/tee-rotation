@@ -1,34 +1,47 @@
+/**
+ * Fonts:
+ *   - Inter            : SIL Open Font License 1.1  (rsms.me/inter)
+ *   - Noto Sans        : SIL Open Font License 1.1  (google/fonts)
+ *   - Source Sans 3    : SIL Open Font License 1.1  (adobe/source-sans)
+ *   - Cormorant Garamond: SIL Open Font License 1.1 (google/fonts)
+ *   - Playfair Display : SIL Open Font License 1.1  (google/fonts)
+ * All fonts are libre / OFL – no proprietary fonts used.
+ * See ABOUT.md for full license text references.
+ */
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
-  // darkMode intentionally removed — Light theme only
   theme: {
     extend: {
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'Times New Roman', 'serif'],
+        // UI text: Inter → Noto Sans → Source Sans 3 → system fallbacks (all OFL)
+        sans: ['Inter', 'Noto Sans', 'Source Sans 3', 'ui-sans-serif', 'system-ui', 'Arial', 'sans-serif'],
+        // Headlines / tea names: Cormorant Garamond → Playfair Display (both OFL)
+        serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],
+        // Display / logo
         display: ['Playfair Display', 'Cormorant Garamond', 'serif'],
       },
       colors: {
-        midnight: '#1d2646',
-        gold: '#c6b975',
+        midnight:    '#1d2646',
+        gold:        '#c6b975',
         'gold-text': '#242b46',
-        ivory: '#FFFFF0',
-        // Status (kept for fill-level indicators)
+        ivory:       '#FFFFF0',
         status: {
           good:    '#34C759',
           warning: '#FF9500',
           danger:  '#FF3B30',
         },
-        // Tea-type accents
         tea: {
-          black:  '#8B4513',
-          green:  '#4CAF50',
-          oolong: '#DAA520',
-          chai:   '#A0522D',
+          black:   '#8B4513',
+          green:   '#4CAF50',
+          oolong:  '#DAA520',
+          chai:    '#A0522D',
+          jasmin:  '#C77DFF',
+          kräuter: '#2E8B57',
         },
       },
       borderRadius: {

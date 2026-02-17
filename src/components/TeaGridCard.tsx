@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Thermometer } from 'lucide-react';
 import { Tea, TEA_TYPE_COLORS } from '@/types/tea';
 
 interface TeaGridCardProps {
@@ -10,96 +9,94 @@ interface TeaGridCardProps {
 
 export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
   const teaColor = TEA_TYPE_COLORS[tea.teeArt];
-  const fuellstandColor = 
-    tea.fuellstand > 70 ? 'bg-ios-green' :
-    tea.fuellstand > 30 ? 'bg-ios-orange' :
-    'bg-ios-red';
+  const fuellstandColor =
+    tea.fuellstand > 70 ? 'bg-green-500' :
+    tea.fuellstand > 30 ? 'bg-orange-400' :
+    'bg-red-500';
 
-  // Show permanent checkmark if tea is selected (for backlog)
   const showCheckmark = tea.isSelected;
 
   return (
     <motion.button
       initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ 
-        opacity: 1, 
-        scale: showCheckmark ? 1.02 : 1,
-      }}
-      transition={{ 
-        delay: index * 0.04,
-        type: "spring",
-        stiffness: 300,
-        damping: 20
-      }}
+      animate={{ opacity: 1, scale: showCheckmark ? 1.02 : 1 }}
+      transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 20 }}
       whileTap={{ scale: 0.97 }}
       onClick={onSelect}
+      aria-label={`${tea.name} auswählen`}
       className={`group relative aspect-square rounded-ios-xl overflow-hidden shadow-ios-md hover:shadow-ios-lg transition-all bg-gold border-2 ${
-        showCheckmark 
-          ? 'border-ios-green shadow-ios-green/50' 
-          : 'border-gold/20'
+        showCheckmark ? 'border-green-500 shadow-green-200' : 'border-gold/20'
       }`}
     >
-      {/* Tea Type Badge */}
-      <div 
+      {/* Tee-Art Farbtönung */}
+      <div
         className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
         style={{ backgroundColor: teaColor }}
       />
-      
-      {/* Selected Indicator */}
+
+      {/* Ausgewählt-Häkchen */}
       {showCheckmark && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="absolute top-2 left-2 w-8 h-8 bg-ios-green rounded-full flex items-center justify-center shadow-lg z-10"
+          className="absolute top-2 left-2 w-7 h-7 bg-green-500 rounded-full flex items-center justify-center shadow-md z-10"
+          aria-hidden="true"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+            fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </motion.div>
       )}
-      
-      {/* Fuellstand Bar */}
-      <div className="absolute top-3 right-3 w-1.5 h-16 bg-gray-200 bg-white/10 rounded-full overflow-hidden">
-        <div 
+
+      {/* Füllstand-Balken */}
+      <div className="absolute top-3 right-3 w-1.5 h-14 bg-white/30 rounded-full overflow-hidden" aria-hidden="true">
+        <div
           className={`${fuellstandColor} w-full absolute bottom-0 transition-all`}
           style={{ height: `${tea.fuellstand}%` }}
         />
       </div>
 
-      {/* Content */}
-      <div className="h-full flex flex-col items-center justify-center p-4 text-center relative z-10">
-        {/* Tea Type Badge */}
-        <div 
-          className="w-12 h-12 rounded-full flex items-center justify-center mb-3 shadow-md"
+      {/* Inhalt */}
+      <div className="h-full flex flex-col justify-center px-3 pt-4 pb-3 relative z-10">
+        {/* Tee-Art Farbpunkt */}
+        <div
+          className="w-2.5 h-2.5 rounded-full mb-2 flex-shrink-0"
           style={{ backgroundColor: teaColor }}
-        >
-          <Thermometer className="w-6 h-6 text-white" />
-        </div>
+          aria-hidden="true"
+        />
 
-        {/* Tea Name */}
-        <h3 className="font-bold text-base mb-1 line-clamp-2 text-gold-text font-serif">
+        {/* Tee-Name — truncated */}
+        <h3
+          className="font-bold text-sm leading-tight text-gold-text font-serif mb-0.5 overflow-hidden"
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
           {tea.name}
         </h3>
 
         {/* Hersteller */}
         {tea.hersteller && (
-          <p className="text-xs text-gold-text/60 line-clamp-1 mb-2">
-            {tea.hersteller}
-          </p>
+          <p className="text-xs text-gold-text/55 truncate mb-1">{tea.hersteller}</p>
         )}
 
-        {/* Temperature Badge */}
-        <div className="inline-flex items-center gap-1 px-2 py-1 bg-midnight/10 rounded-lg text-xs font-medium text-gold-text">
-          <span>{tea.bruehgrad}°</span>
-        </div>
-
-        {/* Gramm */}
-        <div className="absolute bottom-3 left-3 text-xs font-medium text-gold-text/60">
-          {tea.grammAnzahl}g
+        {/* Temperatur + Gramm */}
+        <div className="flex items-center gap-1.5 mt-auto pt-1">
+          <span className="text-xs font-medium text-gold-text/70 bg-midnight/8 px-1.5 py-0.5 rounded-md">
+            {tea.bruehgrad}°C
+          </span>
+          <span className="text-xs font-medium text-gold-text/55">
+            {tea.grammAnzahl}g
+          </span>
         </div>
       </div>
 
-      {/* Hover Effect */}
+      {/* Hover-Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-midnight/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </motion.button>
   );

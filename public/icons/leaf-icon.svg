@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="115" fill="#1d2646"/>
+  <!-- Tea leaf centered -->
+  <g transform="translate(256,256)">
+    <!-- Leaf body -->
+    <path
+      d="M 0 -130
+         C 52 -112, 104 -52, 104 0
+         C 104 78, 38 145, 0 178
+         C -38 145, -104 78, -104 0
+         C -104 -52, -52 -112, 0 -130 Z"
+      fill="#c6b975"
+    />
+    <!-- Central vein -->
+    <line x1="0" y1="-112" x2="0" y2="152"
+      stroke="#a99e61" stroke-width="7" stroke-linecap="round" opacity="0.65"/>
+    <!-- Left vein -->
+    <path d="M 0 -44 C -30 -28, -52 -8, -74 20"
+      stroke="#a99e61" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.45"/>
+    <!-- Right vein -->
+    <path d="M 0 18 C 30 34, 52 56, 72 84"
+      stroke="#a99e61" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.45"/>
+  </g>
+</svg>

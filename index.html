@@ -4,41 +4,59 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
-    <!-- PWA -->
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
 
     <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Royal-Tea" />
-    <link rel="apple-touch-icon" href="/icons/icon-180x180.png" />
 
-    <!-- Theme & Icons -->
+    <!-- Apple Touch Icons (alle Größen) -->
+    <link rel="apple-touch-icon" href="/icons/icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="87x87"   href="/icons/icon-87x87.png" />
+    <link rel="apple-touch-icon" sizes="60x60"   href="/icons/icon-60x60.png" />
+
+    <!-- Theme & Favicon -->
     <meta name="theme-color" content="#1d2646" />
     <link rel="icon" type="image/png" href="/favicon.png" />
 
-    <!-- SEO -->
-    <meta name="description" content="Dein persönlicher Tee-Begleiter mit intelligentem Rotations-System." />
-    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- Logo fix: avoid clipping on small screens (iPhone mini etc.) -->
+    <style>
+      /* Gibt dem Header genug vertikalen Raum auf sehr kleinen Geräten */
+      @media (max-height: 668px) {
+        header { padding-top: env(safe-area-inset-top, 2px); }
+      }
+    </style>
 
-    <!-- Google Fonts -->
+    <!-- Libre Fonts (alle SIL OFL 1.1) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!--
+      Inter          – SIL OFL 1.1  – rsms.me/inter
+      Noto Sans      – SIL OFL 1.1  – google/fonts
+      Source Sans 3  – SIL OFL 1.1  – adobe/source-sans
+      Cormorant Garamond – SIL OFL 1.1
+      Playfair Display   – SIL OFL 1.1
+    -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&family=Source+Sans+3:wght@400;600&family=Cormorant+Garamond:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
+    <meta name="description" content="Dein persönlicher Tee-Begleiter mit intelligentem Rotations-System." />
     <title>Royal-Tea</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-
-    <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
             .then(() => console.log('✅ Royal-Tea SW registered'))
-            .catch((err) => console.log('SW registration failed:', err));
+            .catch(err => console.warn('SW:', err));
         });
       }
     </script>
