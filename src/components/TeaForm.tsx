@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import { X, Plus, Minus } from 'lucide-react';
 import { Tea, TeaType, TEA_TYPE_DEFAULTS, TEA_TYPE_LABELS } from '@/types/tea';
@@ -20,13 +20,16 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
   const [grammAnzahl, setGrammAnzahl] = useState(8);
   const [fuellstand, setFuellstand] = useState(100);
 
-  const sheetY = useMotionValue(0);
+  // Sheet drag state
+  const sheetRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sheetY = useMotionValue(0);
+  const dragStartY = useRef(0);
+  const isDragging = useRef(false);
 
   useEffect(() => {
-    if (isOpen) {
-      animate(sheetY, 0, { type: 'spring', stiffness: 300, damping: 30 });
-    }
+    if (!isOpen) return;
+    sheetY.set(0);
   }, [isOpen]);
 
   useEffect(() => {
@@ -48,6 +51,56 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
     }
   }, [editTea, isOpen]);
 
+  // Native touch handling — funktioniert überall auf dem Sheet
+  useEffect(() => {
+    const sheet = sheetRef.current;
+    const scroll = scrollRef.current;
+    if (!sheet || !scroll) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      dragStartY.current = e.touches[0].clientY;
+      isDragging.current = false;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const deltaY = e.touches[0].clientY - dragStartY.current;
+      const scrollTop = scroll.scrollTop;
+
+      // Nur nach unten ziehen erlaubt, und nur wenn Scroll ganz oben
+      if (deltaY > 0 && scrollTop <= 0) {
+        isDragging.current = true;
+        e.preventDefault(); // verhindert Scroll
+        sheetY.set(deltaY);
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!isDragging.current) return;
+      const deltaY = e.changedTouches[0].clientY - dragStartY.current;
+
+      if (deltaY > 100) {
+        haptic('light');
+        animate(sheetY, window.innerHeight, {
+          type: 'spring', stiffness: 300, damping: 30,
+          onComplete: onClose,
+        });
+      } else {
+        animate(sheetY, 0, { type: 'spring', stiffness: 400, damping: 30 });
+      }
+      isDragging.current = false;
+    };
+
+    sheet.addEventListener('touchstart', onTouchStart, { passive: true });
+    sheet.addEventListener('touchmove', onTouchMove, { passive: false });
+    sheet.addEventListener('touchend', onTouchEnd, { passive: true });
+
+    return () => {
+      sheet.removeEventListener('touchstart', onTouchStart);
+      sheet.removeEventListener('touchmove', onTouchMove);
+      sheet.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [isOpen]);
+
   const handleTeaTypeChange = (type: TeaType) => {
     haptic('light');
     setTeeArt(type);
@@ -68,33 +121,6 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
     onClose();
   };
 
-  // Native Touch Drag-to-Dismiss (funktioniert in PWA + Browser)
-  const touchStartY = useRef(0);
-  const touchStartTime = useRef(0);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchStartTime.current = Date.now();
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    const dy = e.touches[0].clientY - touchStartY.current;
-    if (dy > 0) sheetY.set(dy);
-  }, [sheetY]);
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    const dt = Date.now() - touchStartTime.current;
-    const velocity = dy / dt; // px/ms
-
-    if (dy > 100 || velocity > 0.5) {
-      haptic('light');
-      animate(sheetY, window.innerHeight, { duration: 0.25 }).then(onClose);
-    } else {
-      animate(sheetY, 0, { type: 'spring', stiffness: 400, damping: 30 });
-    }
-  }, [sheetY, haptic, onClose]);
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -108,6 +134,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
 
           {/* Bottom Sheet */}
           <motion.div
+            ref={sheetRef}
             style={{ y: sheetY, backgroundColor: '#FFFFF0' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -115,38 +142,9 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[92vh] flex flex-col"
           >
-            {/* Drag Handle — native touch events, funktioniert in PWA + Browser */}
-            <div
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onMouseDown={(e) => {
-                const startY = e.clientY;
-                const startTime = Date.now();
-                const onMove = (ev: MouseEvent) => {
-                  const dy = ev.clientY - startY;
-                  if (dy > 0) sheetY.set(dy);
-                };
-                const onUp = (ev: MouseEvent) => {
-                  const dy = ev.clientY - startY;
-                  const dt = Date.now() - startTime;
-                  const velocity = dy / dt;
-                  if (dy > 100 || velocity > 0.5) {
-                    haptic('light');
-                    animate(sheetY, window.innerHeight, { duration: 0.25 }).then(onClose);
-                  } else {
-                    animate(sheetY, 0, { type: 'spring', stiffness: 400, damping: 30 });
-                  }
-                  window.removeEventListener('mousemove', onMove);
-                  window.removeEventListener('mouseup', onUp);
-                };
-                window.addEventListener('mousemove', onMove);
-                window.addEventListener('mouseup', onUp);
-              }}
-              className="flex justify-center items-center py-4 flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
-              style={{ touchAction: 'none' }}
-            >
-              <div className="w-12 h-1.5 bg-midnight/30 rounded-full" />
+            {/* Drag Handle — visuell */}
+            <div className="flex justify-center items-center py-4 flex-shrink-0 select-none">
+              <div className="w-12 h-1.5 bg-midnight/25 rounded-full" />
             </div>
 
             {/* Header */}
@@ -162,20 +160,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             </div>
 
             {/* Scrollable Body */}
-            <div
-              ref={scrollRef}
-              className="overflow-y-auto flex-1 overscroll-contain"
-              onPointerDown={(e) => {
-                // Nur wenn ganz oben gescrollt → Drag erlauben
-                const el = scrollRef.current;
-                if (el && el.scrollTop === 0) {
-                  // Bubble zum motion.div → startet Sheet-Drag
-                } else {
-                  // Mitten im Scroll → Drag unterdrücken
-                  e.stopPropagation();
-                }
-              }}
-            >
+            <div ref={scrollRef} className="overflow-y-auto flex-1">
               <form onSubmit={handleSubmit}>
                 <div className="p-6 space-y-5">
 
@@ -296,8 +281,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                     {editTea ? 'Änderungen speichern' : 'Tee hinzufügen'}
                   </motion.button>
 
-                  {/* Safe area padding */}
-                  <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 16px)' }} />
+                  <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 24px)' }} />
                 </div>
               </form>
             </div>
