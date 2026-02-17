@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Sparkles, ChevronDown, Download, Upload, Info, RefreshCw } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
-import { loadFromSupabase, saveToSupabase, subscribeToSync } from '@/lib/supabase';
+import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
@@ -51,14 +51,18 @@ function App() {
 
   // Realtime Subscription — aktualisiert App wenn Partner Änderungen macht
   useEffect(() => {
-    const unsubscribe = subscribeToSync((data) => {
-      setTeas(data.teas);
-      setQueue(data.queue);
-      saveData({ teas: data.teas, queue: data.queue });
-      setSyncStatus('ok');
-      setTimeout(() => setSyncStatus('idle'), 2000);
-    });
-    return unsubscribe;
+    let cleanup: (() => void) | undefined;
+    const setup = () => {
+      cleanup = subscribeToSync((data) => {
+        setTeas(data.teas);
+        setQueue(data.queue);
+        saveData({ teas: data.teas, queue: data.queue });
+        setSyncStatus('ok');
+        setTimeout(() => setSyncStatus('idle'), 2000);
+      });
+    };
+    setup();
+    return () => { cleanup?.(); };
   }, []);
 
   useEffect(() => {
