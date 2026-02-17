@@ -223,7 +223,6 @@ function App() {
                 <HeuteScreen
                   queue={availableTeas}
                   onSelect={handleSelectTea}
-                  onSkip={handleSkipTea}
                   isLoading={isLoading}
                 />
               </motion.div>
