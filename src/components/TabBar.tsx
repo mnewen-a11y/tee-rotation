@@ -8,6 +8,9 @@ interface TabBarProps {
   onTabChange: (tab: TabId) => void;
 }
 
+// Tabs mit ivory/hellem Content-Hintergrund
+const LIGHT_CONTENT_TABS: TabId[] = ['heute', 'list', 'rating'];
+
 export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
   const tabs: { id: TabId; icon: typeof Home; label: string }[] = [
     { id: 'heute',  icon: Home,  label: 'Heute'      },
@@ -16,34 +19,48 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
     { id: 'rating', icon: Star,  label: 'Bewerten'   },
   ];
 
+  // Auf hellem Hintergrund: dunkle Pill + dunkle Icons
+  const isLight = LIGHT_CONTENT_TABS.includes(activeTab);
+
+  const inactiveColor  = isLight ? 'rgba(29,38,70,0.45)'  : 'rgba(255,255,255,0.65)';
+  const activeColor    = '#c6b975'; // gold — immer
+  const pillBg         = isLight
+    ? 'rgba(29,38,70,0.10)'
+    : 'rgba(255,255,255,0.22)';
+  const glassBg        = isLight
+    ? 'rgba(29,38,70,0.08)'
+    : 'rgba(255,255,255,0.18)';
+  const glassBorder    = isLight
+    ? 'rgba(29,38,70,0.15)'
+    : 'rgba(255,255,255,0.25)';
+  const glassHighlight = isLight
+    ? 'rgba(29,38,70,0.06)'
+    : 'rgba(255,255,255,0.35)';
+  const glassShadow    = isLight
+    ? '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)'
+    : '0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.08)';
+
   return (
-    /* Outer wrapper — safe area + positioning */
     <div
       className="fixed bottom-0 left-0 right-0 z-30 flex justify-center"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}
     >
-      {/* Liquid Glass pill */}
       <nav
         aria-label="Hauptnavigation"
-        className="relative flex items-center gap-1 px-3 py-2 rounded-full"
+        className="relative flex items-center gap-1 px-3 py-2 rounded-full transition-all duration-300"
         style={{
-          background: 'rgba(255, 255, 255, 0.18)',
+          background: glassBg,
           backdropFilter: 'blur(40px) saturate(180%)',
           WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-          boxShadow: [
-            '0 8px 32px rgba(0, 0, 0, 0.25)',
-            '0 2px 8px rgba(0, 0, 0, 0.15)',
-            'inset 0 1px 0 rgba(255, 255, 255, 0.35)',
-            'inset 0 -1px 0 rgba(0, 0, 0, 0.08)',
-          ].join(', '),
-          border: '1px solid rgba(255, 255, 255, 0.25)',
+          boxShadow: glassShadow,
+          border: `1px solid ${glassBorder}`,
         }}
       >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
           const isStar = tab.id === 'rating';
-          const isNew = tab.id === 'new';
+          const isNew  = tab.id === 'new';
 
           return (
             <button
@@ -51,23 +68,23 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
               onClick={() => onTabChange(tab.id)}
               aria-label={tab.label}
               aria-current={isActive ? 'page' : undefined}
-              className="relative flex flex-col items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 rounded-full"
+              className="relative flex flex-col items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 rounded-full transition-all duration-300"
               style={{ minWidth: isNew ? '52px' : '68px', padding: '6px 4px' }}
             >
-              {/* Active background pill */}
+              {/* Active pill */}
               {isActive && !isNew && (
                 <motion.div
                   layoutId="tabPill"
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.22)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.06)',
+                    background: pillBg,
+                    boxShadow: `inset 0 1px 0 ${glassHighlight}`,
                   }}
                   transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                 />
               )}
 
-              {/* + Button — gold pill */}
+              {/* + Button */}
               {isNew ? (
                 <motion.div
                   whileTap={{ scale: 0.88 }}
@@ -87,15 +104,15 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
                     className="relative z-10"
                   >
                     <Icon
-                      className="w-[22px] h-[22px] transition-colors duration-200"
-                      style={{ color: isActive ? '#c6b975' : 'rgba(255,255,255,0.65)' }}
-                      fill={isStar && isActive ? '#c6b975' : 'none'}
+                      className="w-[22px] h-[22px] transition-colors duration-300"
+                      style={{ color: isActive ? activeColor : inactiveColor }}
+                      fill={isStar && isActive ? activeColor : 'none'}
                       strokeWidth={isActive ? 2 : 1.75}
                     />
                   </motion.div>
                   <span
-                    className="text-[10px] font-sans font-medium mt-0.5 relative z-10 transition-colors duration-200 leading-none"
-                    style={{ color: isActive ? '#c6b975' : 'rgba(255,255,255,0.55)' }}
+                    className="text-[10px] font-sans font-medium mt-0.5 relative z-10 leading-none transition-colors duration-300"
+                    style={{ color: isActive ? activeColor : inactiveColor }}
                   >
                     {tab.label}
                   </span>

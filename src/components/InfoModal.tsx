@@ -8,22 +8,27 @@ interface InfoModalProps {
   triggerRef: React.RefObject<HTMLButtonElement>;
 }
 
-const RELEASE = 'R002 – v0.9.5';
+const RELEASE = 'R005 – v1.0.0';
 
 const CURRENT_FEATURES = [
-  'Tea-Rotation: Grid-Ansicht mit Kategorien (Schwarztee, Grüntee, Oolong, Chai, Jasmin, Kräuter)',
-  'Kacheln auf- und zuklappbar pro Kategorie',
+  'Tee-Rotation: Grid-Ansicht mit Kategorien (Schwarztee, Grüntee, Oolong, Chai, Jasmin, Kräuter)',
+  'Kategorien auf- und zuklappbar',
   'Tee anlegen, bearbeiten und löschen',
-  'Füllstand-Tracking',
+  'Automatische Brühtemperatur je Tee-Art',
+  'Füllstand-Tracking mit Farbindikator',
+  'Bewertungs-System (1–5 Sterne)',
+  'Realtime-Sync via Supabase — Änderungen sofort auf allen Geräten',
   'Export & Import als JSON',
+  'iOS 26 Liquid Glass Tab Bar',
   'Installierbar als PWA (Home-Bildschirm)',
   'Offline-Unterstützung via Service Worker',
+  'Freie Fonts (SIL OFL 1.1): Inter, Cormorant Garamond',
 ];
 
 const ROADMAP = [
-  { version: 'v1.0.0', label: 'Apple Integration', items: ['Apple Shortcuts / Siri', 'iCloud / AWS S3 Sync', 'Multi-Device Support'] },
-  { version: 'v1.1.0', label: 'Insights', items: ['Rating-System (1–5 ⭐)', 'Merkliste & Auto-Merken', 'Notizen & Fotos pro Tee'] },
-  { version: 'v1.2.0', label: 'Progressive Web App', items: ['Push-Benachrichtigungen', 'Erweiterte Statistiken', 'Preis-Tracking'] },
+  { version: 'v1.1.0', label: 'Insights', items: ['Notizen & Fotos pro Tee', 'Brüh-Historie', 'Preis-Tracking pro Tee'] },
+  { version: 'v1.2.0', label: 'Apple Integration', items: ['Apple Shortcuts / Siri', 'Widget für Home-Bildschirm', 'Benachrichtigungen'] },
+  { version: 'v1.3.0', label: 'Erweiterte PWA', items: ['Push-Benachrichtigungen', 'Erweiterte Statistiken', 'Mehrere Rotationen'] },
 ];
 
 export const InfoModal = ({ isOpen, onClose, triggerRef }: InfoModalProps) => {
