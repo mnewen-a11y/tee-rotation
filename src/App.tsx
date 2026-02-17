@@ -14,21 +14,13 @@ import { RatingPage } from '@/components/RatingPage';
 const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
 
 const TEA_CATEGORY_LABELS: Record<TeaType, string> = {
-  schwarz:  'Schwarztee',
-  grün:     'Grüntee',
-  oolong:   'Oolong',
-  chai:     'Chai',
-  jasmin:   'Jasmin',
-  kräuter:  'Kräuter',
+  schwarz: 'Schwarztee', grün: 'Grüntee', oolong: 'Oolong',
+  chai: 'Chai', jasmin: 'Jasmin', kräuter: 'Kräuter',
 };
 
 const TEA_CATEGORY_COLORS: Record<TeaType, string> = {
-  schwarz:  '#8B4513',
-  grün:     '#4CAF50',
-  oolong:   '#DAA520',
-  chai:     '#A0522D',
-  jasmin:   '#C77DFF',
-  kräuter:  '#2E8B57',
+  schwarz: '#8B4513', grün: '#4CAF50', oolong: '#DAA520',
+  chai: '#A0522D', jasmin: '#C77DFF', kräuter: '#2E8B57',
 };
 
 function App() {
@@ -75,7 +67,6 @@ function App() {
   const toggleCategory = (type: TeaType) =>
     setOpenCategories(prev => ({ ...prev, [type]: !prev[type] }));
 
-  // ── CRUD ────────────────────────────────────────────────────────────────────
   const handleAddTea = (teaData: Omit<Tea, 'id'>) => {
     const t: Tea = { ...teaData, id: generateId() };
     setTeas(prev => [...prev, t]);
@@ -117,9 +108,11 @@ function App() {
 
   const getTeaById = (id: string) => teas.find(t => t.id === id);
 
-  // ── EXPORT / IMPORT ─────────────────────────────────────────────────────────
   const handleExport = () => {
-    const blob = new Blob([JSON.stringify({ version: '1.0.0', exportDate: new Date().toISOString(), teas, queue }, null, 2)], { type: 'application/json' });
+    const blob = new Blob(
+      [JSON.stringify({ version: '1.0.0', exportDate: new Date().toISOString(), teas, queue }, null, 2)],
+      { type: 'application/json' }
+    );
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -145,10 +138,14 @@ function App() {
     e.target.value = '';
   };
 
-  // ── DERIVED ──────────────────────────────────────────────────────────────────
-  const availableTeas = queue.map(id => getTeaById(id)).filter((t): t is Tea => !!t && !t.zuletztGetrunken);
-  const usedTeas = teas.filter(t => t.zuletztGetrunken)
+  const availableTeas = queue
+    .map(id => getTeaById(id))
+    .filter((t): t is Tea => !!t && !t.zuletztGetrunken);
+
+  const usedTeas = teas
+    .filter(t => t.zuletztGetrunken)
     .sort((a, b) => new Date(b.zuletztGetrunken!).getTime() - new Date(a.zuletztGetrunken!).getTime());
+
   const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
     acc[type] = availableTeas.filter(t => t.teeArt === type);
     return acc;
@@ -160,45 +157,37 @@ function App() {
 
       <div className="min-h-screen pb-20">
 
-        {/* ── HEADER ──────────────────────────────────────────────────────────── */}
+        {/* HEADER */}
         <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
           <div className="max-w-3xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              {/* Logo — slight top padding on mini devices handled in index.html */}
               <div className="pt-px sm:pt-0">
                 <RoyalTeaLogo size="sm" className="opacity-90" />
               </div>
-
               <div className="flex items-center gap-2">
                 <motion.button whileTap={{ scale: 0.9 }} onClick={handleExport}
                   className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label="Daten exportieren" title="Exportieren">
+                  aria-label="Daten exportieren">
                   <Download className="w-5 h-5 text-white" />
                 </motion.button>
-
                 <motion.button whileTap={{ scale: 0.9 }} onClick={() => fileInputRef.current?.click()}
                   className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label="Daten importieren" title="Importieren">
+                  aria-label="Daten importieren">
                   <Upload className="w-5 h-5 text-white" />
                 </motion.button>
-
                 <motion.button whileTap={{ scale: 0.9 }} onClick={toggleDarkMode}
                   className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label={darkMode ? 'Hell-Modus aktivieren' : 'Dunkel-Modus aktivieren'}>
+                  aria-label={darkMode ? 'Hell-Modus' : 'Dunkel-Modus'}>
                   {darkMode ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-white" />}
                 </motion.button>
-
-                {/* Info Button */}
                 <motion.button
                   ref={infoTriggerRef}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setIsInfoOpen(true)}
                   className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label="App-Informationen öffnen"
+                  aria-label="App-Informationen"
                   aria-haspopup="dialog"
-                  aria-expanded={isInfoOpen}
-                  title="Info"
-                >
+                  aria-expanded={isInfoOpen}>
                   <Info className="w-5 h-5 text-white" />
                 </motion.button>
               </div>
@@ -206,16 +195,16 @@ function App() {
           </div>
         </header>
 
-        {/* ── CONTENT (Ivory) ─────────────────────────────────────────────────── */}
-        <main className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)]" style={{ backgroundColor: '#FFFFF0' }}>
+        {/* CONTENT */}
+        <main className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)]"
+          style={{ backgroundColor: '#FFFFF0' }}>
           <AnimatePresence mode="wait">
 
-            {/* ── HEUTE ─────────────────────────────────────────────────────────── */}
+            {/* TAB: HEUTE */}
             {activeTab === 'heute' && (
               <motion.div key="heute"
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}
-              >
+                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
@@ -230,6 +219,7 @@ function App() {
                   </div>
                 ) : (
                   <>
+                    {/* Verfügbare Tees nach Kategorie */}
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-5">
                         <Sparkles className="w-5 h-5 text-gold" aria-hidden="true" />
@@ -253,8 +243,7 @@ function App() {
                                   onClick={() => toggleCategory(type)}
                                   aria-expanded={isOpen}
                                   aria-controls={`cat-${type}`}
-                                  className="w-full flex items-center justify-between px-4 py-3 bg-midnight/5 hover:bg-midnight/10 transition-colors"
-                                >
+                                  className="w-full flex items-center justify-between px-4 py-3 bg-midnight/5 hover:bg-midnight/10 transition-colors">
                                   <div className="flex items-center gap-3">
                                     <div className="w-3 h-3 rounded-full flex-shrink-0"
                                       style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }}
@@ -268,7 +257,6 @@ function App() {
                                     <ChevronDown className="w-5 h-5 text-midnight/40" aria-hidden="true" />
                                   </motion.div>
                                 </button>
-
                                 <AnimatePresence initial={false}>
                                   {isOpen && (
                                     <motion.div id={`cat-${type}`} key="body"
@@ -276,8 +264,7 @@ function App() {
                                       animate={{ height: 'auto', opacity: 1 }}
                                       exit={{ height: 0, opacity: 0 }}
                                       transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                      className="overflow-hidden"
-                                    >
+                                      className="overflow-hidden">
                                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-3"
                                         style={{ backgroundColor: 'rgba(255,255,240,0.8)' }}>
                                         {catTeas.map((tea, i) => (
@@ -287,23 +274,7 @@ function App() {
                                       </div>
                                     </motion.div>
                                   )}
-                      
-            {/* ── BEWERTEN ─────────────────────────────────────────────────────── */}
-            {activeTab === 'rating' && (
-              <motion.div key="rating"
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}
-              >
-                <RatingPage
-                  teas={teas}
-                  onRateTea={(id, rating) => {
-                    setTeas(prev => prev.map(t => t.id === id ? { ...t, rating } : t));
-                  }}
-                  onNavigateToNew={() => setActiveTab('new')}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+                                </AnimatePresence>
                               </div>
                             );
                           })}
@@ -311,6 +282,7 @@ function App() {
                       )}
                     </div>
 
+                    {/* Zuletzt verwendet */}
                     {usedTeas.length > 0 && (
                       <div className="mt-8 pt-8 border-t border-midnight/10">
                         <div className="flex items-center gap-2 mb-4">
@@ -333,19 +305,17 @@ function App() {
               </motion.div>
             )}
 
-            {/* ── MEINE TEES ────────────────────────────────────────────────────── */}
+            {/* TAB: MEINE TEES */}
             {activeTab === 'list' && (
               <motion.div key="list"
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}
-              >
+                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
                 <div className="mb-4">
                   <h2 className="text-xl font-bold font-serif text-midnight mb-1">Meine Tees</h2>
                   <p className="text-sm text-midnight/60 font-sans">
                     {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
                   </p>
                 </div>
-
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
@@ -373,26 +343,44 @@ function App() {
                 )}
               </motion.div>
             )}
+
+            {/* TAB: BEWERTEN */}
+            {activeTab === 'rating' && (
+              <motion.div key="rating"
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
+                <RatingPage
+                  teas={teas}
+                  onRateTea={(id, rating) =>
+                    setTeas(prev => prev.map(t => t.id === id ? { ...t, rating } : t))
+                  }
+                  onNavigateToNew={() => setActiveTab('new')}
+                />
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </main>
 
-        {/* ── TAB BAR ──────────────────────────────────────────────────────────── */}
         <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* ── FORM MODAL ───────────────────────────────────────────────────────── */}
         <TeaForm
           isOpen={isFormOpen}
-          onClose={() => { setIsFormOpen(false); setEditingTea(undefined); if (activeTab === 'new') setActiveTab('heute'); }}
+          onClose={() => {
+            setIsFormOpen(false);
+            setEditingTea(undefined);
+            if (activeTab === 'new') setActiveTab('heute');
+          }}
           onSave={editingTea ? handleUpdateTea : handleAddTea}
           editTea={editingTea}
         />
 
-        {/* ── INFO MODAL ───────────────────────────────────────────────────────── */}
         <InfoModal
           isOpen={isInfoOpen}
           onClose={() => setIsInfoOpen(false)}
           triggerRef={infoTriggerRef}
         />
+
       </div>
     </div>
   );
