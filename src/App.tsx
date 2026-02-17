@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Sparkles, ChevronDown, Download, Upload, Info } from 'lucide-react';
+import { Coffee, Sparkles, ChevronDown, Download, Upload, Info, RefreshCw } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
+import { loadFromSupabase, saveToSupabase, subscribeToSync } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
@@ -30,6 +31,7 @@ function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'ok' | 'error'>('idle');
   const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
     schwarz: true, grün: true, oolong: true, chai: true, jasmin: true, kräuter: true,
   });
@@ -46,6 +48,18 @@ function App() {
   useEffect(() => {
     if (teas.length > 0 || queue.length > 0) saveData({ teas, queue });
   }, [teas, queue]);
+
+  // Realtime Subscription — aktualisiert App wenn Partner Änderungen macht
+  useEffect(() => {
+    const unsubscribe = subscribeToSync((data) => {
+      setTeas(data.teas);
+      setQueue(data.queue);
+      saveData({ teas: data.teas, queue: data.queue });
+      setSyncStatus('ok');
+      setTimeout(() => setSyncStatus('idle'), 2000);
+    });
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'new') { setIsFormOpen(true); setEditingTea(undefined); }
@@ -125,6 +139,13 @@ function App() {
     e.target.value = '';
   };
 
+  const handleSync = async () => {
+    setSyncStatus('syncing');
+    const ok = await saveToSupabase(teas, queue);
+    setSyncStatus(ok ? 'ok' : 'error');
+    setTimeout(() => setSyncStatus('idle'), 2000);
+  };
+
   const availableTeas = queue
     .map(id => getTeaById(id))
     .filter((t): t is Tea => !!t && !t.zuletztGetrunken);
@@ -142,7 +163,7 @@ function App() {
     <div className="min-h-screen bg-midnight">
       <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
 
-      <div className="min-h-screen pb-20">
+      <div className="min-h-screen pb-28">
 
         {/* HEADER
              - Unsichtbarer Spacer oben = env(safe-area-inset-top) für PWA-Modus
@@ -165,6 +186,24 @@ function App() {
                 aria-label="Daten importieren">
                 <Upload className="w-5 h-5 text-white" />
               </motion.button>
+              {/* Sync-Button */}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={handleSync}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
+                aria-label="Mit Partner synchronisieren"
+                disabled={syncStatus === 'syncing'}
+              >
+                <RefreshCw
+                  className={`w-5 h-5 transition-colors ${
+                    syncStatus === 'syncing' ? 'text-gold animate-spin' :
+                    syncStatus === 'ok'      ? 'text-green-400' :
+                    syncStatus === 'error'   ? 'text-red-400' :
+                    'text-white'
+                  }`}
+                />
+              </motion.button>
+
               <motion.button
                 ref={infoTriggerRef}
                 whileTap={{ scale: 0.9 }}
