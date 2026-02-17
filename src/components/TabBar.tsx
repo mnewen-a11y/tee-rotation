@@ -21,6 +21,7 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
       className="fixed bottom-0 left-0 right-0 z-30 flex justify-center"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}
     >
+      {/* Dunkles Glas — midnight, immer lesbar */}
       <nav
         aria-label="Hauptnavigation"
         className="relative flex items-center gap-1 px-3 py-2 rounded-full"
@@ -29,10 +30,10 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
           backdropFilter: 'blur(40px) saturate(160%)',
           WebkitBackdropFilter: 'blur(40px) saturate(160%)',
           boxShadow: [
-            '0 8px 32px rgba(0,0,0,0.35)',
+            '0 8px 32px rgba(0,0,0,0.30)',
             '0 2px 8px rgba(0,0,0,0.20)',
-            'inset 0 1px 0 rgba(255,255,255,0.12)',
-            'inset 0 -1px 0 rgba(0,0,0,0.20)',
+            'inset 0 1px 0 rgba(255,255,255,0.10)',
+            'inset 0 -1px 0 rgba(0,0,0,0.15)',
           ].join(', '),
           border: '1px solid rgba(255,255,255,0.10)',
         }}
@@ -58,21 +59,21 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
                   layoutId="tabPill"
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: 'rgba(255,255,255,0.10)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.10)',
+                    background: 'rgba(255,255,255,0.12)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.1)',
                   }}
                   transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                 />
               )}
 
-              {/* + Button — gold pill */}
+              {/* + Button — gold */}
               {isNew ? (
                 <motion.div
                   whileTap={{ scale: 0.88 }}
                   className="w-11 h-11 rounded-full flex items-center justify-center"
                   style={{
                     background: 'linear-gradient(145deg, #d4c47e, #b8a85a)',
-                    boxShadow: '0 4px 12px rgba(198,185,117,0.40), inset 0 1px 0 rgba(255,255,255,0.30)',
+                    boxShadow: '0 4px 12px rgba(198,185,117,0.45), inset 0 1px 0 rgba(255,255,255,0.3)',
                   }}
                 >
                   <Plus className="w-5 h-5 text-midnight" strokeWidth={2.5} />

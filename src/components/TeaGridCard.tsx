@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Tea, TEA_TYPE_COLORS } from '@/types/tea';
+import { useHaptic } from '@/hooks/useHaptic';
 
 interface TeaGridCardProps {
   tea: Tea;
@@ -8,6 +9,7 @@ interface TeaGridCardProps {
 }
 
 export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
+  const { trigger: haptic } = useHaptic();
   const teaColor = TEA_TYPE_COLORS[tea.teeArt];
   const fuellstandColor =
     tea.fuellstand > 70 ? 'bg-green-500' :
@@ -22,7 +24,7 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
       animate={{ opacity: 1, scale: showCheckmark ? 1.02 : 1 }}
       transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 20 }}
       whileTap={{ scale: 0.97 }}
-      onClick={onSelect}
+      onClick={() => { haptic('medium'); onSelect(); }}
       aria-label={`${tea.name} auswählen`}
       className={`group relative aspect-square rounded-ios-xl overflow-hidden shadow-ios-md hover:shadow-ios-lg transition-all bg-white border-2 ${
         showCheckmark ? 'border-green-500 shadow-green-200' : 'border-gold/20'

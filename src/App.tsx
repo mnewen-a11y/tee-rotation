@@ -11,6 +11,8 @@ import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
 import { RatingPage } from '@/components/RatingPage';
+import { useHaptic } from '@/hooks/useHaptic';
+import { useTabDirection } from '@/hooks/useTabDirection';
 
 const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
 
@@ -35,6 +37,10 @@ function App() {
   const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
     schwarz: true, grün: true, oolong: true, chai: true, jasmin: true, kräuter: true,
   });
+
+  const { trigger: haptic } = useHaptic();
+  const { getDirection } = useTabDirection();
+  const [slideDir, setSlideDir] = useState(1);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const infoTriggerRef = useRef<HTMLButtonElement>(null);
@@ -216,13 +222,16 @@ function App() {
         {/* CONTENT */}
         <main className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)]"
           style={{ backgroundColor: '#FFFFF0' }}>
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" custom={slideDir}>
 
             {/* TAB: HEUTE */}
             {activeTab === 'heute' && (
               <motion.div key="heute"
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
+                custom={slideDir}
+                initial={{ opacity: 0, x: slideDir * 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: slideDir * -40 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
@@ -326,8 +335,11 @@ function App() {
             {/* TAB: MEINE TEES */}
             {activeTab === 'list' && (
               <motion.div key="list"
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
+                custom={slideDir}
+                initial={{ opacity: 0, x: slideDir * 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: slideDir * -40 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
                 <div className="mb-4">
                   <h2 className="text-xl font-bold font-serif text-midnight mb-1">Meine Tees</h2>
                   <p className="text-sm text-midnight/60 font-sans">
@@ -365,8 +377,11 @@ function App() {
             {/* TAB: BEWERTEN */}
             {activeTab === 'rating' && (
               <motion.div key="rating"
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}>
+                custom={slideDir}
+                initial={{ opacity: 0, x: slideDir * 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: slideDir * -40 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
                 <RatingPage
                   teas={teas}
                   onRateTea={(id, rating) =>
@@ -380,7 +395,11 @@ function App() {
           </AnimatePresence>
         </main>
 
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+        <TabBar activeTab={activeTab} onTabChange={(tab) => {
+          haptic('light');
+          setSlideDir(getDirection(tab));
+          setActiveTab(tab);
+        }} />
 
         <TeaForm
           isOpen={isFormOpen}
