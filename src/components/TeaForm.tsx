@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, animate, PanInfo } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import { X, Plus, Minus } from 'lucide-react';
 import { Tea, TeaType, TEA_TYPE_DEFAULTS, TEA_TYPE_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -68,15 +68,32 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
     onClose();
   };
 
-  // Drag-to-Dismiss
-  const handleDragEnd = (_: unknown, info: PanInfo) => {
-    if (info.offset.y > 100 || info.velocity.y > 500) {
+  // Native Touch Drag-to-Dismiss (funktioniert in PWA + Browser)
+  const touchStartY = useRef(0);
+  const touchStartTime = useRef(0);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchStartTime.current = Date.now();
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const dy = e.touches[0].clientY - touchStartY.current;
+    if (dy > 0) sheetY.set(dy);
+  }, [sheetY]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    const dt = Date.now() - touchStartTime.current;
+    const velocity = dy / dt; // px/ms
+
+    if (dy > 100 || velocity > 0.5) {
       haptic('light');
-      onClose();
+      animate(sheetY, window.innerHeight, { duration: 0.25 }).then(onClose);
     } else {
       animate(sheetY, 0, { type: 'spring', stiffness: 400, damping: 30 });
     }
-  };
+  }, [sheetY, haptic, onClose]);
 
   return (
     <AnimatePresence>
@@ -98,21 +115,39 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[92vh] flex flex-col"
           >
-            {/* Drag Handle — nur dieser Bereich ist draggable */}
-            <motion.div
-              drag="y"
-              dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={{ top: 0.01, bottom: 0.5 }}
-              dragMomentum={false}
-              onDrag={(_: unknown, info: PanInfo) => {
-                if (info.offset.y > 0) sheetY.set(info.offset.y);
+            {/* Drag Handle — native touch events, funktioniert in PWA + Browser */}
+            <div
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={(e) => {
+                const startY = e.clientY;
+                const startTime = Date.now();
+                const onMove = (ev: MouseEvent) => {
+                  const dy = ev.clientY - startY;
+                  if (dy > 0) sheetY.set(dy);
+                };
+                const onUp = (ev: MouseEvent) => {
+                  const dy = ev.clientY - startY;
+                  const dt = Date.now() - startTime;
+                  const velocity = dy / dt;
+                  if (dy > 100 || velocity > 0.5) {
+                    haptic('light');
+                    animate(sheetY, window.innerHeight, { duration: 0.25 }).then(onClose);
+                  } else {
+                    animate(sheetY, 0, { type: 'spring', stiffness: 400, damping: 30 });
+                  }
+                  window.removeEventListener('mousemove', onMove);
+                  window.removeEventListener('mouseup', onUp);
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
               }}
-              onDragEnd={handleDragEnd}
               className="flex justify-center items-center py-4 flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
               style={{ touchAction: 'none' }}
             >
               <div className="w-12 h-1.5 bg-midnight/30 rounded-full" />
-            </motion.div>
+            </div>
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-midnight flex-shrink-0">
