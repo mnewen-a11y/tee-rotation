@@ -96,20 +96,22 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[92vh] overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[92vh] flex flex-col"
           >
             {/* Drag Handle — nur dieser Bereich ist draggable */}
             <motion.div
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={{ top: 0.01, bottom: 0.4 }}
+              dragElastic={{ top: 0.01, bottom: 0.5 }}
+              dragMomentum={false}
               onDrag={(_: unknown, info: PanInfo) => {
                 if (info.offset.y > 0) sheetY.set(info.offset.y);
               }}
               onDragEnd={handleDragEnd}
-              className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing touch-none"
+              className="flex justify-center items-center py-4 flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
+              style={{ touchAction: 'none' }}
             >
-              <div className="w-10 h-1.5 bg-midnight/25 rounded-full" />
+              <div className="w-12 h-1.5 bg-midnight/30 rounded-full" />
             </motion.div>
 
             {/* Header */}
@@ -125,7 +127,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             </div>
 
             {/* Scrollable Body */}
-            <div ref={scrollRef} className="overflow-y-auto flex-1">
+            <div ref={scrollRef} className="overflow-y-auto flex-1 overscroll-contain rounded-b-ios-xl" style={{ overflow: 'auto' }}>
               <form onSubmit={handleSubmit}>
                 <div className="p-6 space-y-5">
 
