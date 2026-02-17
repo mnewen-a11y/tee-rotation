@@ -1,6 +1,6 @@
 export type TeaType = 'schwarz' | 'grün' | 'oolong' | 'chai';
 
-export type SelectionMode = 'grid' | 'swipe';
+export type SelectionMode = 'grid';
 
 export interface Tea {
   id: string;
