@@ -1,267 +1,343 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info, RefreshCw } from 'lucide-react';
-import { Tea } from '@/types/tea';
-import { loadData, saveData, generateId } from '@/lib/storage';
-import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
+import { Coffee, Sparkles, Moon, Sun, Grid3x3, Layers } from 'lucide-react';
+import { Tea, SelectionMode } from '@/types/tea';
+import { loadData, saveData, loadSettings, saveSettings, generateId } from '@/lib/storage';
 import { TeaCard } from '@/components/TeaCard';
+import { TeaGridCard } from '@/components/TeaGridCard';
+import { SwipeCard } from '@/components/SwipeCard';
 import { TeaForm } from '@/components/TeaForm';
-import { TabBar, TabId } from '@/components/TabBar';
-import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
-import { InfoModal } from '@/components/InfoModal';
-import { RatingPage } from '@/components/RatingPage';
-import { HeuteScreen } from '@/components/HeuteScreen';
-import { useHaptic } from '@/hooks/useHaptic';
-import { useTabDirection } from '@/hooks/useTabDirection';
-
-
+import { TabBar } from '@/components/TabBar';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<TabId>('heute');
+  const [activeTab, setActiveTab] = useState<'heute' | 'list' | 'new'>('heute');
   const [teas, setTeas] = useState<Tea[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
+  const [swipeStack, setSwipeStack] = useState<string[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
-  const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'ok' | 'error'>('idle');
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>('grid');
+  const [darkMode, setDarkMode] = useState(false);
 
-
-  const { trigger: haptic } = useHaptic();
-  const { getDirection } = useTabDirection();
-  const [slideDir, setSlideDir] = useState(1);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const infoTriggerRef = useRef<HTMLButtonElement>(null);
-
+  // Load data and settings on mount
   useEffect(() => {
     const data = loadData();
+    const settings = loadSettings();
+    
     setTeas(data.teas);
     setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
-    setTimeout(() => setIsLoading(false), 400); // kurze Mindest-Ladezeit für Skeleton
+    setSelectionMode(settings.selectionMode);
+    setDarkMode(settings.darkMode);
+    
+    // Apply dark mode
+    if (settings.darkMode) {
+      document.documentElement.classList.add('dark');
+    }
   }, []);
 
+  // Initialize swipe stack when mode changes to swipe
   useEffect(() => {
-    if (teas.length > 0 || queue.length > 0) saveData({ teas, queue });
+    if (selectionMode === 'swipe' && swipeStack.length === 0 && queue.length > 0) {
+      setSwipeStack([...queue].slice(0, 3)); // Show top 3 teas
+    }
+  }, [selectionMode, queue, swipeStack.length]);
+
+  // Save data whenever it changes
+  useEffect(() => {
+    if (teas.length > 0 || queue.length > 0) {
+      saveData({ teas, queue });
+    }
   }, [teas, queue]);
 
-  // Realtime Subscription — aktualisiert App wenn Partner Änderungen macht
+  // Save settings when they change
   useEffect(() => {
-    let cleanup: (() => void) | undefined;
-    const setup = () => {
-      cleanup = subscribeToSync((data) => {
-        setTeas(data.teas);
-        setQueue(data.queue);
-        saveData({ teas: data.teas, queue: data.queue });
-        setSyncStatus('ok');
-        setTimeout(() => setSyncStatus('idle'), 2000);
-      });
-    };
-    setup();
-    return () => { cleanup?.(); };
-  }, []);
+    saveSettings({ selectionMode, darkMode });
+  }, [selectionMode, darkMode]);
 
+  // Handle tab change
   useEffect(() => {
-    if (activeTab === 'new' && !editingTea) {
+    if (activeTab === 'new') {
       setIsFormOpen(true);
+      setEditingTea(undefined);
     }
   }, [activeTab]);
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
+  const toggleSelectionMode = () => {
+    const newMode: SelectionMode = selectionMode === 'grid' ? 'swipe' : 'grid';
+    setSelectionMode(newMode);
+    
+    // Reset swipe stack when switching to swipe mode
+    if (newMode === 'swipe') {
+      setSwipeStack([...queue].slice(0, 3));
+    }
+  };
+
   const handleAddTea = (teaData: Omit<Tea, 'id'>) => {
-    const t: Tea = { ...teaData, id: generateId() };
-    setTeas(prev => [...prev, t]);
-    setQueue(prev => [...prev, t.id]);
+    const newTea: Tea = {
+      ...teaData,
+      id: generateId(),
+    };
+    setTeas([...teas, newTea]);
+    setQueue([...queue, newTea.id]);
   };
 
   const handleUpdateTea = (teaData: Omit<Tea, 'id'>) => {
     if (!editingTea) return;
-    setTeas(prev => prev.map(t => t.id === editingTea.id ? { ...teaData, id: editingTea.id } : t));
+    
+    const updatedTeas = teas.map(t => 
+      t.id === editingTea.id ? { ...teaData, id: editingTea.id } : t
+    );
+    setTeas(updatedTeas);
     setEditingTea(undefined);
   };
 
   const handleDeleteTea = (id: string) => {
-    setTeas(prev => prev.filter(t => t.id !== id));
-    setQueue(prev => prev.filter(q => q !== id));
+    setTeas(teas.filter(t => t.id !== id));
+    setQueue(queue.filter(qId => qId !== id));
+    setSwipeStack(swipeStack.filter(sId => sId !== id));
   };
 
   const handleSelectTea = (id: string) => {
-    setTeas(prev => prev.map(t =>
-      t.id === id ? { ...t, zuletztGetrunken: new Date().toISOString(), isSelected: true }
-                  : { ...t, isSelected: false }
-    ));
-    const q = queue.filter(q => q !== id); q.push(id); setQueue(q);
-    setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
+    // Update last drunk date
+    const updatedTeas = teas.map(t => 
+      t.id === id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t
+    );
+    setTeas(updatedTeas);
+
+    // Move to end of queue
+    const newQueue = queue.filter(qId => qId !== id);
+    newQueue.push(id);
+    setQueue(newQueue);
   };
 
-  const handleSkipTea = (id: string) => {
-    haptic('light');
-    setQueue(prev => {
-      const q = prev.filter(q => q !== id);
-      q.push(id);
-      return q;
-    });
+  const handleSwipeLeft = (id: string) => {
+    // Accept tea - move to end of queue
+    handleSelectTea(id);
+    
+    // Remove from swipe stack and add next tea
+    const newStack = swipeStack.filter(sId => sId !== id);
+    const nextTeaIndex = queue.findIndex(qId => !newStack.includes(qId) && qId !== id);
+    if (nextTeaIndex !== -1) {
+      newStack.push(queue[nextTeaIndex]);
+    }
+    setSwipeStack(newStack);
+  };
+
+  const handleSwipeRight = (id: string) => {
+    // Skip tea - move to end temporarily
+    const newStack = swipeStack.filter(sId => sId !== id);
+    newStack.push(id);
+    setSwipeStack(newStack);
   };
 
   const handleEditTea = (tea: Tea) => {
     setEditingTea(tea);
     setIsFormOpen(true);
-    // KEIN setActiveTab('new') — das würde editingTea via useEffect zurücksetzen
+    setActiveTab('new');
   };
 
-  const getTeaById = (id: string) => teas.find(t => t.id === id);
-
-  const handleExport = () => {
-    const blob = new Blob(
-      [JSON.stringify({ version: '1.0.0', exportDate: new Date().toISOString(), teas, queue }, null, 2)],
-      { type: 'application/json' }
-    );
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `royal-tea-export-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const getTeaById = (id: string): Tea | undefined => {
+    return teas.find(t => t.id === id);
   };
-
-  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const parsed = JSON.parse(ev.target?.result as string);
-        if (!parsed.teas || !Array.isArray(parsed.teas)) { alert('Ungültige Datei.'); return; }
-        if (confirm(`${parsed.teas.length} Tees importieren? Bestehende Daten werden überschrieben.`)) {
-          setTeas(parsed.teas);
-          setQueue(parsed.queue ?? parsed.teas.map((t: Tea) => t.id));
-        }
-      } catch { alert('Datei konnte nicht gelesen werden.'); }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  };
-
-  const handleSync = async () => {
-    setSyncStatus('syncing');
-    const ok = await saveToSupabase(teas, queue);
-    setSyncStatus(ok ? 'ok' : 'error');
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  };
-
-  const availableTeas = queue
-    .map(id => getTeaById(id))
-    .filter((t): t is Tea => !!t && !t.zuletztGetrunken);
-
-
 
   return (
-    <div className="min-h-screen bg-midnight">
-      <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
+    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+      <div className="min-h-screen bg-ios-bg dark:bg-gray-900 pb-20 transition-colors">
+        {/* Header */}
+        <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-ios border-b border-ios-border dark:border-gray-700 sticky top-0 z-20">
+          <div className="max-w-3xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-tea-green to-tea-oolong rounded-ios flex items-center justify-center">
+                  <Coffee className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-ios-label dark:text-white">Tee Rotation</h1>
+                  <p className="text-xs text-ios-secondary dark:text-gray-400">Dein persönlicher Tee-Begleiter</p>
+                </div>
+              </div>
 
-      <div className="min-h-screen pb-28">
-
-        {/* HEADER
-             - Unsichtbarer Spacer oben = env(safe-area-inset-top) für PWA-Modus
-             - Eigentlicher Inhalt: feste Höhe h-14, items-center → Logo + Buttons immer aligned
-             - Header-Gesamthöhe wächst nur um die tatsächliche Status-Bar-Höhe */}
-        <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
-          {/* Safe-area Spacer — nur sichtbar im PWA-Modus */}
-          <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
-          {/* Header-Inhalt — fixe Höhe, vertikal zentriert */}
-          <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
-            <RoyalTeaLogo size="sm" className="opacity-90" />
-            <div className="flex items-center gap-2">
-
-              {/* Sync-Button */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={handleSync}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                aria-label="Mit Partner synchronisieren"
-                disabled={syncStatus === 'syncing'}
-              >
-                <RefreshCw
-                  className={`w-5 h-5 transition-colors ${
-                    syncStatus === 'syncing' ? 'text-gold animate-spin' :
-                    syncStatus === 'ok'      ? 'text-green-400' :
-                    syncStatus === 'error'   ? 'text-red-400' :
-                    'text-white'
-                  }`}
-                />
-              </motion.button>
-
-              <motion.button
-                ref={infoTriggerRef}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsInfoOpen(true)}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                aria-label="App-Informationen"
-                aria-haspopup="dialog"
-                aria-expanded={isInfoOpen}>
-                <Info className="w-5 h-5 text-white" />
-              </motion.button>
+              {/* Settings Buttons */}
+              <div className="flex items-center gap-2">
+                {activeTab === 'heute' && (
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={toggleSelectionMode}
+                    className="p-2 bg-ios-bg dark:bg-gray-700 hover:bg-ios-border dark:hover:bg-gray-600 rounded-ios transition-colors"
+                    title={selectionMode === 'grid' ? 'Swipe-Modus' : 'Grid-Modus'}
+                  >
+                    {selectionMode === 'grid' ? (
+                      <Layers className="w-5 h-5 text-ios-label dark:text-white" />
+                    ) : (
+                      <Grid3x3 className="w-5 h-5 text-ios-label dark:text-white" />
+                    )}
+                  </motion.button>
+                )}
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={toggleDarkMode}
+                  className="p-2 bg-ios-bg dark:bg-gray-700 hover:bg-ios-border dark:hover:bg-gray-600 rounded-ios transition-colors"
+                >
+                  {darkMode ? (
+                    <Sun className="w-5 h-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-ios-label" />
+                  )}
+                </motion.button>
+              </div>
             </div>
           </div>
         </header>
 
-        {/* CONTENT */}
-        <main
-          className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)] transition-colors duration-300"
-          style={{ backgroundColor: activeTab === 'heute' ? '#1d2646' : '#FFFFF0' }}>
-          <AnimatePresence mode="wait" custom={slideDir}>
-
-            {/* TAB: HEUTE — ein Screen, eine Entscheidung */}
+        {/* Content */}
+        <main className="max-w-3xl mx-auto px-6 py-6">
+          <AnimatePresence mode="wait">
             {activeTab === 'heute' && (
-              <motion.div key="heute"
-                custom={slideDir}
-                initial={{ opacity: 0, x: slideDir * 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: slideDir * -40 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="flex flex-col"
-                style={{ minHeight: 'calc(100vh - 180px)' }}
+              <motion.div
+                key="heute"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
               >
-                <HeuteScreen
-                  queue={availableTeas}
-                  onSelect={handleSelectTea}
-                  isLoading={isLoading}
-                />
+                {teas.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-20">
+                    <div className="w-20 h-20 bg-ios-border dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                      <Coffee className="w-10 h-10 text-ios-secondary dark:text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-ios-label dark:text-white mb-2">
+                      Keine Tees vorhanden
+                    </h3>
+                    <p className="text-ios-secondary dark:text-gray-400 text-center mb-6">
+                      Füge deinen ersten Tee hinzu, um zu beginnen.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('new')}
+                      className="bg-ios-blue text-white px-6 py-3 rounded-ios-lg font-medium"
+                    >
+                      Ersten Tee hinzufügen
+                    </button>
+                  </div>
+                ) : selectionMode === 'grid' ? (
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-2 justify-center mb-4">
+                      <Sparkles className="w-5 h-5 text-ios-blue dark:text-blue-400" />
+                      <h2 className="text-lg font-semibold text-ios-secondary dark:text-gray-400">
+                        Wähle deinen Tee
+                      </h2>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {queue.map((teaId, index) => {
+                        const tea = getTeaById(teaId);
+                        if (!tea) return null;
+                        return (
+                          <TeaGridCard
+                            key={tea.id}
+                            tea={tea}
+                            onSelect={() => handleSelectTea(tea.id)}
+                            index={index}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-2 justify-center mb-4">
+                      <Sparkles className="w-5 h-5 text-ios-blue dark:text-blue-400" />
+                      <h2 className="text-lg font-semibold text-ios-secondary dark:text-gray-400">
+                        Swipe für deinen Tee
+                      </h2>
+                    </div>
+                    
+                    <div className="relative h-[600px] flex items-center justify-center">
+                      {swipeStack.length === 0 && (
+                        <div className="text-center">
+                          <p className="text-ios-secondary dark:text-gray-400 mb-4">
+                            Keine Tees mehr in der Queue
+                          </p>
+                          <button
+                            onClick={() => setSwipeStack([...queue].slice(0, 3))}
+                            className="bg-ios-blue text-white px-6 py-3 rounded-ios-lg font-medium"
+                          >
+                            Neu starten
+                          </button>
+                        </div>
+                      )}
+                      
+                      {swipeStack.slice(0, 3).reverse().map((teaId, index) => {
+                        const tea = getTeaById(teaId);
+                        if (!tea) return null;
+                        return (
+                          <SwipeCard
+                            key={tea.id}
+                            tea={tea}
+                            onSwipeLeft={() => handleSwipeLeft(tea.id)}
+                            onSwipeRight={() => handleSwipeRight(tea.id)}
+                            zIndex={swipeStack.length - index}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
-            {/* TAB: MEINE TEES */}
             {activeTab === 'list' && (
-              <motion.div key="list"
-                custom={slideDir}
-                initial={{ opacity: 0, x: slideDir * 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: slideDir * -40 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
+              <motion.div
+                key="list"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+              >
                 <div className="mb-4">
-                  <h2 className="text-xl font-bold font-serif text-midnight mb-1">Meine Tees</h2>
-                  <p className="text-sm text-midnight/60 font-sans">
+                  <h2 className="text-xl font-bold text-ios-label dark:text-white mb-1">Meine Tees</h2>
+                  <p className="text-sm text-ios-secondary dark:text-gray-400">
                     {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
                   </p>
                 </div>
+
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
-                      <span className="text-4xl">🍵</span>
+                    <div className="w-20 h-20 bg-ios-border dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                      <Coffee className="w-10 h-10 text-ios-secondary dark:text-gray-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Noch keine Tees</h3>
-                    <p className="text-midnight/60 text-center mb-6 font-sans">Beginne deine Tee-Sammlung</p>
-                    <button onClick={() => setActiveTab('new')}
-                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">
+                    <h3 className="text-xl font-semibold text-ios-label dark:text-white mb-2">
+                      Noch keine Tees
+                    </h3>
+                    <p className="text-ios-secondary dark:text-gray-400 text-center mb-6">
+                      Beginne deine Tee-Sammlung
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('new')}
+                      className="bg-ios-blue text-white px-6 py-3 rounded-ios-lg font-medium"
+                    >
                       Tee hinzufügen
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {queue.map(teaId => {
-                      const tea = getTeaById(teaId); if (!tea) return null;
+                    {queue.map((teaId) => {
+                      const tea = getTeaById(teaId);
+                      if (!tea) return null;
                       return (
-                        <TeaCard key={tea.id} tea={tea}
+                        <TeaCard
+                          key={tea.id}
+                          tea={tea}
                           onEdit={() => handleEditTea(tea)}
-                          onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
+                          onDelete={() => {
+                            if (confirm(`"${tea.name}" wirklich löschen?`)) {
+                              handleDeleteTea(tea.id);
+                            }
+                          }}
                         />
                       );
                     })}
@@ -269,53 +345,25 @@ function App() {
                 )}
               </motion.div>
             )}
-
-            {/* TAB: BEWERTEN */}
-            {activeTab === 'rating' && (
-              <motion.div key="rating"
-                custom={slideDir}
-                initial={{ opacity: 0, x: slideDir * 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: slideDir * -40 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
-                <RatingPage
-                  teas={teas}
-                  onRateTea={(id, rating) =>
-                    setTeas(prev => prev.map(t => t.id === id ? { ...t, rating } : t))
-                  }
-                  onNavigateToNew={() => setActiveTab('new')}
-                />
-              </motion.div>
-            )}
-
           </AnimatePresence>
         </main>
 
-        <TabBar activeTab={activeTab} onTabChange={(tab) => {
-          haptic('light');
-          setSlideDir(getDirection(tab));
-          setActiveTab(tab);
-        }} />
-
+        {/* Tea Form Modal */}
         <TeaForm
           isOpen={isFormOpen}
           onClose={() => {
             setIsFormOpen(false);
             setEditingTea(undefined);
-            if (activeTab === 'new') setActiveTab('heute');
+            if (activeTab === 'new') {
+              setActiveTab('heute');
+            }
           }}
           onSave={editingTea ? handleUpdateTea : handleAddTea}
           editTea={editingTea}
         />
 
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={() => setIsInfoOpen(false)}
-          triggerRef={infoTriggerRef}
-          onExport={handleExport}
-          onImport={() => fileInputRef.current?.click()}
-        />
-
+        {/* Tab Bar */}
+        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     </div>
   );

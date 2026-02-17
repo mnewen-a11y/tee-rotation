@@ -48,13 +48,13 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
       transition={{ duration: 0.2 }}
       whileTap={{ cursor: 'grabbing' }}
     >
-      <div className="relative bg-gold rounded-3xl shadow-2xl overflow-hidden border-2 border-gold/20">
+      <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-ios-border dark:border-gray-700">
         {/* Swipe Indicators */}
         <motion.div
           className="absolute top-8 left-8 z-10"
           style={{ opacity: useTransform(x, [-200, -50], [1, 0]) }}
         >
-          <div className="bg-ios-green text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg rotate-12 font-serif">
+          <div className="bg-ios-green text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg rotate-12">
             <Check className="w-6 h-6" />
             Trinken!
           </div>
@@ -64,7 +64,7 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
           className="absolute top-8 right-8 z-10"
           style={{ opacity: useTransform(x, [50, 200], [0, 1]) }}
         >
-          <div className="bg-ios-red text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg -rotate-12 font-serif">
+          <div className="bg-ios-red text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg -rotate-12">
             <X className="w-6 h-6" />
             Später
           </div>
@@ -83,13 +83,13 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
           </div>
 
           {/* Tea Name */}
-          <h2 className="text-4xl font-bold text-center mb-2 text-gold-text font-serif">
+          <h2 className="text-4xl font-bold text-center mb-2 text-ios-label dark:text-white">
             {tea.name}
           </h2>
 
           {/* Hersteller */}
           {tea.hersteller && (
-            <p className="text-center text-gold-text/60 text-lg mb-8">
+            <p className="text-center text-ios-secondary dark:text-gray-400 text-lg mb-8">
               {tea.hersteller}
             </p>
           )}
@@ -97,27 +97,27 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-4 mb-8">
             {/* Temperature */}
-            <div className="bg-midnight/10 rounded-2xl p-6 flex flex-col items-center">
-              <Thermometer className="w-8 h-8 mb-2" style={{ color: teaColor }} />
-              <span className="text-3xl font-bold text-gold-text font-serif">{tea.bruehgrad}°</span>
-              <span className="text-xs text-gold-text/60 mt-1">Celsius</span>
+            <div className="bg-ios-bg dark:bg-gray-700 rounded-2xl p-6 flex flex-col items-center">
+              <Thermometer className="w-8 h-8 text-ios-blue dark:text-blue-400 mb-2" />
+              <span className="text-3xl font-bold text-ios-label dark:text-white">{tea.bruehgrad}°</span>
+              <span className="text-xs text-ios-secondary dark:text-gray-400 mt-1">Celsius</span>
             </div>
 
             {/* Gramm */}
-            <div className="bg-midnight/10 rounded-2xl p-6 flex flex-col items-center">
-              <Package className="w-8 h-8 mb-2" style={{ color: teaColor }} />
-              <span className="text-3xl font-bold text-gold-text font-serif">{tea.grammAnzahl}g</span>
-              <span className="text-xs text-gold-text/60 mt-1">pro Kanne</span>
+            <div className="bg-ios-bg dark:bg-gray-700 rounded-2xl p-6 flex flex-col items-center">
+              <Package className="w-8 h-8 text-ios-blue dark:text-blue-400 mb-2" />
+              <span className="text-3xl font-bold text-ios-label dark:text-white">{tea.grammAnzahl}</span>
+              <span className="text-xs text-ios-secondary dark:text-gray-400 mt-1">Gramm</span>
             </div>
           </div>
 
           {/* Fuellstand Bar */}
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gold-text/60">Füllstand</span>
-              <span className="text-sm font-bold text-gold-text">{tea.fuellstand}%</span>
+              <span className="text-sm font-medium text-ios-secondary dark:text-gray-400">Füllstand</span>
+              <span className="text-sm font-bold text-ios-label dark:text-white">{tea.fuellstand}%</span>
             </div>
-            <div className="h-3 bg-midnight/10 rounded-full overflow-hidden">
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div 
                 className={`h-full ${fuellstandColor} transition-all rounded-full`}
                 style={{ width: `${tea.fuellstand}%` }}
@@ -127,7 +127,7 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
 
           {/* Swipe Instructions */}
           <div className="text-center">
-            <p className="text-sm text-gold-text/60">
+            <p className="text-sm text-ios-secondary dark:text-gray-400">
               ← Wischen zum Trinken • Wischen zum Überspringen →
             </p>
           </div>
@@ -135,7 +135,7 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
 
         {/* Gradient Overlay */}
         <div 
-          className="absolute inset-0 opacity-5 pointer-events-none"
+          className="absolute inset-0 opacity-10 pointer-events-none"
           style={{ 
             background: `linear-gradient(135deg, ${teaColor}22 0%, transparent 50%)` 
           }}

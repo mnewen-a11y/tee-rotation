@@ -1,7 +1,6 @@
-// Fonts: Cormorant Garamond & Playfair Display — SIL OFL 1.1 (see ABOUT.md)
+export type TeaType = 'schwarz' | 'grün' | 'oolong' | 'chai';
 
-export type TeaType = 'schwarz' | 'grün' | 'oolong' | 'chai' | 'jasmin' | 'kräuter';
-export type SelectionMode = 'grid';
+export type SelectionMode = 'grid' | 'swipe';
 
 export interface Tea {
   id: string;
@@ -9,40 +8,33 @@ export interface Tea {
   hersteller?: string;
   teeArt: TeaType;
   bruehgrad: number;
-  grammAnzahl: number;
-  fuellstand: number;
-  zuletztGetrunken?: string;
-  isSelected?: boolean;
-  rating?: number; // 1–5, optional
+  grammAnzahl: number; // Gramm-Menge
+  fuellstand: number; // 0-100 Prozent
+  zuletztGetrunken?: string; // ISO date string
 }
 
 export interface AppSettings {
   selectionMode: SelectionMode;
+  darkMode: boolean;
 }
 
-export const TEA_TYPE_DEFAULTS: Record<TeaType, { temp: number; gramm: number }> = {
-  schwarz:  { temp: 100, gramm: 8 },
-  grün:     { temp: 80,  gramm: 3 },
-  oolong:   { temp: 90,  gramm: 8 },
-  chai:     { temp: 90,  gramm: 8 },
-  jasmin:   { temp: 80,  gramm: 4 },
-  kräuter:  { temp: 100, gramm: 5 },
+export const TEA_TYPE_DEFAULTS: Record<TeaType, number> = {
+  schwarz: 100,
+  grün: 80,
+  oolong: 90,
+  chai: 90,
 };
 
 export const TEA_TYPE_COLORS: Record<TeaType, string> = {
-  schwarz:  '#8B4513',
-  grün:     '#4CAF50',
-  oolong:   '#DAA520',
-  chai:     '#A0522D',
-  jasmin:   '#C77DFF',
-  kräuter:  '#2E8B57',
+  schwarz: '#8B4513',
+  grün: '#4CAF50',
+  oolong: '#DAA520',
+  chai: '#A0522D',
 };
 
 export const TEA_TYPE_LABELS: Record<TeaType, string> = {
-  schwarz:  'Schwarztee',
-  grün:     'Grüntee',
-  oolong:   'Oolong',
-  chai:     'Chai',
-  jasmin:   'Jasmin',
-  kräuter:  'Kräuter',
+  schwarz: 'Schwarztee',
+  grün: 'Grüntee',
+  oolong: 'Oolong',
+  chai: 'Chai',
 };
