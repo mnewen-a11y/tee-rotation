@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Sparkles, Moon, Sun, ChevronDown, Download, Upload, Info } from 'lucide-react';
+import { Coffee, Sparkles, ChevronDown, Download, Upload, Info } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, loadSettings, saveSettings, generateId } from '@/lib/storage';
 import { TeaCard } from '@/components/TeaCard';
@@ -29,7 +29,6 @@ function App() {
   const [queue, setQueue] = useState<string[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
-  const [darkMode, setDarkMode] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
     schwarz: true, grün: true, oolong: true, chai: true, jasmin: true, kräuter: true,
@@ -43,8 +42,6 @@ function App() {
     const settings = loadSettings();
     setTeas(data.teas);
     setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
-    setDarkMode(settings.darkMode);
-    if (settings.darkMode) document.documentElement.classList.add('dark');
   }, []);
 
   useEffect(() => {
@@ -52,17 +49,8 @@ function App() {
   }, [teas, queue]);
 
   useEffect(() => {
-    saveSettings({ selectionMode: 'grid', darkMode });
-  }, [darkMode]);
-
-  useEffect(() => {
     if (activeTab === 'new') { setIsFormOpen(true); setEditingTea(undefined); }
   }, [activeTab]);
-
-  const toggleDarkMode = () => {
-    setDarkMode(d => !d);
-    document.documentElement.classList.toggle('dark');
-  };
 
   const toggleCategory = (type: TeaType) =>
     setOpenCategories(prev => ({ ...prev, [type]: !prev[type] }));
@@ -175,11 +163,7 @@ function App() {
                   aria-label="Daten importieren">
                   <Upload className="w-5 h-5 text-white" />
                 </motion.button>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={toggleDarkMode}
-                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label={darkMode ? 'Hell-Modus' : 'Dunkel-Modus'}>
-                  {darkMode ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-white" />}
-                </motion.button>
+
                 <motion.button
                   ref={infoTriggerRef}
                   whileTap={{ scale: 0.9 }}

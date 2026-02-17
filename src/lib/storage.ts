@@ -26,8 +26,8 @@ export const loadSettings = (): AppSettings => {
     const stored = localStorage.getItem(SETTINGS_KEY);
     if (stored) return JSON.parse(stored);
   } catch (e) { console.error('loadSettings:', e); }
-  // Default — darkMode required by AppSettings
-  return { selectionMode: 'grid', darkMode: false };
+
+  return { selectionMode: 'grid' };
 };
 
 export const saveSettings = (settings: AppSettings): void => {

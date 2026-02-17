@@ -18,7 +18,6 @@ export interface Tea {
 
 export interface AppSettings {
   selectionMode: SelectionMode;
-  darkMode: boolean;
 }
 
 export const TEA_TYPE_DEFAULTS: Record<TeaType, { temp: number; gramm: number }> = {
