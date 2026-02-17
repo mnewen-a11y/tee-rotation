@@ -1,53 +1,39 @@
 import { Tea, AppSettings } from '@/types/tea';
 
-const STORAGE_KEY = 'tea-rotation-data';
+const STORAGE_KEY  = 'tea-rotation-data';
 const SETTINGS_KEY = 'tea-rotation-settings';
 
 export interface StorageData {
   teas: Tea[];
-  queue: string[]; // array of tea IDs in order
+  queue: string[];
 }
 
 export const loadData = (): StorageData => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.error('Error loading data:', error);
-  }
+    if (stored) return JSON.parse(stored);
+  } catch (e) { console.error('loadData:', e); }
   return { teas: [], queue: [] };
 };
 
 export const saveData = (data: StorageData): void => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (error) {
-    console.error('Error saving data:', error);
-  }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  catch (e) { console.error('saveData:', e); }
 };
 
 export const loadSettings = (): AppSettings => {
   try {
     const stored = localStorage.getItem(SETTINGS_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.error('Error loading settings:', error);
-  }
-  return { selectionMode: 'grid', darkMode: false };
+    if (stored) return JSON.parse(stored);
+  } catch (e) { console.error('loadSettings:', e); }
+
+  return { selectionMode: 'grid' };
 };
 
 export const saveSettings = (settings: AppSettings): void => {
-  try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  } catch (error) {
-    console.error('Error saving settings:', error);
-  }
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+  catch (e) { console.error('saveSettings:', e); }
 };
 
-export const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-};
+export const generateId = (): string =>
+  `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

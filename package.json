@@ -1,7 +1,8 @@
 {
-  "name": "tee-rotation",
+  "name": "royal-tee",
   "private": true,
   "version": "1.0.0",
+  "release": "R005",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +14,8 @@
     "react-dom": "^18.3.1",
     "lucide-react": "^0.263.1",
     "clsx": "^2.1.0",
-    "framer-motion": "^11.0.0"
+    "framer-motion": "^11.0.0",
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
