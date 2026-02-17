@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Download, Upload } from 'lucide-react';
 
 interface InfoModalProps {
   isOpen: boolean;
   onClose: () => void;
   triggerRef: React.RefObject<HTMLButtonElement>;
+  onExport: () => void;
+  onImport: () => void;
 }
 
 const RELEASE = 'R005 – v1.0.0';
@@ -31,7 +33,7 @@ const ROADMAP = [
   { version: 'v1.3.0', label: 'Erweiterte PWA', items: ['Push-Benachrichtigungen', 'Erweiterte Statistiken', 'Mehrere Rotationen'] },
 ];
 
-export const InfoModal = ({ isOpen, onClose, triggerRef }: InfoModalProps) => {
+export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: InfoModalProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const titleId = 'info-modal-title';
@@ -171,6 +173,59 @@ export const InfoModal = ({ isOpen, onClose, triggerRef }: InfoModalProps) => {
                     </div>
                   ))}
                 </div>
+              </section>
+
+              <hr className="border-midnight/10" />
+
+              {/* Backup */}
+              <section aria-labelledby="info-backup">
+                <h3 id="info-backup" className="text-base font-semibold font-serif text-midnight mb-3">
+                  Datensicherung
+                </h3>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { onExport(); onClose(); }}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-midnight/8 hover:bg-midnight/15 rounded-ios-lg transition-colors"
+                  >
+                    <Download className="w-4 h-4 text-midnight/70" />
+                    <span className="text-sm font-medium text-midnight font-sans">Exportieren</span>
+                  </button>
+                  <button
+                    onClick={() => { onImport(); onClose(); }}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-midnight/8 hover:bg-midnight/15 rounded-ios-lg transition-colors"
+                  >
+                    <Upload className="w-4 h-4 text-midnight/70" />
+                    <span className="text-sm font-medium text-midnight font-sans">Importieren</span>
+                  </button>
+                </div>
+              </section>
+
+              <hr className="border-midnight/10" />
+
+              {/* Backup */}
+              <section aria-labelledby="info-backup">
+                <h3 id="info-backup" className="text-base font-semibold font-serif text-midnight mb-3">
+                  Datensicherung
+                </h3>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { onExport(); onClose(); }}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-midnight/8 hover:bg-midnight/12 rounded-ios-lg transition-colors text-sm font-medium text-midnight font-sans"
+                  >
+                    <Download className="w-4 h-4" aria-hidden="true" />
+                    Exportieren
+                  </button>
+                  <button
+                    onClick={() => { onImport(); onClose(); }}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-midnight/8 hover:bg-midnight/12 rounded-ios-lg transition-colors text-sm font-medium text-midnight font-sans"
+                  >
+                    <Upload className="w-4 h-4" aria-hidden="true" />
+                    Importieren
+                  </button>
+                </div>
+                <p className="text-xs text-midnight/40 font-sans mt-2">
+                  Sync läuft automatisch via Supabase. Export/Import nur für manuelle Backups.
+                </p>
               </section>
 
               <hr className="border-midnight/10" />

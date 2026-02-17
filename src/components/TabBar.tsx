@@ -8,9 +8,6 @@ interface TabBarProps {
   onTabChange: (tab: TabId) => void;
 }
 
-// Tabs mit ivory/hellem Content-Hintergrund
-const LIGHT_CONTENT_TABS: TabId[] = ['heute', 'list', 'rating'];
-
 export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
   const tabs: { id: TabId; icon: typeof Home; label: string }[] = [
     { id: 'heute',  icon: Home,  label: 'Heute'      },
@@ -19,27 +16,6 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
     { id: 'rating', icon: Star,  label: 'Bewerten'   },
   ];
 
-  // Auf hellem Hintergrund: dunkle Pill + dunkle Icons
-  const isLight = LIGHT_CONTENT_TABS.includes(activeTab);
-
-  const inactiveColor  = isLight ? 'rgba(29,38,70,0.45)'  : 'rgba(255,255,255,0.65)';
-  const activeColor    = '#c6b975'; // gold — immer
-  const pillBg         = isLight
-    ? 'rgba(29,38,70,0.10)'
-    : 'rgba(255,255,255,0.22)';
-  const glassBg        = isLight
-    ? 'rgba(29,38,70,0.08)'
-    : 'rgba(255,255,255,0.18)';
-  const glassBorder    = isLight
-    ? 'rgba(29,38,70,0.15)'
-    : 'rgba(255,255,255,0.25)';
-  const glassHighlight = isLight
-    ? 'rgba(29,38,70,0.06)'
-    : 'rgba(255,255,255,0.35)';
-  const glassShadow    = isLight
-    ? '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)'
-    : '0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.08)';
-
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-30 flex justify-center"
@@ -47,13 +23,18 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
     >
       <nav
         aria-label="Hauptnavigation"
-        className="relative flex items-center gap-1 px-3 py-2 rounded-full transition-all duration-300"
+        className="relative flex items-center gap-1 px-3 py-2 rounded-full"
         style={{
-          background: glassBg,
-          backdropFilter: 'blur(40px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-          boxShadow: glassShadow,
-          border: `1px solid ${glassBorder}`,
+          background: 'rgba(18, 24, 48, 0.85)',
+          backdropFilter: 'blur(40px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(160%)',
+          boxShadow: [
+            '0 8px 32px rgba(0,0,0,0.35)',
+            '0 2px 8px rgba(0,0,0,0.20)',
+            'inset 0 1px 0 rgba(255,255,255,0.12)',
+            'inset 0 -1px 0 rgba(0,0,0,0.20)',
+          ].join(', '),
+          border: '1px solid rgba(255,255,255,0.10)',
         }}
       >
         {tabs.map((tab) => {
@@ -68,7 +49,7 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
               onClick={() => onTabChange(tab.id)}
               aria-label={tab.label}
               aria-current={isActive ? 'page' : undefined}
-              className="relative flex flex-col items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 rounded-full transition-all duration-300"
+              className="relative flex flex-col items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 rounded-full"
               style={{ minWidth: isNew ? '52px' : '68px', padding: '6px 4px' }}
             >
               {/* Active pill */}
@@ -77,21 +58,21 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
                   layoutId="tabPill"
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: pillBg,
-                    boxShadow: `inset 0 1px 0 ${glassHighlight}`,
+                    background: 'rgba(255,255,255,0.10)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.10)',
                   }}
                   transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                 />
               )}
 
-              {/* + Button */}
+              {/* + Button — gold pill */}
               {isNew ? (
                 <motion.div
                   whileTap={{ scale: 0.88 }}
                   className="w-11 h-11 rounded-full flex items-center justify-center"
                   style={{
                     background: 'linear-gradient(145deg, #d4c47e, #b8a85a)',
-                    boxShadow: '0 4px 12px rgba(198,185,117,0.45), inset 0 1px 0 rgba(255,255,255,0.3)',
+                    boxShadow: '0 4px 12px rgba(198,185,117,0.40), inset 0 1px 0 rgba(255,255,255,0.30)',
                   }}
                 >
                   <Plus className="w-5 h-5 text-midnight" strokeWidth={2.5} />
@@ -104,15 +85,15 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
                     className="relative z-10"
                   >
                     <Icon
-                      className="w-[22px] h-[22px] transition-colors duration-300"
-                      style={{ color: isActive ? activeColor : inactiveColor }}
-                      fill={isStar && isActive ? activeColor : 'none'}
+                      className="w-[22px] h-[22px]"
+                      style={{ color: isActive ? '#c6b975' : 'rgba(255,255,255,0.60)' }}
+                      fill={isStar && isActive ? '#c6b975' : 'none'}
                       strokeWidth={isActive ? 2 : 1.75}
                     />
                   </motion.div>
                   <span
-                    className="text-[10px] font-sans font-medium mt-0.5 relative z-10 leading-none transition-colors duration-300"
-                    style={{ color: isActive ? activeColor : inactiveColor }}
+                    className="text-[10px] font-sans font-medium mt-0.5 relative z-10 leading-none"
+                    style={{ color: isActive ? '#c6b975' : 'rgba(255,255,255,0.55)' }}
                   >
                     {tab.label}
                   </span>
