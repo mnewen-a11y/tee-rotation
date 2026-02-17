@@ -1,16 +1,35 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Edit3, Trash2 } from 'lucide-react';
 import { Tea, TEA_TYPE_COLORS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useLongPress } from '@/hooks/useLongPress';
+import { ContextMenu } from '@/components/ContextMenu';
 
 interface TeaGridCardProps {
   tea: Tea;
   onSelect: () => void;
   index: number;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
+export const TeaGridCard = ({ tea, onSelect, index, onEdit, onDelete }: TeaGridCardProps) => {
   const { trigger: haptic } = useHaptic();
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null);
   const teaColor = TEA_TYPE_COLORS[tea.teeArt];
+
+  const longPress = useLongPress({
+    onLongPress: (x, y) => {
+      haptic('medium');
+      setMenuPos({ x, y });
+    },
+  });
+
+  const contextItems = [
+    ...(onEdit   ? [{ label: 'Bearbeiten', icon: Edit3,  action: onEdit }] : []),
+    ...(onDelete ? [{ label: 'Löschen',    icon: Trash2, action: onDelete, destructive: true }] : []),
+  ];
   const fuellstandColor =
     tea.fuellstand > 70 ? 'bg-green-500' :
     tea.fuellstand > 30 ? 'bg-orange-400' :
@@ -19,12 +38,14 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
   const showCheckmark = tea.isSelected;
 
   return (
+  <>
     <motion.button
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: showCheckmark ? 1.02 : 1 }}
       transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 20 }}
       whileTap={{ scale: 0.97 }}
       onClick={() => { haptic('medium'); onSelect(); }}
+      {...longPress}
       aria-label={`${tea.name} auswählen`}
       className={`group relative aspect-square rounded-ios-xl overflow-hidden shadow-ios-md hover:shadow-ios-lg transition-all bg-white border-2 ${
         showCheckmark ? 'border-green-500 shadow-green-200' : 'border-gold/20'
@@ -105,5 +126,17 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
       {/* Hover-Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-midnight/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </motion.button>
+
+    {/* Context Menu */}
+    {contextItems.length > 0 && (
+      <ContextMenu
+        isOpen={!!menuPos}
+        x={menuPos?.x ?? 0}
+        y={menuPos?.y ?? 0}
+        items={contextItems}
+        onClose={() => setMenuPos(null)}
+      />
+    )}
+  </>
   );
 };

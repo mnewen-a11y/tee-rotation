@@ -296,7 +296,10 @@ function App() {
                                         style={{ backgroundColor: 'rgba(255,255,240,0.8)' }}>
                                         {catTeas.map((tea, i) => (
                                           <TeaGridCard key={tea.id} tea={tea}
-                                            onSelect={() => handleSelectTea(tea.id)} index={i} />
+                                            onSelect={() => handleSelectTea(tea.id)}
+                                            onEdit={() => handleEditTea(tea)}
+                                            onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
+                                            index={i} />
                                         ))}
                                       </div>
                                     </motion.div>
@@ -319,7 +322,10 @@ function App() {
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
                           {usedTeas.map((tea, i) => (
                             <TeaGridCard key={tea.id} tea={{ ...tea, isSelected: true }}
-                              onSelect={() => handleUnselectTea(tea.id)} index={i} />
+                              onSelect={() => handleUnselectTea(tea.id)}
+                              onEdit={() => handleEditTea(tea)}
+                              onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
+                              index={i} />
                           ))}
                         </div>
                         <p className="text-center text-sm text-midnight/40 italic font-sans">
