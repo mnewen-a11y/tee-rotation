@@ -101,7 +101,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             dragElastic={{ top: 0.02, bottom: 0.5 }}
             onDragEnd={handleDragEnd}
             className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[92vh] overflow-hidden flex flex-col"
-            style={{ backgroundColor: '#FFFFF0', y: sheetY }}
+            style={{ backgroundColor: '#FFFFF0' }}
           >
             {/* Drag Handle */}
             <div className="flex justify-center pt-3 pb-1 flex-shrink-0 cursor-grab active:cursor-grabbing">

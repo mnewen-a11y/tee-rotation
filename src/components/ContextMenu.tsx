@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Edit3, Trash2, Star } from 'lucide-react';
+import { Edit3 } from 'lucide-react';
 
 interface ContextMenuItem {
   label: string;
