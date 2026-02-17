@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Sparkles, ChevronDown, Download, Upload, Info } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
-import { loadData, saveData, loadSettings, saveSettings, generateId } from '@/lib/storage';
+import { loadData, saveData, generateId } from '@/lib/storage';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
@@ -39,7 +39,6 @@ function App() {
 
   useEffect(() => {
     const data = loadData();
-    const settings = loadSettings();
     setTeas(data.teas);
     setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
   }, []);
