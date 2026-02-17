@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Info, RefreshCw } from 'lucide-react';
+import { Info, RefreshCw } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
-// TeaGridCard nur noch in Meine Tees Tab
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
@@ -16,17 +15,7 @@ import { HeuteScreen } from '@/components/HeuteScreen';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useTabDirection } from '@/hooks/useTabDirection';
 
-const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
 
-const TEA_CATEGORY_LABELS: Record<TeaType, string> = {
-  schwarz: 'Schwarztee', grün: 'Grüntee', oolong: 'Oolong',
-  chai: 'Chai', jasmin: 'Jasmin', kräuter: 'Kräuter',
-};
-
-const TEA_CATEGORY_COLORS: Record<TeaType, string> = {
-  schwarz: '#8B4513', grün: '#4CAF50', oolong: '#DAA520',
-  chai: '#A0522D', jasmin: '#C77DFF', kräuter: '#2E8B57',
-};
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabId>('heute');
@@ -37,9 +26,7 @@ function App() {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'ok' | 'error'>('idle');
   const [isLoading, setIsLoading] = useState(true);
-  const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
-    schwarz: true, grün: true, oolong: true, chai: true, jasmin: true, kräuter: true,
-  });
+
 
   const { trigger: haptic } = useHaptic();
   const { getDirection } = useTabDirection();
@@ -81,9 +68,6 @@ function App() {
     }
   }, [activeTab]);
 
-  const toggleCategory = (type: TeaType) =>
-    setOpenCategories(prev => ({ ...prev, [type]: !prev[type] }));
-
   const handleAddTea = (teaData: Omit<Tea, 'id'>) => {
     const t: Tea = { ...teaData, id: generateId() };
     setTeas(prev => [...prev, t]);
@@ -107,15 +91,6 @@ function App() {
                   : { ...t, isSelected: false }
     ));
     const q = queue.filter(q => q !== id); q.push(id); setQueue(q);
-    setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
-  };
-
-  const handleUnselectTea = (id: string) => {
-    setTeas(prev => prev.map(t =>
-      t.id === id ? { ...t, zuletztGetrunken: undefined, isSelected: true }
-                  : { ...t, isSelected: false }
-    ));
-    const q = queue.filter(q => q !== id); q.unshift(id); setQueue(q);
     setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
   };
 
@@ -177,14 +152,7 @@ function App() {
     .map(id => getTeaById(id))
     .filter((t): t is Tea => !!t && !t.zuletztGetrunken);
 
-  const usedTeas = teas
-    .filter(t => t.zuletztGetrunken)
-    .sort((a, b) => new Date(b.zuletztGetrunken!).getTime() - new Date(a.zuletztGetrunken!).getTime());
 
-  const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
-    acc[type] = availableTeas.filter(t => t.teeArt === type);
-    return acc;
-  }, {} as Record<TeaType, Tea[]>);
 
   return (
     <div className="min-h-screen bg-midnight">
@@ -279,7 +247,7 @@ function App() {
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-midnight/40" />
+                      <span className="text-4xl">🍵</span>
                     </div>
                     <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Noch keine Tees</h3>
                     <p className="text-midnight/60 text-center mb-6 font-sans">Beginne deine Tee-Sammlung</p>
