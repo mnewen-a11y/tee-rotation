@@ -144,13 +144,16 @@ function App() {
 
       <div className="min-h-screen pb-20">
 
-        {/* HEADER */}
-        <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
+        {/* HEADER
+             safe-area-inset-top: schiebt Inhalt im PWA-Modus (kein Browser-Chrome)
+             unterhalb der iOS Status Bar — ohne den Header zu vergrößern */}
+        <header
+          className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        >
           <div className="max-w-3xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              <div className="pt-px sm:pt-0">
-                <RoyalTeaLogo size="sm" className="opacity-90" />
-              </div>
+              <RoyalTeaLogo size="sm" className="opacity-90" />
               <div className="flex items-center gap-2">
                 <motion.button whileTap={{ scale: 0.9 }} onClick={handleExport}
                   className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
