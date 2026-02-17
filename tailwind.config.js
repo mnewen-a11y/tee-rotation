@@ -4,7 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
+  // darkMode intentionally removed — Light theme only
   theme: {
     extend: {
       fontFamily: {
@@ -16,36 +16,34 @@ export default {
         midnight: '#1d2646',
         gold: '#c6b975',
         'gold-text': '#242b46',
-        ios: {
-          bg: '#F2F2F7',
-          card: '#FFFFFF',
-          border: '#E5E5EA',
-          label: '#000000',
-          secondary: '#8E8E93',
-          blue: '#007AFF',
-          green: '#34C759',
-          orange: '#FF9500',
-          red: '#FF3B30',
+        ivory: '#FFFFF0',
+        // Status (kept for fill-level indicators)
+        status: {
+          good:    '#34C759',
+          warning: '#FF9500',
+          danger:  '#FF3B30',
         },
+        // Tea-type accents
         tea: {
-          black: '#8B4513',
-          green: '#4CAF50',
+          black:  '#8B4513',
+          green:  '#4CAF50',
           oolong: '#DAA520',
-          chai: '#A0522D',
-        }
+          chai:   '#A0522D',
+        },
       },
       borderRadius: {
-        'ios': '12px',
+        'ios':    '12px',
         'ios-lg': '20px',
         'ios-xl': '24px',
       },
       boxShadow: {
-        'ios': '0 2px 8px rgba(0, 0, 0, 0.04)',
-        'ios-lg': '0 4px 16px rgba(0, 0, 0, 0.08)',
+        'ios':    '0 2px 8px rgba(0,0,0,0.04)',
+        'ios-md': '0 4px 16px rgba(0,0,0,0.08)',
+        'ios-lg': '0 8px 40px rgba(0,0,0,0.18)',
       },
       backdropBlur: {
         'ios': '24px',
-      }
+      },
     },
   },
   plugins: [],

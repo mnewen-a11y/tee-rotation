@@ -37,7 +37,7 @@ export const loadSettings = (): AppSettings => {
   } catch (error) {
     console.error('Error loading settings:', error);
   }
-  return { selectionMode: 'grid', darkMode: false };
+  return { selectionMode: 'grid' };
 };
 
 export const saveSettings = (settings: AppSettings): void => {
