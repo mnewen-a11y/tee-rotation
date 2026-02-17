@@ -6,9 +6,10 @@ import { loadData, saveData, loadSettings, saveSettings, generateId } from '@/li
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
-import { TabBar } from '@/components/TabBar';
+import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
+import { RatingPage } from '@/components/RatingPage';
 
 const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
 
@@ -31,7 +32,7 @@ const TEA_CATEGORY_COLORS: Record<TeaType, string> = {
 };
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'heute' | 'list' | 'new'>('heute');
+  const [activeTab, setActiveTab] = useState<TabId>('heute');
   const [teas, setTeas] = useState<Tea[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -286,7 +287,23 @@ function App() {
                                       </div>
                                     </motion.div>
                                   )}
-                                </AnimatePresence>
+                      
+            {/* ── BEWERTEN ─────────────────────────────────────────────────────── */}
+            {activeTab === 'rating' && (
+              <motion.div key="rating"
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}
+              >
+                <RatingPage
+                  teas={teas}
+                  onRateTea={(id, rating) => {
+                    setTeas(prev => prev.map(t => t.id === id ? { ...t, rating } : t));
+                  }}
+                  onNavigateToNew={() => setActiveTab('new')}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
                               </div>
                             );
                           })}

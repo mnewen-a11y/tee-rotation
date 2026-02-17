@@ -1,10 +1,6 @@
-// Fonts used:
-// - Cormorant Garamond: SIL Open Font License 1.1
-// - Playfair Display:   SIL Open Font License 1.1
-// Both replaced by libre alternatives in tailwind.config.js (see ABOUT.md)
+// Fonts: Cormorant Garamond & Playfair Display — SIL OFL 1.1 (see ABOUT.md)
 
 export type TeaType = 'schwarz' | 'grün' | 'oolong' | 'chai' | 'jasmin' | 'kräuter';
-
 export type SelectionMode = 'grid';
 
 export interface Tea {
@@ -17,6 +13,7 @@ export interface Tea {
   fuellstand: number;
   zuletztGetrunken?: string;
   isSelected?: boolean;
+  rating?: number; // 1–5, optional
 }
 
 export interface AppSettings {
