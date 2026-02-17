@@ -49,16 +49,9 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
         </motion.div>
       )}
 
-      {/* Füllstand-Balken */}
-      <div className="absolute top-3 right-3 w-1.5 h-14 bg-white/30 rounded-full overflow-hidden" aria-hidden="true">
-        <div
-          className={`${fuellstandColor} w-full absolute bottom-0 transition-all`}
-          style={{ height: `${tea.fuellstand}%` }}
-        />
-      </div>
-
       {/* Inhalt */}
       <div className="h-full flex flex-col justify-center px-3 pt-4 pb-3 relative z-10">
+
         {/* Tee-Art Farbpunkt */}
         <div
           className="w-2.5 h-2.5 rounded-full mb-2 flex-shrink-0"
@@ -66,7 +59,7 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
           aria-hidden="true"
         />
 
-        {/* Tee-Name — truncated */}
+        {/* Tee-Name */}
         <h3
           className="font-bold text-sm leading-tight text-gold-text font-serif mb-0.5 overflow-hidden"
           style={{
@@ -85,14 +78,29 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
           <p className="text-xs text-gold-text/55 truncate mb-1">{tea.hersteller}</p>
         )}
 
-        {/* Temperatur + Gramm */}
+        {/* Temperatur · Gramm · Füllstand-Balken */}
         <div className="flex items-center gap-1.5 mt-auto pt-1">
-          <span className="text-xs font-medium text-gold-text/70 bg-midnight/8 px-1.5 py-0.5 rounded-md">
+          <span className="text-xs font-medium text-gold-text/70 bg-midnight/8 px-1.5 py-0.5 rounded-md flex-shrink-0">
             {tea.bruehgrad}°C
           </span>
-          <span className="text-xs font-medium text-gold-text/55">
+          <span className="text-xs font-medium text-gold-text/55 flex-shrink-0">
             {tea.grammAnzahl}g
           </span>
+
+          {/* Füllstand-Balken — horizontal, füllt restlichen Platz */}
+          <div
+            className="flex-1 h-1.5 bg-midnight/15 rounded-full overflow-hidden"
+            aria-label={`Füllstand ${tea.fuellstand}%`}
+            role="meter"
+            aria-valuenow={tea.fuellstand}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className={`${fuellstandColor} h-full rounded-full transition-all`}
+              style={{ width: `${tea.fuellstand}%` }}
+            />
+          </div>
         </div>
       </div>
 
