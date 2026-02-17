@@ -1,61 +1,63 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Sparkles, Moon, Sun, LayoutGrid, Layers } from 'lucide-react';
-import { Tea, SelectionMode } from '@/types/tea';
+import { Coffee, Sparkles, Moon, Sun, ChevronDown, Download, Upload } from 'lucide-react';
+import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, loadSettings, saveSettings, generateId } from '@/lib/storage';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
-import { SwipeCard } from '@/components/SwipeCard';
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
+
+const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai'];
+
+const TEA_CATEGORY_LABELS: Record<TeaType, string> = {
+  schwarz: 'Schwarztee',
+  grün: 'Grüntee',
+  oolong: 'Oolong',
+  chai: 'Chai',
+};
+
+const TEA_CATEGORY_COLORS: Record<TeaType, string> = {
+  schwarz: '#8B4513',
+  grün: '#4CAF50',
+  oolong: '#DAA520',
+  chai: '#A0522D',
+};
 
 function App() {
   const [activeTab, setActiveTab] = useState<'heute' | 'list' | 'new'>('heute');
   const [teas, setTeas] = useState<Tea[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
-  const [swipeStack, setSwipeStack] = useState<string[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
-  const [selectionMode, setSelectionMode] = useState<SelectionMode>('grid');
   const [darkMode, setDarkMode] = useState(false);
+  const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
+    schwarz: true,
+    grün: true,
+    oolong: true,
+    chai: true,
+  });
 
-  // Load data and settings on mount
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const data = loadData();
     const settings = loadSettings();
-    
     setTeas(data.teas);
     setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
-    setSelectionMode(settings.selectionMode);
     setDarkMode(settings.darkMode);
-    
-    // Apply dark mode
-    if (settings.darkMode) {
-      document.documentElement.classList.add('dark');
-    }
+    if (settings.darkMode) document.documentElement.classList.add('dark');
   }, []);
 
-  // Initialize swipe stack when mode changes to swipe
   useEffect(() => {
-    if (selectionMode === 'swipe' && swipeStack.length === 0 && queue.length > 0) {
-      setSwipeStack([...queue].slice(0, 3)); // Show top 3 teas
-    }
-  }, [selectionMode, queue, swipeStack.length]);
-
-  // Save data whenever it changes
-  useEffect(() => {
-    if (teas.length > 0 || queue.length > 0) {
-      saveData({ teas, queue });
-    }
+    if (teas.length > 0 || queue.length > 0) saveData({ teas, queue });
   }, [teas, queue]);
 
-  // Save settings when they change
   useEffect(() => {
-    saveSettings({ selectionMode, darkMode });
-  }, [selectionMode, darkMode]);
+    saveSettings({ selectionMode: 'grid', darkMode });
+  }, [darkMode]);
 
-  // Handle tab change
   useEffect(() => {
     if (activeTab === 'new') {
       setIsFormOpen(true);
@@ -68,99 +70,49 @@ function App() {
     document.documentElement.classList.toggle('dark');
   };
 
-  const toggleSelectionMode = () => {
-    const newMode: SelectionMode = selectionMode === 'grid' ? 'swipe' : 'grid';
-    setSelectionMode(newMode);
-    
-    // Reset swipe stack when switching to swipe mode
-    if (newMode === 'swipe') {
-      setSwipeStack([...queue].slice(0, 3));
-    }
+  const toggleCategory = (type: TeaType) => {
+    setOpenCategories(prev => ({ ...prev, [type]: !prev[type] }));
   };
 
   const handleAddTea = (teaData: Omit<Tea, 'id'>) => {
-    const newTea: Tea = {
-      ...teaData,
-      id: generateId(),
-    };
-    setTeas([...teas, newTea]);
-    setQueue([...queue, newTea.id]);
+    const newTea: Tea = { ...teaData, id: generateId() };
+    setTeas(prev => [...prev, newTea]);
+    setQueue(prev => [...prev, newTea.id]);
   };
 
   const handleUpdateTea = (teaData: Omit<Tea, 'id'>) => {
     if (!editingTea) return;
-    
-    const updatedTeas = teas.map(t => 
-      t.id === editingTea.id ? { ...teaData, id: editingTea.id } : t
-    );
-    setTeas(updatedTeas);
+    setTeas(prev => prev.map(t => t.id === editingTea.id ? { ...teaData, id: editingTea.id } : t));
     setEditingTea(undefined);
   };
 
   const handleDeleteTea = (id: string) => {
-    setTeas(teas.filter(t => t.id !== id));
-    setQueue(queue.filter(qId => qId !== id));
-    setSwipeStack(swipeStack.filter(sId => sId !== id));
+    setTeas(prev => prev.filter(t => t.id !== id));
+    setQueue(prev => prev.filter(qId => qId !== id));
   };
 
   const handleSelectTea = (id: string) => {
-    // Update last drunk date and mark as selected
-    const updatedTeas = teas.map(t => 
-      t.id === id 
-        ? { ...t, zuletztGetrunken: new Date().toISOString(), isSelected: true } 
+    setTeas(prev => prev.map(t =>
+      t.id === id
+        ? { ...t, zuletztGetrunken: new Date().toISOString(), isSelected: true }
         : { ...t, isSelected: false }
-    );
-    setTeas(updatedTeas);
-
-    // Move to end of queue
+    ));
     const newQueue = queue.filter(qId => qId !== id);
     newQueue.push(id);
     setQueue(newQueue);
-
-    // Clear selection after 2 seconds
-    setTimeout(() => {
-      setTeas(prev => prev.map(t => ({ ...t, isSelected: false })));
-    }, 2000);
+    setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
   };
 
   const handleUnselectTea = (id: string) => {
-    // Remove zuletztGetrunken date to move back to available section
-    const updatedTeas = teas.map(t => 
-      t.id === id 
-        ? { ...t, zuletztGetrunken: undefined, isSelected: true } 
+    setTeas(prev => prev.map(t =>
+      t.id === id
+        ? { ...t, zuletztGetrunken: undefined, isSelected: true }
         : { ...t, isSelected: false }
-    );
-    setTeas(updatedTeas);
-
-    // Move to front of queue for immediate selection
+    ));
     const newQueue = queue.filter(qId => qId !== id);
-    newQueue.unshift(id); // Add to beginning
+    newQueue.unshift(id);
     setQueue(newQueue);
-
-    // Clear selection after 2 seconds
-    setTimeout(() => {
-      setTeas(prev => prev.map(t => ({ ...t, isSelected: false })));
-    }, 2000);
-  };
-
-  const handleSwipeLeft = (id: string) => {
-    // Accept tea - move to end of queue
-    handleSelectTea(id);
-    
-    // Remove from swipe stack and add next tea
-    const newStack = swipeStack.filter(sId => sId !== id);
-    const nextTeaIndex = queue.findIndex(qId => !newStack.includes(qId) && qId !== id);
-    if (nextTeaIndex !== -1) {
-      newStack.push(queue[nextTeaIndex]);
-    }
-    setSwipeStack(newStack);
-  };
-
-  const handleSwipeRight = (id: string) => {
-    // Skip tea - move to end temporarily
-    const newStack = swipeStack.filter(sId => sId !== id);
-    newStack.push(id);
-    setSwipeStack(newStack);
+    setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
   };
 
   const handleEditTea = (tea: Tea) => {
@@ -169,287 +121,240 @@ function App() {
     setActiveTab('new');
   };
 
-  const getTeaById = (id: string): Tea | undefined => {
-    return teas.find(t => t.id === id);
+  const getTeaById = (id: string): Tea | undefined => teas.find(t => t.id === id);
+
+  // ── EXPORT ──────────────────────────────────────────────────────────────────
+  const handleExport = () => {
+    const data = {
+      version: '1.0.0',
+      exportDate: new Date().toISOString(),
+      teas,
+      queue,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `royal-tea-export-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
+
+  // ── IMPORT ──────────────────────────────────────────────────────────────────
+  const handleImportClick = () => fileInputRef.current?.click();
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (!parsed.teas || !Array.isArray(parsed.teas)) {
+          alert('Ungültige Datei. Bitte eine Royal-Tea Export-Datei verwenden.');
+          return;
+        }
+        if (confirm(`${parsed.teas.length} Tees importieren? Bestehende Daten werden überschrieben.`)) {
+          setTeas(parsed.teas);
+          setQueue(parsed.queue ?? parsed.teas.map((t: Tea) => t.id));
+        }
+      } catch {
+        alert('Datei konnte nicht gelesen werden.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  // ── DERIVED DATA ─────────────────────────────────────────────────────────────
+  const availableTeas = queue
+    .map(id => getTeaById(id))
+    .filter((t): t is Tea => !!t && !t.zuletztGetrunken);
+
+  const usedTeas = teas
+    .filter(t => t.zuletztGetrunken)
+    .sort((a, b) => new Date(b.zuletztGetrunken!).getTime() - new Date(a.zuletztGetrunken!).getTime());
+
+  const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
+    acc[type] = availableTeas.filter(t => t.teeArt === type);
+    return acc;
+  }, {} as Record<TeaType, Tea[]>);
 
   return (
     <div className="min-h-screen bg-midnight">
-      <div className="min-h-screen pb-20 transition-colors">
-        {/* Header */}
+      <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
+
+      <div className="min-h-screen pb-20">
+
+        {/* ── HEADER (Midnight) ───────────────────────────────────────────────── */}
         <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
           <div className="max-w-3xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <RoyalTeaLogo size="sm" className="opacity-90" />
-
-              {/* Settings Buttons */}
               <div className="flex items-center gap-2">
-                {activeTab === 'heute' && (
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={toggleSelectionMode}
-                    className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                    title={selectionMode === 'grid' ? 'Swipe-Modus' : 'Grid-Modus'}
-                  >
-                    {selectionMode === 'grid' ? (
-                      <Layers className="w-5 h-5 text-white" />
-                    ) : (
-                      <LayoutGrid className="w-5 h-5 text-white" />
-                    )}
-                  </motion.button>
-                )}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={toggleDarkMode}
-                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                >
-                  {darkMode ? (
-                    <Sun className="w-5 h-5 text-gold" />
-                  ) : (
-                    <Moon className="w-5 h-5 text-white" />
-                  )}
+                <motion.button whileTap={{ scale: 0.9 }} onClick={handleExport}
+                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors" title="Exportieren">
+                  <Download className="w-5 h-5 text-white" />
+                </motion.button>
+                <motion.button whileTap={{ scale: 0.9 }} onClick={handleImportClick}
+                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors" title="Importieren">
+                  <Upload className="w-5 h-5 text-white" />
+                </motion.button>
+                <motion.button whileTap={{ scale: 0.9 }} onClick={toggleDarkMode}
+                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors">
+                  {darkMode ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-white" />}
                 </motion.button>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Content */}
-        <main className="max-w-3xl mx-auto px-6 py-6">
+        {/* ── CONTENT (Ivory #FFFFF0) ─────────────────────────────────────────── */}
+        <main className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)]" style={{ backgroundColor: '#FFFFF0' }}>
           <AnimatePresence mode="wait">
+
+            {/* ── TAB: HEUTE ────────────────────────────────────────────────────── */}
             {activeTab === 'heute' && (
-              <motion.div
-                key="heute"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2 }}
+              <motion.div key="heute"
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}
               >
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-ios-border bg-white/10 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-white/60" />
+                    <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
+                      <Coffee className="w-10 h-10 text-midnight/40" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2 font-serif">
-                      Keine Tees vorhanden
-                    </h3>
-                    <p className="text-white/60 text-center mb-6">
-                      Füge deinen ersten Tee hinzu, um zu beginnen.
-                    </p>
-                    <button
-                      onClick={() => setActiveTab('new')}
-                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium"
-                    >
+                    <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Keine Tees vorhanden</h3>
+                    <p className="text-midnight/60 text-center mb-6">Füge deinen ersten Tee hinzu, um zu beginnen.</p>
+                    <button onClick={() => setActiveTab('new')}
+                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium">
                       Ersten Tee hinzufügen
                     </button>
                   </div>
                 ) : (
                   <>
-                    {/* Active Selection Section */}
+                    {/* Verfügbare Tees — nach Kategorie */}
                     <div className="mb-8">
-                      {selectionMode === 'grid' ? (
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-2 justify-center mb-4">
-                            <Sparkles className="w-5 h-5 text-gold" />
-                            <h2 className="text-lg font-semibold font-serif text-white/60">
-                              Wähle deinen Tee
-                            </h2>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            {queue
-                              .map(teaId => getTeaById(teaId))
-                              .filter(tea => tea && !tea.zuletztGetrunken) // Nur ungetrunkene Tees
-                              .map((tea, index) => {
-                                if (!tea) return null;
-                                return (
-                                  <TeaGridCard
-                                    key={tea.id}
-                                    tea={tea}
-                                    onSelect={() => handleSelectTea(tea.id)}
-                                    index={index}
-                                  />
-                                );
-                              })}
-                          </div>
-                          
-                          {queue.filter(id => {
-                            const tea = getTeaById(id);
-                            return tea && !tea.zuletztGetrunken;
-                          }).length === 0 && (
-                            <div className="text-center py-12">
-                              <p className="text-white/60 mb-2">
-                                Alle Tees wurden verwendet! 🎉
-                              </p>
-                              <p className="text-sm text-white/60 mb-4">
-                                Klicke unten auf einen Tee um ihn erneut zu verwenden
-                              </p>
-                            </div>
-                          )}
+                      <div className="flex items-center gap-2 mb-5">
+                        <Sparkles className="w-5 h-5 text-gold" />
+                        <h2 className="text-lg font-semibold font-serif text-midnight/70">Wähle deinen Tee</h2>
+                      </div>
+
+                      {availableTeas.length === 0 ? (
+                        <div className="text-center py-12">
+                          <p className="text-midnight/60 mb-2">Alle Tees wurden verwendet! 🎉</p>
+                          <p className="text-sm text-midnight/40">Klicke unten auf einen Tee um ihn erneut zu verwenden</p>
                         </div>
                       ) : (
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-2 justify-center mb-4">
-                            <Sparkles className="w-5 h-5 text-gold" />
-                            <h2 className="text-lg font-semibold font-serif text-white/60">
-                              Swipe für deinen Tee
-                            </h2>
-                          </div>
-                          
-                          <div className="relative h-[600px] flex items-center justify-center">
-                            {swipeStack.filter(id => {
-                              const tea = getTeaById(id);
-                              return tea && !tea.zuletztGetrunken;
-                            }).length === 0 && (
-                              <div className="text-center">
-                                <p className="text-white/60 mb-4">
-                                  {queue.filter(id => {
-                                    const tea = getTeaById(id);
-                                    return tea && !tea.zuletztGetrunken;
-                                  }).length === 0 
-                                    ? 'Alle Tees getrunken! 🎉'
-                                    : 'Keine Tees mehr im Stack'}
-                                </p>
+                        <div className="space-y-2">
+                          {TEA_CATEGORY_ORDER.map(type => {
+                            const catTeas = teasByCategory[type];
+                            if (catTeas.length === 0) return null;
+                            const isOpen = openCategories[type];
+                            return (
+                              <div key={type} className="rounded-ios-xl overflow-hidden border border-midnight/10 shadow-sm">
+                                {/* Accordion Header */}
                                 <button
-                                  onClick={() => {
-                                    const undrunkTeas = queue.filter(id => {
-                                      const tea = getTeaById(id);
-                                      return tea && !tea.zuletztGetrunken;
-                                    });
-                                    if (undrunkTeas.length > 0) {
-                                      setSwipeStack(undrunkTeas.slice(0, 3));
-                                    } else {
-                                      // Reset all teas
-                                      const resetTeas = teas.map(t => ({ ...t, zuletztGetrunken: undefined }));
-                                      setTeas(resetTeas);
-                                      setSwipeStack([...queue].slice(0, 3));
-                                    }
-                                  }}
-                                  className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium"
+                                  onClick={() => toggleCategory(type)}
+                                  className="w-full flex items-center justify-between px-4 py-3 bg-midnight/5 hover:bg-midnight/10 transition-colors"
                                 >
-                                  {queue.filter(id => {
-                                    const tea = getTeaById(id);
-                                    return tea && !tea.zuletztGetrunken;
-                                  }).length === 0 
-                                    ? 'Rotation neu starten'
-                                    : 'Neu laden'}
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-3 h-3 rounded-full flex-shrink-0"
+                                      style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }} />
+                                    <span className="font-serif font-semibold text-midnight text-base">
+                                      {TEA_CATEGORY_LABELS[type]}
+                                    </span>
+                                    <span className="text-sm text-midnight/40 font-sans">({catTeas.length})</span>
+                                  </div>
+                                  <motion.div animate={{ rotate: isOpen ? 0 : -90 }} transition={{ duration: 0.2 }}>
+                                    <ChevronDown className="w-5 h-5 text-midnight/40" />
+                                  </motion.div>
                                 </button>
+
+                                {/* Accordion Content */}
+                                <AnimatePresence initial={false}>
+                                  {isOpen && (
+                                    <motion.div key="body"
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-3" style={{ backgroundColor: 'rgba(255,255,240,0.8)' }}>
+                                        {catTeas.map((tea, index) => (
+                                          <TeaGridCard key={tea.id} tea={tea}
+                                            onSelect={() => handleSelectTea(tea.id)} index={index} />
+                                        ))}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
-                            )}
-                            
-                            {swipeStack.slice(0, 3).reverse().map((teaId, index) => {
-                              const tea = getTeaById(teaId);
-                              if (!tea || tea.zuletztGetrunken) return null; // Skip bereits getrunkene
-                              return (
-                                <SwipeCard
-                                  key={tea.id}
-                                  tea={tea}
-                                  onSwipeLeft={() => handleSwipeLeft(tea.id)}
-                                  onSwipeRight={() => handleSwipeRight(tea.id)}
-                                  zIndex={swipeStack.length - index}
-                                />
-                              );
-                            })}
-                          </div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
 
-                    {/* Backlog Section - Zuletzt verwendet */}
-                    <div className="mt-12 pt-8 border-t border-white/10">
-                      <div className="flex items-center gap-2 mb-6">
-                        <h2 className="text-xl font-bold font-serif text-white font-serif">
-                          Zuletzt verwendet
-                        </h2>
-                        <span className="text-sm text-white/60">
-                          ({teas.filter(t => t.zuletztGetrunken).length})
-                        </span>
-                      </div>
-                      
-                      {teas.filter(t => t.zuletztGetrunken).length === 0 ? (
-                        <div className="text-center py-8">
-                          <p className="text-white/60">
-                            Noch keine Tees verwendet. Wähle einen Tee oben aus!
-                          </p>
+                    {/* Zuletzt verwendet */}
+                    {usedTeas.length > 0 && (
+                      <div className="mt-8 pt-8 border-t border-midnight/10">
+                        <div className="flex items-center gap-2 mb-4">
+                          <h2 className="text-xl font-bold font-serif text-midnight">Zuletzt verwendet</h2>
+                          <span className="text-sm text-midnight/50">({usedTeas.length})</span>
                         </div>
-                      ) : (
-                        <>
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                            {teas
-                              .filter(t => t.zuletztGetrunken)
-                              .sort((a, b) => {
-                                const dateA = a.zuletztGetrunken ? new Date(a.zuletztGetrunken).getTime() : 0;
-                                const dateB = b.zuletztGetrunken ? new Date(b.zuletztGetrunken).getTime() : 0;
-                                return dateB - dateA; // Neueste zuerst
-                              })
-                              .map((tea, index) => (
-                                <TeaGridCard
-                                  key={tea.id}
-                                  tea={{ ...tea, isSelected: true }} // Permanent grünes Häkchen
-                                  onSelect={() => handleUnselectTea(tea.id)}
-                                  index={index}
-                                />
-                              ))}
-                          </div>
-                          
-                          <p className="text-center text-sm text-white/60 italic">
-                            💡 Tipp: Klicke auf einen Tee um ihn erneut zu verwenden
-                          </p>
-                        </>
-                      )}
-                    </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+                          {usedTeas.map((tea, index) => (
+                            <TeaGridCard key={tea.id} tea={{ ...tea, isSelected: true }}
+                              onSelect={() => handleUnselectTea(tea.id)} index={index} />
+                          ))}
+                        </div>
+                        <p className="text-center text-sm text-midnight/40 italic">
+                          💡 Klicke auf einen Tee um ihn erneut zu verwenden
+                        </p>
+                      </div>
+                    )}
                   </>
                 )}
               </motion.div>
             )}
 
+            {/* ── TAB: MEINE TEES ───────────────────────────────────────────────── */}
             {activeTab === 'list' && (
-              <motion.div
-                key="list"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2 }}
+              <motion.div key="list"
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }}
               >
                 <div className="mb-4">
-                  <h2 className="text-xl font-bold font-serif text-white mb-1 font-serif">Meine Tees</h2>
-                  <p className="text-sm text-white/60">
+                  <h2 className="text-xl font-bold font-serif text-midnight mb-1">Meine Tees</h2>
+                  <p className="text-sm text-midnight/60 font-sans">
                     {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
                   </p>
                 </div>
 
                 {teas.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-ios-border bg-white/10 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-white/60" />
+                    <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
+                      <Coffee className="w-10 h-10 text-midnight/40" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2 font-serif">
-                      Noch keine Tees
-                    </h3>
-                    <p className="text-white/60 text-center mb-6">
-                      Beginne deine Tee-Sammlung
-                    </p>
-                    <button
-                      onClick={() => setActiveTab('new')}
-                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium"
-                    >
+                    <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Noch keine Tees</h3>
+                    <p className="text-midnight/60 text-center mb-6">Beginne deine Tee-Sammlung</p>
+                    <button onClick={() => setActiveTab('new')}
+                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium">
                       Tee hinzufügen
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {queue.map((teaId) => {
+                    {queue.map(teaId => {
                       const tea = getTeaById(teaId);
                       if (!tea) return null;
                       return (
-                        <TeaCard
-                          key={tea.id}
-                          tea={tea}
+                        <TeaCard key={tea.id} tea={tea}
                           onEdit={() => handleEditTea(tea)}
                           onDelete={() => {
-                            if (confirm(`"${tea.name}" wirklich löschen?`)) {
-                              handleDeleteTea(tea.id);
-                            }
+                            if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id);
                           }}
                         />
                       );
@@ -458,25 +363,23 @@ function App() {
                 )}
               </motion.div>
             )}
+
           </AnimatePresence>
         </main>
 
-        {/* Tea Form Modal */}
+        {/* ── FOOTER / TAB BAR (Midnight) ─────────────────────────────────────── */}
+        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+
         <TeaForm
           isOpen={isFormOpen}
           onClose={() => {
             setIsFormOpen(false);
             setEditingTea(undefined);
-            if (activeTab === 'new') {
-              setActiveTab('heute');
-            }
+            if (activeTab === 'new') setActiveTab('heute');
           }}
           onSave={editingTea ? handleUpdateTea : handleAddTea}
           editTea={editingTea}
         />
-
-        {/* Tab Bar */}
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     </div>
   );
