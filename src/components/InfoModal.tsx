@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useMotionValue, animate } from 'framer-motion';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Upload } from 'lucide-react';
 
@@ -36,7 +37,11 @@ const ROADMAP = [
 export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: InfoModalProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const titleId = 'info-modal-title';
+  const sheetY = useMotionValue(0);
+  const dragStartY = useRef(0);
+  const isDragging = useRef(false);
 
   // Fokus-Trap + ESC
   useEffect(() => {
@@ -76,6 +81,48 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
     }
   }, [isOpen, triggerRef]);
 
+  // Drag-to-Dismiss — native Touch Events
+  useEffect(() => {
+    const sheet = modalRef.current;
+    const scroll = scrollRef.current;
+    if (!sheet || !scroll || !isOpen) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      dragStartY.current = e.touches[0].clientY;
+      isDragging.current = false;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const deltaY = e.touches[0].clientY - dragStartY.current;
+      if (deltaY > 0 && scroll.scrollTop <= 0) {
+        isDragging.current = true;
+        e.preventDefault();
+        sheetY.set(deltaY);
+      }
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!isDragging.current) return;
+      const deltaY = e.changedTouches[0].clientY - dragStartY.current;
+      if (deltaY > 100) {
+        animate(sheetY, window.innerHeight, {
+          type: 'spring', stiffness: 300, damping: 30,
+          onComplete: onClose,
+        });
+      } else {
+        animate(sheetY, 0, { type: 'spring', stiffness: 400, damping: 30 });
+      }
+      isDragging.current = false;
+    };
+
+    sheet.addEventListener('touchstart', onTouchStart, { passive: true });
+    sheet.addEventListener('touchmove', onTouchMove, { passive: false });
+    sheet.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      sheet.removeEventListener('touchstart', onTouchStart);
+      sheet.removeEventListener('touchmove', onTouchMove);
+      sheet.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -100,12 +147,12 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[85vh] overflow-hidden"
-            style={{ backgroundColor: '#FFFFF0' }}
+            style={{ y: sheetY, backgroundColor: '#FFFFF0' }}
+            className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[85vh] flex flex-col"
           >
             {/* Drag Handle */}
-            <div className="flex justify-center pt-3 pb-1" aria-hidden="true">
-              <div className="w-10 h-1 bg-midnight/20 rounded-full" />
+            <div className="flex justify-center py-3" aria-hidden="true">
+              <div className="w-12 h-1.5 bg-midnight/25 rounded-full" />
             </div>
 
             {/* Header */}
