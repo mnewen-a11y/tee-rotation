@@ -2,10 +2,15 @@ import { createClient } from '@supabase/supabase-js';
 import type { Tea } from '@/types/tea';
 
 // Werte aus Vercel Environment Variables (siehe SUPABASE-SETUP.md)
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Supabase nur initialisieren wenn Env-Variablen vorhanden
+export const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY)
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+const isConfigured = !!supabase;
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -18,6 +23,7 @@ export interface SyncData {
 // ── LOAD ─────────────────────────────────────────────────────────────────────
 
 export const loadFromSupabase = async (): Promise<SyncData | null> => {
+  if (!isConfigured || !supabase) return null;
   const { data, error } = await supabase
     .from('royal_tea_sync')
     .select('*')
@@ -35,6 +41,7 @@ export const loadFromSupabase = async (): Promise<SyncData | null> => {
 // ── SAVE ──────────────────────────────────────────────────────────────────────
 
 export const saveToSupabase = async (teas: Tea[], queue: string[]): Promise<boolean> => {
+  if (!isConfigured || !supabase) return false;
   const { error } = await supabase
     .from('royal_tea_sync')
     .upsert({
@@ -52,6 +59,7 @@ export const saveToSupabase = async (teas: Tea[], queue: string[]): Promise<bool
 export const subscribeToSync = (
   onUpdate: (data: SyncData) => void
 ) => {
+  if (!isConfigured || !supabase) return () => {};
   const channel = supabase
     .channel('royal_tea_sync_changes')
     .on(
@@ -74,5 +82,5 @@ export const subscribeToSync = (
     .subscribe();
 
   // Cleanup-Funktion zurückgeben
-  return () => supabase.removeChannel(channel);
+  return () => supabase!.removeChannel(channel);
 };
