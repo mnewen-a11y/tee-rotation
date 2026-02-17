@@ -115,14 +115,14 @@ function App() {
   const handleEditTea = (tea: Tea) => {
     setEditingTea(tea);
     setIsFormOpen(true);
-    setActiveTab('new');
+    // Don't change tab - form opens as modal
   };
 
   const handleTabChange = (tab: TabId) => {
     setSlideDir(getDirection(tab));
     setActiveTab(tab);
-    // Only open form and clear editingTea when clicking "Neu" tab directly (not when editing)
-    if (tab === 'new' && !editingTea) {
+    if (tab === 'new') {
+      setEditingTea(undefined);  // Clear edit mode when clicking "Neu" tab
       setIsFormOpen(true);
     }
   };
