@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, RefreshCw } from 'lucide-react';
-import { Tea, TeaType } from '@/types/tea';
+import { Tea } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
-import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
