@@ -28,11 +28,7 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
         showCheckmark ? 'border-green-500 shadow-green-200' : 'border-gold/20'
       }`}
     >
-      {/* Tee-Art Farbtönung */}
-      <div
-        className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity"
-        style={{ backgroundColor: teaColor }}
-      />
+
 
       {/* Ausgewählt-Häkchen */}
       {showCheckmark && (

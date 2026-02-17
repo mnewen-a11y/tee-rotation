@@ -66,7 +66,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
           {/* Füllstand Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gold-text/60">Füllstand</span>
+              <span className="text-sm font-medium text-midnight/60">Füllstand</span>
               <span className={`text-sm font-bold ${fuellstandColor}`}>{tea.fuellstand}%</span>
             </div>
             <div className="h-3 bg-midnight/10 rounded-full overflow-hidden">
@@ -97,7 +97,7 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -100 }}
-      className="bg-gold backdrop-blur-ios rounded-ios-lg p-4 shadow-ios border border-gold/20 mb-3"
+      className="bg-white rounded-ios-lg p-4 shadow-ios border border-midnight/10 mb-3"
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
@@ -106,19 +106,19 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: TEA_TYPE_COLORS[tea.teeArt] }}
             />
-            <h3 className="font-semibold text-gold-text text-lg font-serif">{tea.name}</h3>
+            <h3 className="font-semibold text-midnight text-lg font-serif">{tea.name}</h3>
           </div>
           
           {tea.hersteller && (
-            <p className="text-gold-text/60 text-sm mb-2">{tea.hersteller}</p>
+            <p className="text-midnight/60 text-sm mb-2">{tea.hersteller}</p>
           )}
 
           <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1 text-gold-text/60">
+            <div className="flex items-center gap-1 text-midnight/60">
               <Thermometer className="w-4 h-4" />
               <span>{tea.bruehgrad}°C</span>
             </div>
-            <div className="flex items-center gap-1 text-gold-text/60">
+            <div className="flex items-center gap-1 text-midnight/60">
               <Package className="w-4 h-4" />
               <span>{tea.grammAnzahl}g</span>
             </div>

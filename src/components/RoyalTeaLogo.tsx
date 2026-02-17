@@ -5,7 +5,7 @@ interface RoyalTeaLogoProps {
 
 export const RoyalTeaLogo = ({ className = '', size = 'md' }: RoyalTeaLogoProps) => {
   const sizes = {
-    sm: 'w-28 h-8',
+    sm: 'w-36 h-10',
     md: 'w-48 h-24',
     lg: 'w-64 h-32',
   };
