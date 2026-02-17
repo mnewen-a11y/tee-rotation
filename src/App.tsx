@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Sparkles, ChevronDown, Info, RefreshCw } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
-import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
+import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
@@ -48,14 +48,37 @@ function App() {
   const infoTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const data = loadData();
-    setTeas(data.teas);
-    setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
-    setTimeout(() => setIsLoading(false), 400); // kurze Mindest-Ladezeit für Skeleton
+    const initData = async () => {
+      // Erst versuchen von Supabase zu laden
+      const supabaseData = await loadFromSupabase();
+      
+      if (supabaseData) {
+        // Supabase Daten gefunden - diese verwenden
+        setTeas(supabaseData.teas);
+        setQueue(supabaseData.queue.length > 0 ? supabaseData.queue : supabaseData.teas.map(t => t.id));
+        // Auch lokal speichern für Offline-Nutzung
+        saveData({ teas: supabaseData.teas, queue: supabaseData.queue });
+      } else {
+        // Kein Supabase oder nicht konfiguriert - localStorage verwenden
+        const localData = loadData();
+        setTeas(localData.teas);
+        setQueue(localData.queue.length > 0 ? localData.queue : localData.teas.map(t => t.id));
+      }
+      
+      setTimeout(() => setIsLoading(false), 400);
+    };
+    
+    initData();
   }, []);
 
   useEffect(() => {
-    if (teas.length > 0 || queue.length > 0) saveData({ teas, queue });
+    if (teas.length > 0 || queue.length > 0) {
+      saveData({ teas, queue });  // localStorage
+      saveToSupabase(teas, queue).then(success => {
+        if (success) setSyncStatus('ok');
+        setTimeout(() => setSyncStatus('idle'), 2000);
+      });
+    }
   }, [teas, queue]);
 
   // Realtime Subscription — aktualisiert App wenn Partner Änderungen macht
