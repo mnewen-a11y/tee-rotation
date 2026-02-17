@@ -1,49 +1,52 @@
 import { motion } from 'framer-motion';
-import { Home, List, Plus } from 'lucide-react';
+import { Home, List, Plus, Star } from 'lucide-react';
+
+export type TabId = 'heute' | 'list' | 'new' | 'rating';
 
 interface TabBarProps {
-  activeTab: 'heute' | 'list' | 'new';
-  onTabChange: (tab: 'heute' | 'list' | 'new') => void;
+  activeTab: TabId;
+  onTabChange: (tab: TabId) => void;
 }
 
 export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
-  const tabs = [
-    { id: 'heute' as const, icon: Home, label: 'Heute' },
-    { id: 'list' as const, icon: List, label: 'Meine Tees' },
-    { id: 'new' as const, icon: Plus, label: 'Neu' },
+  const tabs: { id: TabId; icon: typeof Home; label: string }[] = [
+    { id: 'heute',  icon: Home,  label: 'Heute'      },
+    { id: 'list',   icon: List,  label: 'Meine Tees' },
+    { id: 'new',    icon: Plus,  label: 'Neu'        },
+    { id: 'rating', icon: Star,  label: 'Bewerten'   },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 bg-midnight/95 backdrop-blur-ios border-t border-white/10 safe-area-bottom">
-      <div className="max-w-3xl mx-auto px-4">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-30 bg-midnight/95 backdrop-blur-ios border-t border-white/10 safe-area-bottom"
+      aria-label="Hauptnavigation"
+    >
+      <div className="max-w-3xl mx-auto px-2">
         <div className="flex items-center justify-around py-2">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             const Icon = tab.icon;
+            const isStar = tab.id === 'rating';
 
             return (
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className="flex flex-col items-center justify-center py-2 px-6 relative min-w-[80px]"
+                className="flex flex-col items-center justify-center py-2 px-4 relative min-w-[64px] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-ios"
+                aria-label={tab.label}
+                aria-current={isActive ? 'page' : undefined}
               >
                 <motion.div
-                  animate={{
-                    scale: isActive ? 1.1 : 1,
-                  }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  animate={{ scale: isActive ? 1.12 : 1 }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 22 }}
                 >
                   <Icon
-                    className={`w-6 h-6 transition-colors ${
-                      isActive ? 'text-gold' : 'text-white/60'
-                    }`}
+                    className={`w-6 h-6 transition-colors ${isActive ? 'text-gold' : 'text-white/55'}`}
+                    fill={isStar && isActive ? 'currentColor' : 'none'}
+                    strokeWidth={isStar && isActive ? 0 : 2}
                   />
                 </motion.div>
-                <span
-                  className={`text-xs mt-1 font-medium transition-colors ${
-                    isActive ? 'text-gold' : 'text-white/60'
-                  }`}
-                >
+                <span className={`text-xs mt-1 font-sans font-medium transition-colors ${isActive ? 'text-gold' : 'text-white/55'}`}>
                   {tab.label}
                 </span>
                 {isActive && (
@@ -58,6 +61,6 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
           })}
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
