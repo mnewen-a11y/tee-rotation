@@ -261,10 +261,9 @@ function App() {
                           <p className="text-midnight/60 mb-2">Alle Tees wurden verwendet! 🎉</p>
                           <p className="text-sm text-midnight/40">Klicke unten auf einen Tee um ihn erneut zu verwenden</p>
                         </div>
+                      ) : isLoading ? (
+                        <SkeletonGrid count={4} />
                       ) : (
-                        {isLoading ? (
-                          <SkeletonGrid count={4} />
-                        ) : (
                         <div className="space-y-2">
                           {TEA_CATEGORY_ORDER.map(type => {
                             const catTeas = teasByCategory[type];
@@ -315,7 +314,6 @@ function App() {
                             );
                           })}
                         </div>
-                        )}
                       )}
                     </div>
 
