@@ -24,7 +24,7 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
       whileTap={{ scale: 0.97 }}
       onClick={onSelect}
       aria-label={`${tea.name} auswählen`}
-      className={`group relative aspect-square rounded-ios-xl overflow-hidden shadow-ios-md hover:shadow-ios-lg transition-all bg-gold border-2 ${
+      className={`group relative aspect-square rounded-ios-xl overflow-hidden shadow-ios-md hover:shadow-ios-lg transition-all bg-white border-2 ${
         showCheckmark ? 'border-green-500 shadow-green-200' : 'border-gold/20'
       }`}
     >
@@ -61,7 +61,7 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
 
         {/* Tee-Name */}
         <h3
-          className="font-bold text-sm leading-tight text-gold-text font-serif mb-0.5 overflow-hidden"
+          className="font-bold text-sm leading-tight text-midnight font-serif mb-0.5 overflow-hidden"
           style={{
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -75,21 +75,21 @@ export const TeaGridCard = ({ tea, onSelect, index }: TeaGridCardProps) => {
 
         {/* Hersteller */}
         {tea.hersteller && (
-          <p className="text-xs text-gold-text/55 truncate mb-1">{tea.hersteller}</p>
+          <p className="text-xs text-midnight/50 truncate mb-1">{tea.hersteller}</p>
         )}
 
         {/* Temperatur · Gramm · Füllstand-Balken */}
         <div className="flex items-center gap-1.5 mt-auto pt-1">
-          <span className="text-xs font-medium text-gold-text/70 bg-midnight/8 px-1.5 py-0.5 rounded-md flex-shrink-0">
+          <span className="text-xs font-medium text-midnight/70 bg-midnight/8 px-1.5 py-0.5 rounded-md flex-shrink-0">
             {tea.bruehgrad}°C
           </span>
-          <span className="text-xs font-medium text-gold-text/55 flex-shrink-0">
+          <span className="text-xs font-medium text-midnight/50 flex-shrink-0">
             {tea.grammAnzahl}g
           </span>
 
           {/* Füllstand-Balken — horizontal, füllt restlichen Platz */}
           <div
-            className="flex-1 h-1.5 bg-midnight/15 rounded-full overflow-hidden"
+            className="flex-1 h-1.5 bg-midnight/10 rounded-full overflow-hidden"
             aria-label={`Füllstand ${tea.fuellstand}%`}
             role="meter"
             aria-valuenow={tea.fuellstand}

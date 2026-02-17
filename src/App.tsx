@@ -145,38 +145,36 @@ function App() {
       <div className="min-h-screen pb-20">
 
         {/* HEADER
-             safe-area-inset-top: schiebt Inhalt im PWA-Modus (kein Browser-Chrome)
-             unterhalb der iOS Status Bar — ohne den Header zu vergrößern */}
-        <header
-          className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20"
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-        >
-          <div className="max-w-3xl mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <RoyalTeaLogo size="sm" className="opacity-90" />
-              <div className="flex items-center gap-2">
-                <motion.button whileTap={{ scale: 0.9 }} onClick={handleExport}
-                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label="Daten exportieren">
-                  <Download className="w-5 h-5 text-white" />
-                </motion.button>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={() => fileInputRef.current?.click()}
-                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label="Daten importieren">
-                  <Upload className="w-5 h-5 text-white" />
-                </motion.button>
-
-                <motion.button
-                  ref={infoTriggerRef}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setIsInfoOpen(true)}
-                  className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                  aria-label="App-Informationen"
-                  aria-haspopup="dialog"
-                  aria-expanded={isInfoOpen}>
-                  <Info className="w-5 h-5 text-white" />
-                </motion.button>
-              </div>
+             - Unsichtbarer Spacer oben = env(safe-area-inset-top) für PWA-Modus
+             - Eigentlicher Inhalt: feste Höhe h-14, items-center → Logo + Buttons immer aligned
+             - Header-Gesamthöhe wächst nur um die tatsächliche Status-Bar-Höhe */}
+        <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
+          {/* Safe-area Spacer — nur sichtbar im PWA-Modus */}
+          <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
+          {/* Header-Inhalt — fixe Höhe, vertikal zentriert */}
+          <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
+            <RoyalTeaLogo size="sm" className="opacity-90" />
+            <div className="flex items-center gap-2">
+              <motion.button whileTap={{ scale: 0.9 }} onClick={handleExport}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
+                aria-label="Daten exportieren">
+                <Download className="w-5 h-5 text-white" />
+              </motion.button>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={() => fileInputRef.current?.click()}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
+                aria-label="Daten importieren">
+                <Upload className="w-5 h-5 text-white" />
+              </motion.button>
+              <motion.button
+                ref={infoTriggerRef}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsInfoOpen(true)}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
+                aria-label="App-Informationen"
+                aria-haspopup="dialog"
+                aria-expanded={isInfoOpen}>
+                <Info className="w-5 h-5 text-white" />
+              </motion.button>
             </div>
           </div>
         </header>
