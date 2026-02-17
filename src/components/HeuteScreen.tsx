@@ -7,7 +7,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 interface HeuteScreenProps {
   queue: Tea[];         // verfügbare Tees in Reihenfolge
   onSelect: (id: string) => void;
-  onSkip: (id: string) => void;  // nach hinten schieben
+  onSkip?: (id: string) => void;  // nach hinten schieben
   isLoading: boolean;
 }
 
