@@ -43,7 +43,7 @@ export const TeaGridCard = ({ tea, onSelect, index, onEdit, onDelete }: TeaGridC
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: showCheckmark ? 1.02 : 1 }}
       transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 20 }}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.94, filter: 'brightness(0.92)' }}
       onClick={() => { haptic('medium'); onSelect(); }}
       {...longPress}
       aria-label={`${tea.name} auswählen`}

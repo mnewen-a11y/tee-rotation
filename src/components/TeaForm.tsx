@@ -96,16 +96,21 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0.02, bottom: 0.5 }}
-            onDragEnd={handleDragEnd}
             className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[92vh] overflow-hidden flex flex-col"
           >
-            {/* Drag Handle */}
-            <div className="flex justify-center pt-3 pb-1 flex-shrink-0 cursor-grab active:cursor-grabbing">
-              <div className="w-10 h-1 bg-midnight/20 rounded-full" />
-            </div>
+            {/* Drag Handle — nur dieser Bereich ist draggable */}
+            <motion.div
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={{ top: 0.01, bottom: 0.4 }}
+              onDrag={(_: unknown, info: PanInfo) => {
+                if (info.offset.y > 0) sheetY.set(info.offset.y);
+              }}
+              onDragEnd={handleDragEnd}
+              className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing touch-none"
+            >
+              <div className="w-10 h-1.5 bg-midnight/25 rounded-full" />
+            </motion.div>
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-midnight flex-shrink-0">

@@ -11,6 +11,7 @@ import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
 import { RatingPage } from '@/components/RatingPage';
+import { SkeletonGrid } from '@/components/SkeletonCard';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useTabDirection } from '@/hooks/useTabDirection';
 
@@ -34,6 +35,7 @@ function App() {
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'ok' | 'error'>('idle');
+  const [isLoading, setIsLoading] = useState(true);
   const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
     schwarz: true, grün: true, oolong: true, chai: true, jasmin: true, kräuter: true,
   });
@@ -49,6 +51,7 @@ function App() {
     const data = loadData();
     setTeas(data.teas);
     setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
+    setTimeout(() => setIsLoading(false), 400); // kurze Mindest-Ladezeit für Skeleton
   }, []);
 
   useEffect(() => {
@@ -259,6 +262,9 @@ function App() {
                           <p className="text-sm text-midnight/40">Klicke unten auf einen Tee um ihn erneut zu verwenden</p>
                         </div>
                       ) : (
+                        {isLoading ? (
+                          <SkeletonGrid count={4} />
+                        ) : (
                         <div className="space-y-2">
                           {TEA_CATEGORY_ORDER.map(type => {
                             const catTeas = teasByCategory[type];
@@ -309,6 +315,7 @@ function App() {
                             );
                           })}
                         </div>
+                        )}
                       )}
                     </div>
 

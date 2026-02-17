@@ -98,3 +98,10 @@
   /* Accent on range inputs (Ivory sections) */
   .accent-gold { accent-color: var(--color-gold); }
 }
+
+/* Status Bar Meta wird per index.html gesetzt — hier nur Fallback */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
