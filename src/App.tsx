@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Sparkles, ChevronDown, Download, Upload, Info, RefreshCw } from 'lucide-react';
+import { Coffee, Sparkles, ChevronDown, Info, RefreshCw } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
@@ -180,16 +180,7 @@ function App() {
           <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
-              <motion.button whileTap={{ scale: 0.9 }} onClick={handleExport}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                aria-label="Daten exportieren">
-                <Download className="w-5 h-5 text-white" />
-              </motion.button>
-              <motion.button whileTap={{ scale: 0.9 }} onClick={() => fileInputRef.current?.click()}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                aria-label="Daten importieren">
-                <Upload className="w-5 h-5 text-white" />
-              </motion.button>
+
               {/* Sync-Button */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
@@ -406,6 +397,8 @@ function App() {
           isOpen={isInfoOpen}
           onClose={() => setIsInfoOpen(false)}
           triggerRef={infoTriggerRef}
+          onExport={handleExport}
+          onImport={() => fileInputRef.current?.click()}
         />
 
       </div>
