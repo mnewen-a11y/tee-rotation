@@ -6,6 +6,7 @@ import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getGreeting, getRecommendedTeaTypes } from '@/lib/timeOfDay';
 import { SwipeTeaCard } from '@/components/SwipeTeaCard';
+import { SuccessScreen } from '@/components/SuccessScreen';
 import { TeaForm } from '@/components/TeaForm';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
@@ -31,6 +32,7 @@ function App() {
   const [teas, setTeas] = useState<Tea[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedTea, setSelectedTea] = useState<Tea | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -47,7 +49,9 @@ function App() {
   const recommendedTypes = getRecommendedTeaTypes();
   const recommendedTeas = availableTeas.filter(t => recommendedTypes.includes(t.teeArt));
   const suggestedTeas = recommendedTeas.length > 0 ? recommendedTeas : availableTeas;
-  const currentTea = suggestedTeas[currentIndex % suggestedTeas.length];
+  
+  // Endlos-Loop: Modulo für Index
+  const currentTea = suggestedTeas.length > 0 ? suggestedTeas[currentIndex % suggestedTeas.length] : null;
 
   const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
     acc[type] = availableTeas.filter(t => t.teeArt === type);
@@ -110,11 +114,24 @@ function App() {
   const handleSelectTea = (tea: Tea) => {
     setTeas(prev => prev.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t));
     setQueue(prev => { const filtered = prev.filter(id => id !== tea.id); return [...filtered, tea.id]; });
-    setCurrentIndex(prev => prev + 1);
+    setSelectedTea(tea); // Zeige Success Screen
     haptic('success');
   };
 
-  const handleSkipTea = () => { setCurrentIndex(prev => prev + 1); haptic('light'); };
+  const handleSkipTea = () => { 
+    setCurrentIndex(prev => prev + 1); // Endlos-Loop via Modulo
+    haptic('light'); 
+  };
+
+  const handleBackFromSuccess = () => {
+    setSelectedTea(null);
+    setCurrentIndex(0); // Reset zu erstem empfohlenen Tee
+  };
+
+  const handlePickAnother = () => {
+    setSelectedTea(null);
+    setCurrentIndex(prev => prev + 1);
+  };
 
   const handleSync = async () => {
     if (teas.length === 0) { alert('⚠️ Keine Tees zum Synchronisieren vorhanden.'); return; }
@@ -224,7 +241,15 @@ function App() {
                   <p className="text-midnight/60 mb-6">Öffne das Inventar um Tees erneut zu verwenden</p>
                   <button onClick={() => setIsInventoryOpen(true)} className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">Inventar öffnen</button>
                 </div>
+              ) : selectedTea ? (
+                /* SUCCESS SCREEN */
+                <SuccessScreen 
+                  tea={selectedTea}
+                  onBack={handleBackFromSuccess}
+                  onPickAnother={handlePickAnother}
+                />
               ) : (
+                /* SWIPE VIEW */
                 <>
                   <AnimatePresence mode="wait">
                     {currentTea && <SwipeTeaCard key={currentTea.id} tea={currentTea} onSwipeRight={() => handleSelectTea(currentTea)} onSwipeLeft={handleSkipTea} onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} />}
