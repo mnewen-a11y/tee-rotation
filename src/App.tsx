@@ -238,8 +238,28 @@ function App() {
                 <div className="text-center py-20">
                   <div className="text-6xl mb-4">🎉</div>
                   <h3 className="text-xl font-semibold text-midnight mb-2 font-sans">Alle Tees verwendet!</h3>
-                  <p className="text-midnight/60 mb-6">Öffne das Inventar um Tees erneut zu verwenden</p>
-                  <button onClick={() => setIsInventoryOpen(true)} className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">Inventar öffnen</button>
+                  <p className="text-midnight/60 mb-6">Starte eine neue Rotation</p>
+                  <div className="flex justify-center gap-4">
+                    <motion.button 
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        // Alle zuletztGetrunken zurücksetzen
+                        setTeas(prev => prev.map(t => ({ ...t, zuletztGetrunken: undefined })));
+                        setCurrentIndex(0);
+                        haptic('success');
+                      }}
+                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans"
+                    >
+                      Rotation neu starten
+                    </motion.button>
+                    <motion.button 
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setIsInventoryOpen(true)} 
+                      className="bg-midnight/5 hover:bg-midnight/10 px-6 py-3 rounded-ios-lg font-medium font-sans text-midnight/70"
+                    >
+                      Inventar öffnen
+                    </motion.button>
+                  </div>
                 </div>
               ) : selectedTea ? (
                 /* SUCCESS SCREEN */
