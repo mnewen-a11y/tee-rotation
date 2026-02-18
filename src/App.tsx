@@ -251,9 +251,21 @@ function App() {
               ) : (
                 /* SWIPE VIEW */
                 <>
-                  <AnimatePresence mode="wait">
-                    {currentTea && <SwipeTeaCard key={currentTea.id} tea={currentTea} onSwipeRight={() => handleSelectTea(currentTea)} onSwipeLeft={handleSkipTea} onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} />}
-                  </AnimatePresence>
+                  {currentTea ? (
+                    <AnimatePresence mode="wait">
+                      <SwipeTeaCard 
+                        key={`${currentTea.id}-${currentIndex}`}
+                        tea={currentTea} 
+                        onSwipeRight={() => handleSelectTea(currentTea)} 
+                        onSwipeLeft={handleSkipTea} 
+                        onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} 
+                      />
+                    </AnimatePresence>
+                  ) : (
+                    <div className="text-center py-12 text-midnight/60">
+                      Debug: Keine Karte! (Index: {currentIndex}, Teas: {suggestedTeas.length})
+                    </div>
+                  )}
                   {/* Action Buttons - Apple Style */}
                   <div className="flex justify-center items-center gap-4 mt-8">
                     {/* Skip Button */}
