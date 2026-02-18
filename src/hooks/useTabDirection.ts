@@ -1,16 +1,20 @@
-import { useState } from 'react';
-import { TabId } from '@/components/TabBar';
+/**
+ * useTabDirection — ermittelt Slide-Richtung beim Tab-Wechsel
+ * Links → Rechts wenn Tab-Index sinkt, sonst umgekehrt
+ */
+import { useRef } from 'react';
+import type { TabId } from '@/components/TabBar';
+
+const TAB_ORDER: TabId[] = ['heute', 'list'];
 
 export const useTabDirection = () => {
-  const [prevTab, setPrevTab] = useState<TabId>('heute');
-
-  const tabOrder: TabId[] = ['heute', 'list', 'new'];
+  const prevTab = useRef<TabId>('heute');
 
   const getDirection = (nextTab: TabId): number => {
-    const prevIndex = tabOrder.indexOf(prevTab);
-    const nextIndex = tabOrder.indexOf(nextTab);
-    setPrevTab(nextTab);
-    return nextIndex > prevIndex ? 1 : -1;
+    const prev = TAB_ORDER.indexOf(prevTab.current);
+    const next = TAB_ORDER.indexOf(nextTab);
+    prevTab.current = nextTab;
+    return next > prev ? 1 : -1;
   };
 
   return { getDirection };
