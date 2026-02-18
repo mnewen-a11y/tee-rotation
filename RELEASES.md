@@ -17,6 +17,51 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R008.3** - v0.9.7.3 (2026-02-18)
+**Status:** 🚨 CRITICAL HOTFIX  
+**Codename:** Supabase Data Protection
+
+#### 🐛 Critical Bug Fix
+- ✅ **KRITISCH:** Verhindert versehentliches Löschen von Supabase-Daten
+- ✅ Sync-Button deaktiviert wenn keine lokalen Daten vorhanden
+- ✅ Auto-Sync zu Supabase implementiert (2s debounced)
+- ✅ Warnung beim Versuch leere Daten zu syncen
+
+#### ⚠️ Problem gelöst
+**Vorher:** 
+- Cache löschen → localStorage leer
+- Sync-Button klicken → Supabase mit `[]` überschrieben
+- **ALLE DATEN VERLOREN!** 💥
+
+**Nachher:**
+- Sync nur möglich wenn `teas.length > 0`
+- Auto-Sync nach jeder Änderung
+- Supabase-Daten bleiben sicher
+
+#### 🔧 Technical
+- handleSync: Prüft `teas.length === 0` vor Sync
+- Sync-Button: `disabled={teas.length === 0}`
+- Auto-Save: Debounced 2s, nur wenn Daten vorhanden
+- Alert wenn leerer Sync versucht wird
+
+---
+
+### **R008.2** - v0.9.7.2 (2026-02-18)
+**Status:** Critical Hotfix  
+**Codename:** Font & DB Fix
+
+#### 🐛 Critical Fixes
+- ✅ Logo nutzt jetzt Sans-Serif (war noch Playfair/Times)
+- ✅ Supabase-Loading implementiert (App liest jetzt zuerst aus DB)
+- ✅ Fallback zu localStorage wenn Supabase nicht verfügbar
+
+#### 🔧 Technical
+- RoyalTeaLogo.tsx: System Font Stack im SVG
+- App.tsx: loadFromSupabase() beim Init
+- Supabase-first, localStorage-fallback Strategie
+
+---
+
 ### **R008.1** - v0.9.7.1 (2026-02-18)
 **Status:** Beta  
 **Codename:** All Sans-Serif
