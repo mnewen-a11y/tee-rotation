@@ -1,12 +1,11 @@
 /**
  * Fonts:
- *   - Inter            : SIL Open Font License 1.1  (rsms.me/inter)
- *   - Noto Sans        : SIL Open Font License 1.1  (google/fonts)
- *   - Source Sans 3    : SIL Open Font License 1.1  (adobe/source-sans)
- *   - Cormorant Garamond: SIL Open Font License 1.1 (google/fonts)
- *   - Playfair Display : SIL Open Font License 1.1  (google/fonts)
- * All fonts are libre / OFL – no proprietary fonts used.
- * See ABOUT.md for full license text references.
+ *   - System Font Stack: Native fonts for each platform
+ *     - iOS/macOS: SF Pro (Apple's system font)
+ *     - Android: Roboto
+ *     - Windows: Segoe UI
+ *   - Serif: System serif stack with fallbacks
+ * Using system fonts = better performance, native feel, accessibility
  */
 
 /** @type {import('tailwindcss').Config} */
@@ -18,12 +17,36 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // UI text: Inter → Noto Sans → Source Sans 3 → system fallbacks (all OFL)
-        sans: ['Inter', 'Noto Sans', 'Source Sans 3', 'ui-sans-serif', 'system-ui', 'Arial', 'sans-serif'],
-        // Headlines / tea names: Cormorant Garamond → Playfair Display (both OFL)
-        serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],
-        // Display / logo
-        display: ['Playfair Display', 'Cormorant Garamond', 'serif'],
+        // System Font Stack - automatically uses SF Pro on iOS/macOS
+        sans: [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'sans-serif',
+        ],
+        // Serif AUCH auf Sans umgestellt für Konsistenz
+        serif: [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'sans-serif',
+        ],
+        // Display = same as sans
+        display: [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'sans-serif',
+        ],
       },
       colors: {
         midnight:    '#1d2646',

@@ -17,6 +17,23 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R008.4** - v0.9.7.4 (2026-02-18)
+**Status:** Font Fix  
+**Codename:** Full Sans-Serif (finally!)
+
+#### 🎨 Design Fix
+- ✅ Serif → Sans-Serif in Tailwind Config
+- ✅ ALLE Font-Definitionen auf System Font Stack
+- ✅ Kein Times New Roman / Georgia mehr
+- ✅ SF Pro überall auf iOS
+
+#### 🔧 Technical
+- tailwind.config.js: serif, display → Sans-Serif Stack
+- Verhindert Fallback auf Serif-Fonts
+- Konsistente Typography überall
+
+---
+
 ### **R008.3** - v0.9.7.3 (2026-02-18)
 **Status:** 🚨 CRITICAL HOTFIX  
 **Codename:** Supabase Data Protection
