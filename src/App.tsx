@@ -1,19 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Sparkles, ChevronDown, Info, RefreshCw, Plus } from 'lucide-react';
+import { Info, RefreshCw, LayoutGrid } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
-import { getGreeting, getRecommendedTeaTypes, sortTeaTypesByTime } from '@/lib/timeOfDay';
-import { TeaCard } from '@/components/TeaCard';
-import { TeaGridCard } from '@/components/TeaGridCard';
+import { getGreeting, getRecommendedTeaTypes } from '@/lib/timeOfDay';
+import { SwipeTeaCard } from '@/components/SwipeTeaCard';
 import { TeaForm } from '@/components/TeaForm';
-import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
-import { SkeletonGrid } from '@/components/SkeletonCard';
+import { InventorySheet } from '@/components/InventorySheet';
+import { TeaGridCard } from '@/components/TeaGridCard';
 import { useHaptic } from '@/hooks/useHaptic';
-import { useTabDirection } from '@/hooks/useTabDirection';
 
 const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
 
@@ -27,144 +25,121 @@ const TEA_CATEGORY_COLORS: Record<TeaType, string> = {
   chai: '#A0522D', jasmin: '#C77DFF', kräuter: '#2E8B57',
 };
 
+type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error';
+
 function App() {
-  const [activeTab, setActiveTab] = useState<TabId>('heute');
   const [teas, setTeas] = useState<Tea[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'ok' | 'error'>('idle');
+  const [isInventoryOpen, setIsInventoryOpen] = useState(false);
+  const [showAllTeas, setShowAllTeas] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [isLoading, setIsLoading] = useState(true);
-  const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
-    schwarz: true, grün: true, oolong: true, chai: true, jasmin: true, kräuter: true,
-  });
-
-  // Tageszeit-basierte Empfehlungen
-  const recommendedTypes = getRecommendedTeaTypes();
-  const sortedCategoryOrder = sortTeaTypesByTime([...TEA_CATEGORY_ORDER]);
 
   const { trigger: haptic } = useHaptic();
-  const { getDirection } = useTabDirection();
-  const [slideDir, setSlideDir] = useState(1);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const infoTriggerRef = useRef<HTMLButtonElement>(null);
 
+  const availableTeas = teas.filter(t => !t.zuletztGetrunken);
+  const recommendedTypes = getRecommendedTeaTypes();
+  const recommendedTeas = availableTeas.filter(t => recommendedTypes.includes(t.teeArt));
+  const suggestedTeas = recommendedTeas.length > 0 ? recommendedTeas : availableTeas;
+  const currentTea = suggestedTeas[currentIndex % suggestedTeas.length];
+
+  const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
+    acc[type] = availableTeas.filter(t => t.teeArt === type);
+    return acc;
+  }, {} as Record<TeaType, Tea[]>);
+
   useEffect(() => {
     const initData = async () => {
-      // 1. Versuche von Supabase zu laden
       const supabaseData = await loadFromSupabase();
-      
       if (supabaseData) {
-        // Supabase hat Daten → nutze diese
         setTeas(supabaseData.teas);
         setQueue(supabaseData.queue.length > 0 ? supabaseData.queue : supabaseData.teas.map(t => t.id));
-        // Speichere auch in localStorage als Backup
         saveData({ teas: supabaseData.teas, queue: supabaseData.queue });
       } else {
-        // 2. Fallback: Lade von localStorage
         const localData = loadData();
         setTeas(localData.teas);
         setQueue(localData.queue.length > 0 ? localData.queue : localData.teas.map(t => t.id));
       }
-      
       setTimeout(() => setIsLoading(false), 400);
     };
-    
     initData();
   }, []);
 
   useEffect(() => {
     if (teas.length > 0 || queue.length > 0) {
       saveData({ teas, queue });
-      // Auto-Sync zu Supabase (debounced mit 2 Sekunden Verzögerung)
-      const timer = setTimeout(() => {
-        if (teas.length > 0) {  // Nur syncen wenn Daten vorhanden!
-          saveToSupabase(teas, queue);
-        }
-      }, 2000);
+      const timer = setTimeout(() => { if (teas.length > 0) saveToSupabase(teas, queue); }, 2000);
       return () => clearTimeout(timer);
     }
   }, [teas, queue]);
 
-  // Realtime Subscription — aktualisiert App wenn Partner Änderungen macht
   useEffect(() => {
-    let cleanup: (() => void) | undefined;
-    const setup = () => {
-      cleanup = subscribeToSync((data) => {
-        setTeas(data.teas);
-        setQueue(data.queue);
-        saveData({ teas: data.teas, queue: data.queue });
-        setSyncStatus('ok');
-        setTimeout(() => setSyncStatus('idle'), 2000);
-      });
-    };
-    setup();
-    return () => { cleanup?.(); };
+    const cleanup = subscribeToSync((data) => {
+      setTeas(data.teas);
+      setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
+      saveData({ teas: data.teas, queue: data.queue });
+    });
+    return cleanup;
   }, []);
-
-  const toggleCategory = (type: TeaType) =>
-    setOpenCategories(prev => ({ ...prev, [type]: !prev[type] }));
 
   const handleAddTea = (teaData: Omit<Tea, 'id'>) => {
     const t: Tea = { ...teaData, id: generateId() };
     setTeas(prev => [...prev, t]);
     setQueue(prev => [...prev, t.id]);
+    haptic('success');
   };
 
   const handleUpdateTea = (teaData: Omit<Tea, 'id'>) => {
     if (!editingTea) return;
     setTeas(prev => prev.map(t => t.id === editingTea.id ? { ...teaData, id: editingTea.id } : t));
-    setEditingTea(undefined);
+    haptic('success');
   };
 
   const handleDeleteTea = (id: string) => {
     setTeas(prev => prev.filter(t => t.id !== id));
-    setQueue(prev => prev.filter(q => q !== id));
+    setQueue(prev => prev.filter(qid => qid !== id));
+    haptic('light');
   };
 
-  const handleSelectTea = (id: string) => {
-    setTeas(prev => prev.map(t =>
-      t.id === id ? { ...t, zuletztGetrunken: new Date().toISOString(), isSelected: true }
-                  : { ...t, isSelected: false }
-    ));
-    const q = queue.filter(q => q !== id); q.push(id); setQueue(q);
-    setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
+  const handleSelectTea = (tea: Tea) => {
+    setTeas(prev => prev.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t));
+    setQueue(prev => { const filtered = prev.filter(id => id !== tea.id); return [...filtered, tea.id]; });
+    setCurrentIndex(prev => prev + 1);
+    haptic('success');
   };
 
-  const handleUnselectTea = (id: string) => {
-    setTeas(prev => prev.map(t =>
-      t.id === id ? { ...t, zuletztGetrunken: undefined, isSelected: true }
-                  : { ...t, isSelected: false }
-    ));
-    const q = queue.filter(q => q !== id); q.unshift(id); setQueue(q);
-    setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
-  };
+  const handleSkipTea = () => { setCurrentIndex(prev => prev + 1); haptic('light'); };
 
-  const handleEditTea = (tea: Tea) => {
-    setEditingTea(tea); setIsFormOpen(true);
+  const handleSync = async () => {
+    if (teas.length === 0) { alert('⚠️ Keine Tees zum Synchronisieren vorhanden.'); return; }
+    setSyncStatus('syncing');
+    const ok = await saveToSupabase(teas, queue);
+    setSyncStatus(ok ? 'ok' : 'error');
+    setTimeout(() => setSyncStatus('idle'), 2000);
   };
-
-  const getTeaById = (id: string) => teas.find(t => t.id === id);
 
   const handleExport = () => {
-    const blob = new Blob(
-      [JSON.stringify({ version: '1.0.0', exportDate: new Date().toISOString(), teas, queue }, null, 2)],
-      { type: 'application/json' }
-    );
+    const data = JSON.stringify({ teas, queue }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `royal-tea-export-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `royal-tea-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
+    reader.onload = (ev) => {
       try {
         const parsed = JSON.parse(ev.target?.result as string);
         if (!parsed.teas || !Array.isArray(parsed.teas)) { alert('Ungültige Datei.'); return; }
@@ -178,300 +153,98 @@ function App() {
     e.target.value = '';
   };
 
-  const handleSync = async () => {
-    // KRITISCH: Verhindere Sync mit leeren Daten → würde Supabase überschreiben!
-    if (teas.length === 0) {
-      alert('⚠️ Keine Tees zum Synchronisieren vorhanden. Bitte lade erst Daten von Supabase oder füge neue Tees hinzu.');
-      return;
-    }
-    
-    setSyncStatus('syncing');
-    const ok = await saveToSupabase(teas, queue);
-    setSyncStatus(ok ? 'ok' : 'error');
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  };
-
-  const availableTeas = queue
-    .map(id => getTeaById(id))
-    .filter((t): t is Tea => !!t && !t.zuletztGetrunken);
-
-  const usedTeas = teas
-    .filter(t => t.zuletztGetrunken)
-    .sort((a, b) => new Date(b.zuletztGetrunken!).getTime() - new Date(a.zuletztGetrunken!).getTime());
-
-  const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
-    acc[type] = availableTeas.filter(t => t.teeArt === type);
-    return acc;
-  }, {} as Record<TeaType, Tea[]>);
-
   return (
-    <div className="min-h-screen bg-midnight">
+    <div className="min-h-screen bg-midnight text-white font-sans">
       <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
-
-      <div className="min-h-screen pb-28">
-
-        {/* HEADER
-             - Unsichtbarer Spacer oben = env(safe-area-inset-top) für PWA-Modus
-             - Eigentlicher Inhalt: feste Höhe h-14, items-center → Logo + Buttons immer aligned
-             - Header-Gesamthöhe wächst nur um die tatsächliche Status-Bar-Höhe */}
+      <div className="min-h-screen pb-8">
         <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
-          {/* Safe-area Spacer — nur sichtbar im PWA-Modus */}
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
-          {/* Header-Inhalt — fixe Höhe, vertikal zentriert */}
           <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
-
-              {/* Sync-Button - Upload zu Supabase (nur wenn Daten vorhanden) */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={handleSync}
+              <motion.button whileTap={{ scale: 0.9 }} onClick={() => { setIsInventoryOpen(true); haptic('light'); }}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors" aria-label="Inventar öffnen">
+                <LayoutGrid className="w-5 h-5 text-white" />
+              </motion.button>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={handleSync}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors disabled:opacity-50"
-                aria-label="Daten zu Supabase hochladen"
-                disabled={syncStatus === 'syncing' || teas.length === 0}
-                title={teas.length === 0 ? 'Keine Daten zum Hochladen' : 'Zu Supabase hochladen'}
-              >
-                <RefreshCw
-                  className={`w-5 h-5 transition-colors ${
-                    syncStatus === 'syncing' ? 'text-gold animate-spin' :
-                    syncStatus === 'ok'      ? 'text-green-400' :
-                    syncStatus === 'error'   ? 'text-red-400' :
-                    teas.length === 0        ? 'text-white/30' :
-                    'text-white'
-                  }`}
-                />
+                disabled={syncStatus === 'syncing' || teas.length === 0}>
+                <RefreshCw className={`w-5 h-5 transition-colors ${syncStatus === 'syncing' ? 'text-gold animate-spin' : syncStatus === 'ok' ? 'text-green-400' : syncStatus === 'error' ? 'text-red-400' : teas.length === 0 ? 'text-white/30' : 'text-white'}`} />
               </motion.button>
-
-              {/* Add Button — Gold */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => { setIsFormOpen(true); setEditingTea(undefined); haptic('light'); }}
-                className="p-2 rounded-ios transition-all"
-                style={{
-                  background: 'linear-gradient(145deg, #d4c47e, #b8a85a)',
-                  boxShadow: '0 2px 8px rgba(198,185,117,0.4)',
-                }}
-                aria-label="Neuen Tee hinzufügen"
-              >
-                <Plus className="w-5 h-5 text-midnight" strokeWidth={2.5} />
-              </motion.button>
-
-              {/* Info Button */}
-              <motion.button
-                ref={infoTriggerRef}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsInfoOpen(true)}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                aria-label="App-Informationen"
-                aria-haspopup="dialog"
-                aria-expanded={isInfoOpen}>
+              <motion.button ref={infoTriggerRef} whileTap={{ scale: 0.9 }} onClick={() => setIsInfoOpen(true)}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors">
                 <Info className="w-5 h-5 text-white" />
               </motion.button>
             </div>
           </div>
         </header>
-
-        {/* CONTENT */}
-        <main className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)]"
-          style={{ backgroundColor: '#FFFFF0' }}>
-          <AnimatePresence mode="wait" custom={slideDir}>
-
-            {/* TAB: HEUTE */}
-            {activeTab === 'heute' && (
-              <motion.div key="heute"
-                custom={slideDir}
-                initial={{ opacity: 0, x: slideDir * 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: slideDir * -40 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
-                {teas.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-midnight/40" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-midnight mb-2 font-sans">Keine Tees vorhanden</h3>
-                    <p className="text-midnight/60 text-center mb-6">Füge deinen ersten Tee hinzu.</p>
-                    <button onClick={() => { setIsFormOpen(true); setEditingTea(undefined); }}
-                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">
-                      Ersten Tee hinzufügen
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    {/* Verfügbare Tees nach Kategorie */}
-                    <div className="mb-8">
-                      <div className="flex items-center gap-2 mb-5">
-                        <Sparkles className="w-5 h-5 text-gold" aria-hidden="true" />
-                        <h2 className="text-lg font-semibold font-sans text-midnight/70">{getGreeting()}</h2>
+        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]" style={{ backgroundColor: '#FFFFF0' }}>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="animate-spin w-8 h-8 border-4 border-gold border-t-transparent rounded-full" />
+            </div>
+          ) : showAllTeas ? (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold font-sans text-midnight">Alle Tees</h2>
+                <button onClick={() => setShowAllTeas(false)} className="text-sm font-sans text-midnight/60 hover:text-midnight transition-colors">← Zurück</button>
+              </div>
+              {availableTeas.length === 0 ? (
+                <div className="text-center py-12"><p className="text-midnight/60">Alle Tees wurden verwendet! 🎉</p></div>
+              ) : (
+                <div className="space-y-6">
+                  {TEA_CATEGORY_ORDER.map(type => {
+                    const catTeas = teasByCategory[type];
+                    if (catTeas.length === 0) return null;
+                    return (
+                      <div key={type}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }} />
+                          <h3 className="font-sans font-semibold text-midnight">{TEA_CATEGORY_LABELS[type]} ({catTeas.length})</h3>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          {catTeas.map(tea => <TeaGridCard key={tea.id} tea={tea} onClick={() => handleSelectTea(tea)} />)}
+                        </div>
                       </div>
-
-                      {availableTeas.length === 0 ? (
-                        <div className="text-center py-12">
-                          <p className="text-midnight/60 mb-2">Alle Tees wurden verwendet! 🎉</p>
-                          <p className="text-sm text-midnight/40">Klicke unten auf einen Tee um ihn erneut zu verwenden</p>
-                        </div>
-                      ) : isLoading ? (
-                        <SkeletonGrid count={4} />
-                      ) : (
-                        <div className="space-y-2">
-                          {(sortedCategoryOrder as TeaType[]).map(type => {
-                            const catTeas = teasByCategory[type];
-                            if (catTeas.length === 0) return null;
-                            const isRecommended = recommendedTypes.includes(type);
-                            const isOpen = isRecommended || openCategories[type]; // Empfohlene automatisch auf
-                            return (
-                              <div key={type} className={`rounded-ios-xl overflow-hidden border shadow-sm ${
-                                isRecommended 
-                                  ? 'border-gold/30 ring-1 ring-gold/20' 
-                                  : 'border-midnight/10'
-                              }`}>
-                                <button
-                                  onClick={() => toggleCategory(type)}
-                                  aria-expanded={isOpen}
-                                  aria-controls={`cat-${type}`}
-                                  className="w-full flex items-center justify-between px-4 py-3 bg-midnight/5 hover:bg-midnight/10 transition-colors">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full flex-shrink-0"
-                                      style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }}
-                                      aria-hidden="true" />
-                                    <span className="font-sans font-semibold text-midnight text-base">
-                                      {TEA_CATEGORY_LABELS[type]}
-                                    </span>
-                                    <span className="text-sm text-midnight/40 font-sans">({catTeas.length})</span>
-                                    {isRecommended && (
-                                      <span className="text-xs bg-gold/20 text-gold-text px-2 py-0.5 rounded-full font-sans font-medium">
-                                        Jetzt empfohlen
-                                      </span>
-                                    )}
-                                  </div>
-                                  <motion.div animate={{ rotate: isOpen ? 0 : -90 }} transition={{ duration: 0.2 }}>
-                                    <ChevronDown className="w-5 h-5 text-midnight/40" aria-hidden="true" />
-                                  </motion.div>
-                                </button>
-                                <AnimatePresence initial={false}>
-                                  {isOpen && (
-                                    <motion.div id={`cat-${type}`} key="body"
-                                      initial={{ height: 0, opacity: 0 }}
-                                      animate={{ height: 'auto', opacity: 1 }}
-                                      exit={{ height: 0, opacity: 0 }}
-                                      transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                      className="overflow-hidden">
-                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-3"
-                                        style={{ backgroundColor: 'rgba(255,255,240,0.8)' }}>
-                                        {catTeas.map((tea, i) => (
-                                          <TeaGridCard key={tea.id} tea={tea}
-                                            onSelect={() => handleSelectTea(tea.id)}
-                                            onEdit={() => handleEditTea(tea)}
-                                            onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
-                                            index={i} />
-                                        ))}
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Zuletzt verwendet */}
-                    {usedTeas.length > 0 && (
-                      <div className="mt-8 pt-8 border-t border-midnight/10">
-                        <div className="flex items-center gap-2 mb-4">
-                          <h2 className="text-xl font-bold font-sans text-midnight">Zuletzt verwendet</h2>
-                          <span className="text-sm text-midnight/50 font-sans">({usedTeas.length})</span>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
-                          {usedTeas.map((tea, i) => (
-                            <TeaGridCard key={tea.id} tea={{ ...tea, isSelected: true }}
-                              onSelect={() => handleUnselectTea(tea.id)}
-                              onEdit={() => handleEditTea(tea)}
-                              onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
-                              index={i} />
-                          ))}
-                        </div>
-                        <p className="text-center text-sm text-midnight/40 italic font-sans">
-                          💡 Klicke auf einen Tee um ihn erneut zu verwenden
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </motion.div>
-            )}
-
-            {/* TAB: MEINE TEES */}
-            {activeTab === 'list' && (
-              <motion.div key="list"
-                custom={slideDir}
-                initial={{ opacity: 0, x: slideDir * 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: slideDir * -40 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
-                <div className="mb-4">
-                  <h2 className="text-xl font-bold font-sans text-midnight mb-1">Meine Tees</h2>
-                  <p className="text-sm text-midnight/60 font-sans">
-                    {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
-                  </p>
+                    );
+                  })}
                 </div>
-                {teas.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
-                      <Coffee className="w-10 h-10 text-midnight/40" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-midnight mb-2 font-sans">Noch keine Tees</h3>
-                    <p className="text-midnight/60 text-center mb-6 font-sans">Beginne deine Tee-Sammlung</p>
-                    <button onClick={() => { setIsFormOpen(true); setEditingTea(undefined); }}
-                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">
-                      Tee hinzufügen
-                    </button>
+              )}
+            </div>
+          ) : (
+            <div>
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold font-sans text-midnight mb-2">{getGreeting()}</h1>
+                {recommendedTeas.length > 0 && <p className="text-sm font-sans text-midnight/60">Perfekt für jetzt</p>}
+              </div>
+              {availableTeas.length === 0 ? (
+                <div className="text-center py-20">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h3 className="text-xl font-semibold text-midnight mb-2 font-sans">Alle Tees verwendet!</h3>
+                  <p className="text-midnight/60 mb-6">Öffne das Inventar um Tees erneut zu verwenden</p>
+                  <button onClick={() => setIsInventoryOpen(true)} className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">Inventar öffnen</button>
+                </div>
+              ) : (
+                <>
+                  <AnimatePresence mode="wait">
+                    {currentTea && <SwipeTeaCard key={currentTea.id} tea={currentTea} onSwipeRight={() => handleSelectTea(currentTea)} onSwipeLeft={handleSkipTea} onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} />}
+                  </AnimatePresence>
+                  <div className="flex justify-center items-center gap-8 mt-8 text-midnight/40 text-sm font-sans">
+                    <div className="flex items-center gap-2"><span>←</span><span>Überspringen</span></div>
+                    <div className="flex items-center gap-2"><span>Auswählen</span><span>→</span></div>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {queue.map(teaId => {
-                      const tea = getTeaById(teaId); if (!tea) return null;
-                      return (
-                        <TeaCard key={tea.id} tea={tea}
-                          onEdit={() => handleEditTea(tea)}
-                          onDelete={() => { if (confirm(`"${tea.name}" wirklich löschen?`)) handleDeleteTea(tea.id); }}
-                        />
-                      );
-                    })}
+                  <div className="text-center mt-8">
+                    <button onClick={() => setShowAllTeas(true)} className="text-midnight/60 hover:text-midnight transition-colors font-sans text-sm">Alle Tees anzeigen ›</button>
                   </div>
-                )}
-              </motion.div>
-            )}
-
-          </AnimatePresence>
+                </>
+              )}
+            </div>
+          )}
         </main>
-
-        <TabBar activeTab={activeTab} onTabChange={(tab) => {
-          haptic('light');
-          setSlideDir(getDirection(tab));
-          setActiveTab(tab);
-        }} />
-
-        <TeaForm
-          isOpen={isFormOpen}
-          onClose={() => {
-            setIsFormOpen(false);
-            setEditingTea(undefined);
-          }}
-          onSave={editingTea ? handleUpdateTea : handleAddTea}
-          editTea={editingTea}
-        />
-
-        <InfoModal
-          isOpen={isInfoOpen}
-          onClose={() => setIsInfoOpen(false)}
-          triggerRef={infoTriggerRef}
-          onExport={handleExport}
-          onImport={() => fileInputRef.current?.click()}
-        />
-
       </div>
+      <TeaForm isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }} onSave={editingTea ? handleUpdateTea : handleAddTea} editTea={editingTea} />
+      <InfoModal isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} triggerRef={infoTriggerRef} onExport={handleExport} onImport={() => fileInputRef.current?.click()} />
+      <InventorySheet isOpen={isInventoryOpen} onClose={() => setIsInventoryOpen(false)} teas={teas} queue={queue} onEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); setIsInventoryOpen(false); }} onDelete={handleDeleteTea} onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }} />
     </div>
   );
 }
