@@ -17,6 +17,35 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R010.1** - v0.11.1 (2026-02-18)
+**Status:** Feature Branch - UX Improvements 🎯  
+**Codename:** Success & Loop
+
+#### ✨ Features
+- ✅ **Success Screen** nach Tee-Auswahl
+  - ✅ Checkmark Animation
+  - ✅ "Zurück" Button
+  - ✅ "Noch einen Tee" Button
+  - ✅ Brewing Info angezeigt
+  
+- ✅ **Endlos-Loop** bei Swipe Left
+  - Skip durch alle Tees
+  - Automatisch wieder von vorne
+  - Nie "fertig" beim Skippen
+
+#### 🔧 Logic Changes
+- Swipe Right → Success Screen (statt nächste Karte)
+- Swipe Left → Nächster Tee (endlos)
+- "Noch einen Tee" → Weiter swipen
+- "Zurück" → Reset zu Anfang
+
+#### 🎨 Design
+- Spring Animations auf Success Screen
+- Check-Icon mit Bounce
+- Apple-Style Success-UI
+
+---
+
 ### **R010** - v0.11.0 (2026-02-18)
 **Status:** Feature Branch - Apple UX v2 🍎  
 **Codename:** Radical Simplification

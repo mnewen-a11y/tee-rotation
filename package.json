@@ -1,8 +1,8 @@
 {
   "name": "royal-tee",
   "private": true,
-  "version": "0.11.0",
-  "release": "R010",
+  "version": "0.11.1",
+  "release": "R010.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
