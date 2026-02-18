@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, RefreshCw, LayoutGrid } from 'lucide-react';
-import { Tea, TeaType } from '@/types/tea';
+import { Tea, TeaType, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getGreeting, getRecommendedTeaTypes } from '@/lib/timeOfDay';
@@ -61,14 +61,36 @@ function App() {
   useEffect(() => {
     const initData = async () => {
       const supabaseData = await loadFromSupabase();
+      
+      // Migration-Funktion: Füge bestTimeOfDay zu alten Tees hinzu
+      const migrateTeas = (teas: Tea[]): Tea[] => {
+        return teas.map(tea => {
+          if (!tea.bestTimeOfDay || tea.bestTimeOfDay.length === 0) {
+            // Auto-migrate basierend auf Tee-Typ
+            return {
+              ...tea,
+              bestTimeOfDay: TEA_TYPE_DEFAULT_TIMES[tea.teeArt]
+            };
+          }
+          return tea;
+        });
+      };
+      
       if (supabaseData) {
-        setTeas(supabaseData.teas);
-        setQueue(supabaseData.queue.length > 0 ? supabaseData.queue : supabaseData.teas.map(t => t.id));
-        saveData({ teas: supabaseData.teas, queue: supabaseData.queue });
+        const migratedTeas = migrateTeas(supabaseData.teas);
+        setTeas(migratedTeas);
+        setQueue(supabaseData.queue.length > 0 ? supabaseData.queue : migratedTeas.map(t => t.id));
+        saveData({ teas: migratedTeas, queue: supabaseData.queue });
+        // Speichere migrierte Daten zurück zu Supabase
+        if (migratedTeas.some((t, i) => t.bestTimeOfDay !== supabaseData.teas[i].bestTimeOfDay)) {
+          saveToSupabase(migratedTeas, supabaseData.queue);
+        }
       } else {
         const localData = loadData();
-        setTeas(localData.teas);
-        setQueue(localData.queue.length > 0 ? localData.queue : localData.teas.map(t => t.id));
+        const migratedTeas = migrateTeas(localData.teas);
+        setTeas(migratedTeas);
+        setQueue(localData.queue.length > 0 ? localData.queue : migratedTeas.map(t => t.id));
+        saveData({ teas: migratedTeas, queue: localData.queue });
       }
       setTimeout(() => setIsLoading(false), 400);
     };
