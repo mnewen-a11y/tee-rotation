@@ -17,6 +17,130 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R011** - v0.12.0 (2026-02-18)
+**Status:** Feature - Personalisierte Tageszeiten 🕐  
+**Codename:** Best Time of Day
+
+#### ✨ Features
+- ✅ **Datenmodell erweitert:** `bestTimeOfDay?: TimeOfDay[]`
+- ✅ **Edit-Dialog:** Checkboxen für Tageszeiten (Multiselect)
+  - ☀️ Morgen (6-11h)
+  - 🌤️ Mittag (11-15h)
+  - ☕ Nachmittag (15-18h)
+  - 🌙 Abend (18-6h)
+
+- ✅ **Smart Defaults:** Automatische Vorschläge basierend auf Tee-Typ
+  - Schwarztee → Morgen + Mittag
+  - Grüntee → Mittag + Nachmittag
+  - Kräutertee → Abend
+  - etc.
+
+- ✅ **Badges auf Kachel:** Emoji-Badges zeigen beste Zeiten
+- ✅ **Auto-Migration:** Alte Tees bekommen automatisch Defaults
+- ✅ **Persistenz:** Wird in localStorage + Supabase gespeichert
+
+#### 🎨 UI/UX
+- Checkboxen mit Gold-Highlight wenn ausgewählt
+- Emoji + Label für jede Tageszeit
+- "Mehrfachauswahl möglich" Hinweis
+- Badges auf SwipeCard (nur Emojis, kompakt)
+
+#### 🔧 Technical
+- Neue Typen: `TimeOfDay`, `TEA_TYPE_DEFAULT_TIMES`, `TIME_OF_DAY_LABELS`
+- Migration beim App-Start
+- Auto-Update zu Supabase nach Migration
+
+#### 📝 Datenmodell
+```typescript
+interface Tea {
+  // ... existing fields
+  bestTimeOfDay?: ('morning' | 'midday' | 'afternoon' | 'evening')[];
+}
+```
+
+---
+
+### **R010.1** - v0.11.1 (2026-02-18)
+**Status:** Feature Branch - UX Improvements 🎯  
+**Codename:** Success & Loop
+
+#### ✨ Features
+- ✅ **Success Screen** nach Tee-Auswahl
+  - ✅ Checkmark Animation
+  - ✅ "Zurück" Button
+  - ✅ "Noch einen Tee" Button
+  - ✅ Brewing Info angezeigt
+  
+- ✅ **Endlos-Loop** bei Swipe Left
+  - Skip durch alle Tees
+  - Automatisch wieder von vorne
+  - Nie "fertig" beim Skippen
+
+#### 🔧 Logic Changes
+- Swipe Right → Success Screen (statt nächste Karte)
+- Swipe Left → Nächster Tee (endlos)
+- "Noch einen Tee" → Weiter swipen
+- "Zurück" → Reset zu Anfang
+
+#### 🎨 Design
+- Spring Animations auf Success Screen
+- Check-Icon mit Bounce
+- Apple-Style Success-UI
+
+---
+
+### **R010** - v0.11.0 (2026-02-18)
+**Status:** Feature Branch - Apple UX v2 🍎  
+**Codename:** Radical Simplification
+
+#### 🚀 BREAKING CHANGES
+- ❌ Tab-Bar komplett entfernt
+- ❌ Grid-View nicht mehr Standard
+- ✅ Tinder-Style Single Card Interface
+- ✅ Inventar als Bottom Sheet
+
+#### ✨ Features
+- ✅ **SwipeTeaCard:** Tinder-Style Tee-Auswahl
+  - Swipe Right → Tee auswählen
+  - Swipe Left → Nächster Tee
+  - Tap → Bearbeiten
+  - Haptic Feedback
+  - Visuelle Overlays (✓ und →)
+  
+- ✅ **InventorySheet:** Bottom Sheet statt Tab
+  - 📋 Button im Header
+  - + Button im Sheet
+  - Drag-to-dismiss
+  - Alle Tees in scrollbarer Liste
+
+- ✅ **Rating sichtbar:** Sterne auf SwipeCard
+
+- ✅ **Füllstand als Dots:** Visuell ansprechend
+
+- ✅ **"Alle Tees anzeigen":** Fallback zum Grid
+
+#### 🎨 Apple UX Principles
+- **Radikale Vereinfachung:** 1 Karte statt Grid
+- **Swipe-Gestures:** Natürliche Interaktion
+- **Haptic Feedback:** Taktiles Feedback
+- **Progressive Disclosure:** Inventar versteckt
+- **Joy-of-Use:** Überraschung beim Swipen
+
+#### 🔧 Technical
+- **Neue Dateien:**
+  - `src/components/SwipeTeaCard.tsx`
+  - `src/components/InventorySheet.tsx`
+  
+- **Geändert:**
+  - `src/App.tsx` - Komplett neu (kein TabBar)
+  
+- **Entfernt:**
+  - TabBar-Logik aus App
+  - "new" und "rating" Tabs
+  - Grid als Default-View
+
+---
+
 ### **R009** - v0.10.0 (2026-02-18)
 **Status:** Feature Branch - Apple UX 🍎  
 **Codename:** Time-Based Magic

@@ -2,6 +2,7 @@
 
 export type TeaType = 'schwarz' | 'grün' | 'oolong' | 'chai' | 'jasmin' | 'kräuter';
 export type SelectionMode = 'grid';
+export type TimeOfDay = 'morning' | 'midday' | 'afternoon' | 'evening';
 
 export interface Tea {
   id: string;
@@ -14,6 +15,7 @@ export interface Tea {
   zuletztGetrunken?: string;
   isSelected?: boolean;
   rating?: number; // 1–5, optional
+  bestTimeOfDay?: TimeOfDay[]; // Beste Tageszeiten für diesen Tee
 }
 
 export interface AppSettings {
@@ -45,4 +47,22 @@ export const TEA_TYPE_LABELS: Record<TeaType, string> = {
   chai:     'Chai',
   jasmin:   'Jasmin',
   kräuter:  'Kräuter',
+};
+
+// Smart Defaults für beste Tageszeiten basierend auf Tee-Typ
+export const TEA_TYPE_DEFAULT_TIMES: Record<TeaType, TimeOfDay[]> = {
+  schwarz:  ['morning', 'midday'],     // Koffein: Morgen & Mittag
+  grün:     ['midday', 'afternoon'],   // Leichtes Koffein: Mittag & Nachmittag
+  oolong:   ['midday', 'afternoon'],   // Mittleres Koffein
+  chai:     ['morning', 'midday'],     // Stark: Morgen & Mittag
+  jasmin:   ['afternoon', 'evening'],  // Leicht/Koffeinfrei: Nachmittag & Abend
+  kräuter:  ['evening'],               // Koffeinfrei: Abend
+};
+
+// Labels für Tageszeiten
+export const TIME_OF_DAY_LABELS: Record<TimeOfDay, { label: string; emoji: string }> = {
+  morning:   { label: 'Morgen',      emoji: '☀️' },
+  midday:    { label: 'Mittag',      emoji: '🌤️' },
+  afternoon: { label: 'Nachmittag',  emoji: '☕' },
+  evening:   { label: 'Abend',       emoji: '🌙' },
 };
