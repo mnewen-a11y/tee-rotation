@@ -3,18 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Sparkles, ChevronDown, Info, RefreshCw } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
-import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
+import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
 import { TabBar, TabId } from '@/components/TabBar';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
-import { RatingPage } from '@/components/RatingPage';
 import { SkeletonGrid } from '@/components/SkeletonCard';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useTabDirection } from '@/hooks/useTabDirection';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 
 const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
 
@@ -49,37 +47,14 @@ function App() {
   const infoTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const initData = async () => {
-      // Erst versuchen von Supabase zu laden
-      const supabaseData = await loadFromSupabase();
-      
-      if (supabaseData) {
-        // Supabase Daten gefunden - diese verwenden
-        setTeas(supabaseData.teas);
-        setQueue(supabaseData.queue.length > 0 ? supabaseData.queue : supabaseData.teas.map(t => t.id));
-        // Auch lokal speichern für Offline-Nutzung
-        saveData({ teas: supabaseData.teas, queue: supabaseData.queue });
-      } else {
-        // Kein Supabase oder nicht konfiguriert - localStorage verwenden
-        const localData = loadData();
-        setTeas(localData.teas);
-        setQueue(localData.queue.length > 0 ? localData.queue : localData.teas.map(t => t.id));
-      }
-      
-      setTimeout(() => setIsLoading(false), 400);
-    };
-    
-    initData();
+    const data = loadData();
+    setTeas(data.teas);
+    setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
+    setTimeout(() => setIsLoading(false), 400); // kurze Mindest-Ladezeit für Skeleton
   }, []);
 
   useEffect(() => {
-    if (teas.length > 0 || queue.length > 0) {
-      saveData({ teas, queue });  // localStorage
-      saveToSupabase(teas, queue).then(success => {
-        if (success) setSyncStatus('ok');
-        setTimeout(() => setSyncStatus('idle'), 2000);
-      });
-    }
+    if (teas.length > 0 || queue.length > 0) saveData({ teas, queue });
   }, [teas, queue]);
 
   // Realtime Subscription — aktualisiert App wenn Partner Änderungen macht
@@ -98,11 +73,14 @@ function App() {
     return () => { cleanup?.(); };
   }, []);
 
+  useEffect(() => {
+    if (activeTab === 'new') { setIsFormOpen(true); setEditingTea(undefined); }
+  }, [activeTab]);
+
   const toggleCategory = (type: TeaType) =>
     setOpenCategories(prev => ({ ...prev, [type]: !prev[type] }));
 
   const handleAddTea = (teaData: Omit<Tea, 'id'>) => {
-    haptic('success');
     const t: Tea = { ...teaData, id: generateId() };
     setTeas(prev => [...prev, t]);
     setQueue(prev => [...prev, t.id]);
@@ -110,32 +88,25 @@ function App() {
 
   const handleUpdateTea = (teaData: Omit<Tea, 'id'>) => {
     if (!editingTea) return;
-    haptic('success');
     setTeas(prev => prev.map(t => t.id === editingTea.id ? { ...teaData, id: editingTea.id } : t));
     setEditingTea(undefined);
   };
 
   const handleDeleteTea = (id: string) => {
-    haptic('heavy');
     setTeas(prev => prev.filter(t => t.id !== id));
     setQueue(prev => prev.filter(q => q !== id));
   };
 
   const handleSelectTea = (id: string) => {
-    haptic('impact');
     setTeas(prev => prev.map(t =>
       t.id === id ? { ...t, zuletztGetrunken: new Date().toISOString(), isSelected: true }
                   : { ...t, isSelected: false }
     ));
     const q = queue.filter(q => q !== id); q.push(id); setQueue(q);
-    setTimeout(() => {
-      setTeas(prev => prev.map(t => ({ ...t, isSelected: false })));
-      haptic('success');
-    }, 2000);
+    setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
   };
 
   const handleUnselectTea = (id: string) => {
-    haptic('light');
     setTeas(prev => prev.map(t =>
       t.id === id ? { ...t, zuletztGetrunken: undefined, isSelected: true }
                   : { ...t, isSelected: false }
@@ -144,47 +115,13 @@ function App() {
     setTimeout(() => setTeas(prev => prev.map(t => ({ ...t, isSelected: false }))), 2000);
   };
 
-  const handleRefresh = async () => {
-    haptic('medium');
-    setSyncStatus('syncing');
-    const supabaseData = await loadFromSupabase();
-    if (supabaseData) {
-      setTeas(supabaseData.teas);
-      setQueue(supabaseData.queue);
-      saveData({ teas: supabaseData.teas, queue: supabaseData.queue });
-      haptic('success');
-      setSyncStatus('ok');
-    } else {
-      setSyncStatus('idle');
-    }
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  };
-
-  const { containerRef, isPulling, isRefreshing, pullDistance } = usePullToRefresh({
-    onRefresh: handleRefresh,
-    threshold: 80,
-  });
-
   const handleEditTea = (tea: Tea) => {
-    haptic('light');
-    setEditingTea(tea);
-    setIsFormOpen(true);
-    // Don't change tab - form opens as modal
-  };
-
-  const handleTabChange = (tab: TabId) => {
-    setSlideDir(getDirection(tab));
-    setActiveTab(tab);
-    if (tab === 'new') {
-      setEditingTea(undefined);  // Clear edit mode when clicking "Neu" tab
-      setIsFormOpen(true);
-    }
+    setEditingTea(tea); setIsFormOpen(true); setActiveTab('new');
   };
 
   const getTeaById = (id: string) => teas.find(t => t.id === id);
 
   const handleExport = () => {
-    haptic('medium');
     const blob = new Blob(
       [JSON.stringify({ version: '1.0.0', exportDate: new Date().toISOString(), teas, queue }, null, 2)],
       { type: 'application/json' }
@@ -285,32 +222,8 @@ function App() {
         </header>
 
         {/* CONTENT */}
-        <main 
-          ref={containerRef}
-          className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)] overflow-y-auto relative"
+        <main className="max-w-3xl mx-auto px-6 py-6 min-h-[calc(100vh-140px)]"
           style={{ backgroundColor: '#FFFFF0' }}>
-          
-          {/* Pull to Refresh Indicator */}
-          {pullDistance > 0 && (
-            <div 
-              className="absolute top-0 left-0 right-0 flex justify-center items-center transition-opacity"
-              style={{ 
-                height: `${Math.min(pullDistance, 80)}px`,
-                opacity: pullDistance / 80,
-              }}
-            >
-              <div className={`transition-transform ${isRefreshing || isPulling ? 'animate-spin' : ''}`}>
-                <RefreshCw 
-                  className="text-gold" 
-                  size={24}
-                  style={{
-                    transform: `rotate(${(pullDistance / 80) * 360}deg)`
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
           <AnimatePresence mode="wait" custom={slideDir}>
 
             {/* TAB: HEUTE */}
@@ -471,30 +384,13 @@ function App() {
               </motion.div>
             )}
 
-            {/* TAB: BEWERTEN */}
-            {activeTab === 'rating' && (
-              <motion.div key="rating"
-                custom={slideDir}
-                initial={{ opacity: 0, x: slideDir * 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: slideDir * -40 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
-                <RatingPage
-                  teas={teas}
-                  onRateTea={(id, rating) =>
-                    setTeas(prev => prev.map(t => t.id === id ? { ...t, rating } : t))
-                  }
-                  onNavigateToNew={() => setActiveTab('new')}
-                />
-              </motion.div>
-            )}
-
           </AnimatePresence>
         </main>
 
         <TabBar activeTab={activeTab} onTabChange={(tab) => {
           haptic('light');
-          handleTabChange(tab);
+          setSlideDir(getDirection(tab));
+          setActiveTab(tab);
         }} />
 
         <TeaForm
