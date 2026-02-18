@@ -21,6 +21,7 @@ const SWIPE_THRESHOLD = 100; // Mindest-Distance für Swipe
 export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTeaCardProps) => {
   const { trigger: haptic } = useHaptic();
   const cardRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
   
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
@@ -29,6 +30,14 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
   // Farb-Overlay basierend auf Swipe-Richtung
   const acceptOpacity = useTransform(x, [0, SWIPE_THRESHOLD, 200], [0, 0.3, 0.8]);
   const rejectOpacity = useTransform(x, [-200, -SWIPE_THRESHOLD, 0], [0.8, 0.3, 0]);
+
+  const handleDragStart = () => {
+    isDragging.current = false;
+  };
+
+  const handleDrag = () => {
+    isDragging.current = true;
+  };
 
   const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const offset = info.offset.x;
@@ -47,6 +56,14 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
     }
   };
 
+  const handleClick = () => {
+    // Nur Tap-Action wenn nicht gedragged wurde
+    if (!isDragging.current) {
+      onTap();
+    }
+    isDragging.current = false;
+  };
+
   // Füllstand als Dots
   const fullDots = Math.round(tea.fuellstand / 10);
   const emptyDots = 10 - fullDots;
@@ -58,9 +75,10 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.7}
+      onDragStart={handleDragStart}
+      onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      whileTap={{ scale: 0.98 }}
-      onClick={onTap}
+      onClick={handleClick}
       className="relative w-full max-w-sm mx-auto aspect-[3/4] cursor-grab active:cursor-grabbing"
     >
       {/* Card Background */}
