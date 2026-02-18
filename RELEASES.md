@@ -17,6 +17,37 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R009** - v0.10.0 (2026-02-18)
+**Status:** Feature Branch - Apple UX 🍎  
+**Codename:** Time-Based Magic
+
+#### ✨ Features
+- ✅ Zeitbasiertes Greeting (☀️ Guten Morgen, 🌙 Guten Abend, etc.)
+- ✅ Smart Sorting: Empfohlene Tee-Kategorien zuerst
+- ✅ Auto-Expand: Empfohlene Kategorien automatisch aufgeklappt
+- ✅ Badge: "Jetzt empfohlen" Label bei passenden Tees
+- ✅ Visuelle Hervorhebung mit Gold-Ring
+
+#### 🕐 Tageszeit-Logik
+- **Morgen (6-11h):** Schwarztee, Chai (Koffein)
+- **Mittag (11-15h):** Oolong, Grün, Schwarz
+- **Nachmittag (15-18h):** Grün, Jasmin, Oolong
+- **Abend (18-6h):** Kräuter, Jasmin (wenig/kein Koffein)
+
+#### 🎨 Apple UX Principles
+- Progressive Disclosure (wichtigstes zuerst)
+- Contextual Awareness (Zeit-sensitiv)
+- Joy-of-Use (kleine Überraschungen)
+- Zero-Interaction (automatisch richtig)
+
+#### 🔧 Technical
+- Neue Datei: `src/lib/timeOfDay.ts`
+- System-Zeit basiert (keine API-Calls)
+- Funktioniert offline
+- Auto-Timezone via Browser
+
+---
+
 ### **R008.4** - v0.9.7.4 (2026-02-18)
 **Status:** Font Fix  
 **Codename:** Full Sans-Serif (finally!)
