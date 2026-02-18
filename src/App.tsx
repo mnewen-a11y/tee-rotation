@@ -4,6 +4,7 @@ import { Coffee, Sparkles, ChevronDown, Info, RefreshCw, Plus } from 'lucide-rea
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
+import { getGreeting, getRecommendedTeaTypes, sortTeaTypesByTime } from '@/lib/timeOfDay';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
@@ -38,6 +39,10 @@ function App() {
   const [openCategories, setOpenCategories] = useState<Record<TeaType, boolean>>({
     schwarz: true, grün: true, oolong: true, chai: true, jasmin: true, kräuter: true,
   });
+
+  // Tageszeit-basierte Empfehlungen
+  const recommendedTypes = getRecommendedTeaTypes();
+  const sortedCategoryOrder = sortTeaTypesByTime([...TEA_CATEGORY_ORDER]);
 
   const { trigger: haptic } = useHaptic();
   const { getDirection } = useTabDirection();
@@ -297,7 +302,7 @@ function App() {
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-5">
                         <Sparkles className="w-5 h-5 text-gold" aria-hidden="true" />
-                        <h2 className="text-lg font-semibold font-sans text-midnight/70">Wähle deinen Tee</h2>
+                        <h2 className="text-lg font-semibold font-sans text-midnight/70">{getGreeting()}</h2>
                       </div>
 
                       {availableTeas.length === 0 ? (
@@ -309,12 +314,17 @@ function App() {
                         <SkeletonGrid count={4} />
                       ) : (
                         <div className="space-y-2">
-                          {TEA_CATEGORY_ORDER.map(type => {
+                          {sortedCategoryOrder.map(type => {
                             const catTeas = teasByCategory[type];
                             if (catTeas.length === 0) return null;
-                            const isOpen = openCategories[type];
+                            const isRecommended = recommendedTypes.includes(type);
+                            const isOpen = isRecommended || openCategories[type]; // Empfohlene automatisch auf
                             return (
-                              <div key={type} className="rounded-ios-xl overflow-hidden border border-midnight/10 shadow-sm">
+                              <div key={type} className={`rounded-ios-xl overflow-hidden border shadow-sm ${
+                                isRecommended 
+                                  ? 'border-gold/30 ring-1 ring-gold/20' 
+                                  : 'border-midnight/10'
+                              }`}>
                                 <button
                                   onClick={() => toggleCategory(type)}
                                   aria-expanded={isOpen}
@@ -328,6 +338,11 @@ function App() {
                                       {TEA_CATEGORY_LABELS[type]}
                                     </span>
                                     <span className="text-sm text-midnight/40 font-sans">({catTeas.length})</span>
+                                    {isRecommended && (
+                                      <span className="text-xs bg-gold/20 text-gold-text px-2 py-0.5 rounded-full font-sans font-medium">
+                                        Jetzt empfohlen
+                                      </span>
+                                    )}
                                   </div>
                                   <motion.div animate={{ rotate: isOpen ? 0 : -90 }} transition={{ duration: 0.2 }}>
                                     <ChevronDown className="w-5 h-5 text-midnight/40" aria-hidden="true" />
