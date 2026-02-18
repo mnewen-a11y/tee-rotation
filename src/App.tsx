@@ -229,12 +229,40 @@ function App() {
                   <AnimatePresence mode="wait">
                     {currentTea && <SwipeTeaCard key={currentTea.id} tea={currentTea} onSwipeRight={() => handleSelectTea(currentTea)} onSwipeLeft={handleSkipTea} onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} />}
                   </AnimatePresence>
-                  <div className="flex justify-center items-center gap-8 mt-8 text-midnight/40 text-sm font-sans">
-                    <div className="flex items-center gap-2"><span>←</span><span>Überspringen</span></div>
-                    <div className="flex items-center gap-2"><span>Auswählen</span><span>→</span></div>
+                  {/* Action Buttons - Apple Style */}
+                  <div className="flex justify-center items-center gap-4 mt-8">
+                    {/* Skip Button */}
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSkipTea}
+                      className="flex-1 max-w-[140px] py-3 px-6 bg-midnight/5 hover:bg-midnight/10 active:bg-midnight/15 rounded-ios-lg font-sans font-medium text-midnight/70 transition-colors"
+                    >
+                      Überspringen
+                    </motion.button>
+
+                    {/* Select Button */}
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => currentTea && handleSelectTea(currentTea)}
+                      className="flex-1 max-w-[140px] py-3 px-6 rounded-ios-lg font-sans font-semibold text-white transition-all"
+                      style={{
+                        background: 'linear-gradient(145deg, #d4c47e, #b8a85a)',
+                        boxShadow: '0 2px 8px rgba(198,185,117,0.4)',
+                      }}
+                    >
+                      Auswählen
+                    </motion.button>
                   </div>
-                  <div className="text-center mt-8">
-                    <button onClick={() => setShowAllTeas(true)} className="text-midnight/60 hover:text-midnight transition-colors font-sans text-sm">Alle Tees anzeigen ›</button>
+
+                  {/* Grid View Link */}
+                  <div className="text-center mt-6">
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setShowAllTeas(true)}
+                      className="py-2 px-4 bg-midnight/5 hover:bg-midnight/10 active:bg-midnight/15 rounded-ios font-sans text-sm font-medium text-midnight/60 transition-colors"
+                    >
+                      Alle Tees anzeigen
+                    </motion.button>
                   </div>
                 </>
               )}
