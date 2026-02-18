@@ -17,6 +17,37 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R007** - v0.9.6 (2026-02-18)
+**Status:** Beta  
+**Codename:** Header Plus Button
+
+#### ✨ Features
+- ✅ + Button in den Header verschoben (zwischen Refresh und Info)
+- ✅ Nur noch 2 Tabs: Heute & Meine Tees (Rating & Neu entfernt)
+- ✅ Rating im Edit-Dialog integriert (beim Bearbeiten)
+- ✅ StarRating als wiederverwendbare Komponente
+
+#### 🎨 Design
+- + Button prominent im Header mit Gold-Gradient
+- Saubere Navigation mit nur 2 Tabs
+- Rating-UI im Edit-Dialog
+
+#### 🔧 Technical
+- TabBar: reduziert auf 2 Tabs (heute, list)
+- useTabDirection: angepasst für 2 Tabs
+- Header: + Button zwischen Sync und Info
+- StarRating.tsx: neue wiederverwendbare Komponente
+- RatingPage.tsx: entfernt
+
+#### ⚠️ Hinweis
+Rating ist NOCH NICHT auf Kacheln sichtbar - kommt in R008
+
+#### 🐛 Fixes
+- Konsistente Navigation
+- Rating immer sichtbar wo es relevant ist
+
+---
+
 ### **R001** - v0.9.0 (2026-02-08)
 **Status:** Beta  
 **Codename:** Royal Foundation
