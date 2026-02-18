@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Sparkles, ChevronDown, Info, RefreshCw } from 'lucide-react';
+import { Coffee, Sparkles, ChevronDown, Info, RefreshCw, Plus } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
@@ -73,10 +73,6 @@ function App() {
     return () => { cleanup?.(); };
   }, []);
 
-  useEffect(() => {
-    if (activeTab === 'new') { setIsFormOpen(true); setEditingTea(undefined); }
-  }, [activeTab]);
-
   const toggleCategory = (type: TeaType) =>
     setOpenCategories(prev => ({ ...prev, [type]: !prev[type] }));
 
@@ -116,7 +112,7 @@ function App() {
   };
 
   const handleEditTea = (tea: Tea) => {
-    setEditingTea(tea); setIsFormOpen(true); setActiveTab('new');
+    setEditingTea(tea); setIsFormOpen(true);
   };
 
   const getTeaById = (id: string) => teas.find(t => t.id === id);
@@ -207,6 +203,21 @@ function App() {
                 />
               </motion.button>
 
+              {/* Add Button — Gold */}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => { setIsFormOpen(true); setEditingTea(undefined); haptic('light'); }}
+                className="p-2 rounded-ios transition-all"
+                style={{
+                  background: 'linear-gradient(145deg, #d4c47e, #b8a85a)',
+                  boxShadow: '0 2px 8px rgba(198,185,117,0.4)',
+                }}
+                aria-label="Neuen Tee hinzufügen"
+              >
+                <Plus className="w-5 h-5 text-midnight" strokeWidth={2.5} />
+              </motion.button>
+
+              {/* Info Button */}
               <motion.button
                 ref={infoTriggerRef}
                 whileTap={{ scale: 0.9 }}
@@ -241,7 +252,7 @@ function App() {
                     </div>
                     <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Keine Tees vorhanden</h3>
                     <p className="text-midnight/60 text-center mb-6">Füge deinen ersten Tee hinzu.</p>
-                    <button onClick={() => setActiveTab('new')}
+                    <button onClick={() => { setIsFormOpen(true); setEditingTea(undefined); }}
                       className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">
                       Ersten Tee hinzufügen
                     </button>
@@ -363,7 +374,7 @@ function App() {
                     </div>
                     <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Noch keine Tees</h3>
                     <p className="text-midnight/60 text-center mb-6 font-sans">Beginne deine Tee-Sammlung</p>
-                    <button onClick={() => setActiveTab('new')}
+                    <button onClick={() => { setIsFormOpen(true); setEditingTea(undefined); }}
                       className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">
                       Tee hinzufügen
                     </button>
@@ -398,7 +409,6 @@ function App() {
           onClose={() => {
             setIsFormOpen(false);
             setEditingTea(undefined);
-            if (activeTab === 'new') setActiveTab('heute');
           }}
           onSave={editingTea ? handleUpdateTea : handleAddTea}
           editTea={editingTea}
