@@ -203,7 +203,7 @@ function App() {
                           <h3 className="font-sans font-semibold text-midnight">{TEA_CATEGORY_LABELS[type]} ({catTeas.length})</h3>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                          {catTeas.map(tea => <TeaGridCard key={tea.id} tea={tea} onClick={() => handleSelectTea(tea)} />)}
+                          {catTeas.map((tea, i) => <TeaGridCard key={tea.id} tea={tea} index={i} onSelect={() => handleSelectTea(tea)} />)}
                         </div>
                       </div>
                     );
