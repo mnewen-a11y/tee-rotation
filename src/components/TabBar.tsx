@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Home, List, Plus, Star } from 'lucide-react';
+import { Home, List, Plus } from 'lucide-react';
 
-export type TabId = 'heute' | 'list' | 'new' | 'rating';
+export type TabId = 'heute' | 'list' | 'new';
 
 interface TabBarProps {
   activeTab: TabId;
@@ -13,7 +13,6 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
     { id: 'heute',  icon: Home,  label: 'Heute'      },
     { id: 'list',   icon: List,  label: 'Meine Tees' },
     { id: 'new',    icon: Plus,  label: 'Neu'        },
-    { id: 'rating', icon: Star,  label: 'Bewerten'   },
   ];
 
   return (
@@ -41,7 +40,6 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
-          const isStar = tab.id === 'rating';
           const isNew  = tab.id === 'new';
 
           return (
@@ -88,7 +86,6 @@ export const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
                     <Icon
                       className="w-[22px] h-[22px]"
                       style={{ color: isActive ? '#c6b975' : 'rgba(255,255,255,0.60)' }}
-                      fill={isStar && isActive ? '#c6b975' : 'none'}
                       strokeWidth={isActive ? 2 : 1.75}
                     />
                   </motion.div>

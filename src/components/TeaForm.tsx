@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { X, Plus, Minus } from 'lucide-react';
 import { Tea, TeaType, TEA_TYPE_DEFAULTS, TEA_TYPE_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
+import { StarRating, ratingLabel } from '@/components/StarRating';
 
 interface TeaFormProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
   const [bruehgrad, setBruehgrad] = useState(100);
   const [grammAnzahl, setGrammAnzahl] = useState(8);
   const [fuellstand, setFuellstand] = useState(100);
+  const [rating, setRating] = useState<number>(0);
 
   // Sheet drag state
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -40,6 +42,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
       setBruehgrad(editTea.bruehgrad);
       setGrammAnzahl(editTea.grammAnzahl);
       setFuellstand(editTea.fuellstand);
+      setRating(editTea.rating || 0);
     } else {
       setName('');
       setHersteller('');
@@ -48,6 +51,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
       setBruehgrad(d.temp);
       setGrammAnzahl(d.gramm);
       setFuellstand(100);
+      setRating(0);
     }
   }, [editTea, isOpen]);
 
@@ -117,6 +121,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
       name: name.trim(),
       hersteller: hersteller.trim() || undefined,
       teeArt, bruehgrad, grammAnzahl, fuellstand,
+      rating: rating > 0 ? rating : undefined,
     });
     onClose();
   };
@@ -271,6 +276,21 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       onChange={e => setFuellstand(Number(e.target.value))}
                       className="w-full accent-gold" />
                   </div>
+
+                  {/* Bewertung — nur im Edit-Modus */}
+                  {editTea && (
+                    <div className="pt-2 pb-1">
+                      <label className="block text-xs font-semibold text-midnight/50 uppercase tracking-wide mb-3 font-sans">
+                        Bewertung
+                      </label>
+                      <div className="flex flex-col items-center gap-2 bg-white rounded-ios-lg p-4 border border-midnight/10">
+                        <StarRating value={rating} onChange={setRating} size="lg" />
+                        <p className="text-sm text-midnight/45 font-sans min-h-[20px]">
+                          {ratingLabel(rating)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Submit */}
                   <motion.button
