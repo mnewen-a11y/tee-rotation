@@ -17,6 +17,58 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R010** - v0.11.0 (2026-02-18)
+**Status:** Feature Branch - Apple UX v2 🍎  
+**Codename:** Radical Simplification
+
+#### 🚀 BREAKING CHANGES
+- ❌ Tab-Bar komplett entfernt
+- ❌ Grid-View nicht mehr Standard
+- ✅ Tinder-Style Single Card Interface
+- ✅ Inventar als Bottom Sheet
+
+#### ✨ Features
+- ✅ **SwipeTeaCard:** Tinder-Style Tee-Auswahl
+  - Swipe Right → Tee auswählen
+  - Swipe Left → Nächster Tee
+  - Tap → Bearbeiten
+  - Haptic Feedback
+  - Visuelle Overlays (✓ und →)
+  
+- ✅ **InventorySheet:** Bottom Sheet statt Tab
+  - 📋 Button im Header
+  - + Button im Sheet
+  - Drag-to-dismiss
+  - Alle Tees in scrollbarer Liste
+
+- ✅ **Rating sichtbar:** Sterne auf SwipeCard
+
+- ✅ **Füllstand als Dots:** Visuell ansprechend
+
+- ✅ **"Alle Tees anzeigen":** Fallback zum Grid
+
+#### 🎨 Apple UX Principles
+- **Radikale Vereinfachung:** 1 Karte statt Grid
+- **Swipe-Gestures:** Natürliche Interaktion
+- **Haptic Feedback:** Taktiles Feedback
+- **Progressive Disclosure:** Inventar versteckt
+- **Joy-of-Use:** Überraschung beim Swipen
+
+#### 🔧 Technical
+- **Neue Dateien:**
+  - `src/components/SwipeTeaCard.tsx`
+  - `src/components/InventorySheet.tsx`
+  
+- **Geändert:**
+  - `src/App.tsx` - Komplett neu (kein TabBar)
+  
+- **Entfernt:**
+  - TabBar-Logik aus App
+  - "new" und "rating" Tabs
+  - Grid als Default-View
+
+---
+
 ### **R009** - v0.10.0 (2026-02-18)
 **Status:** Feature Branch - Apple UX 🍎  
 **Codename:** Time-Based Magic
