@@ -1,25 +1,17 @@
 /**
- * useHaptic — Web Vibration API + iOS-native Patterns
+ * useHaptic — Web Vibration API
  * Funktioniert auf iPhone (Safari) + Android Chrome
  * Auf Desktop: kein Fehler, einfach keine Vibration
  */
 
-type HapticStyle = 'light' | 'medium' | 'heavy' | 'success' | 'error' | 'warning' | 'selection' | 'impact';
+type HapticStyle = 'light' | 'medium' | 'heavy' | 'success' | 'error';
 
 const PATTERNS: Record<HapticStyle, number | number[]> = {
-  // Basis
-  light:     10,   // Tab-Wechsel, Hover
-  medium:    20,   // Button-Klick, Toggle
-  heavy:     35,   // Delete, Wichtige Action
-  
-  // Feedback
-  success:   [10, 50, 10],           // Gespeichert, Fertig
-  error:     [20, 80, 20, 80, 20],   // Fehler, Validation
-  warning:   [15, 60, 15],           // Warnung
-  
-  // iOS-spezifisch
-  selection: 5,    // List-Item Select, Picker
-  impact:    15,   // Card-Tap, Swipe
+  light:   10,
+  medium:  20,
+  heavy:   35,
+  success: [10, 50, 10],
+  error:   [20, 80, 20, 80, 20],
 };
 
 export const useHaptic = () => {

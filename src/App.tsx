@@ -250,7 +250,7 @@ function App() {
                     <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
                       <Coffee className="w-10 h-10 text-midnight/40" />
                     </div>
-                    <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Keine Tees vorhanden</h3>
+                    <h3 className="text-xl font-semibold text-midnight mb-2 font-sans">Keine Tees vorhanden</h3>
                     <p className="text-midnight/60 text-center mb-6">Füge deinen ersten Tee hinzu.</p>
                     <button onClick={() => { setIsFormOpen(true); setEditingTea(undefined); }}
                       className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">
@@ -263,7 +263,7 @@ function App() {
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-5">
                         <Sparkles className="w-5 h-5 text-gold" aria-hidden="true" />
-                        <h2 className="text-lg font-semibold font-serif text-midnight/70">Wähle deinen Tee</h2>
+                        <h2 className="text-lg font-semibold font-sans text-midnight/70">Wähle deinen Tee</h2>
                       </div>
 
                       {availableTeas.length === 0 ? (
@@ -290,7 +290,7 @@ function App() {
                                     <div className="w-3 h-3 rounded-full flex-shrink-0"
                                       style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }}
                                       aria-hidden="true" />
-                                    <span className="font-serif font-semibold text-midnight text-base">
+                                    <span className="font-sans font-semibold text-midnight text-base">
                                       {TEA_CATEGORY_LABELS[type]}
                                     </span>
                                     <span className="text-sm text-midnight/40 font-sans">({catTeas.length})</span>
@@ -331,7 +331,7 @@ function App() {
                     {usedTeas.length > 0 && (
                       <div className="mt-8 pt-8 border-t border-midnight/10">
                         <div className="flex items-center gap-2 mb-4">
-                          <h2 className="text-xl font-bold font-serif text-midnight">Zuletzt verwendet</h2>
+                          <h2 className="text-xl font-bold font-sans text-midnight">Zuletzt verwendet</h2>
                           <span className="text-sm text-midnight/50 font-sans">({usedTeas.length})</span>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
@@ -362,7 +362,7 @@ function App() {
                 exit={{ opacity: 0, x: slideDir * -40 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
                 <div className="mb-4">
-                  <h2 className="text-xl font-bold font-serif text-midnight mb-1">Meine Tees</h2>
+                  <h2 className="text-xl font-bold font-sans text-midnight mb-1">Meine Tees</h2>
                   <p className="text-sm text-midnight/60 font-sans">
                     {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} in der Rotation
                   </p>
@@ -372,7 +372,7 @@ function App() {
                     <div className="w-20 h-20 bg-midnight/10 rounded-full flex items-center justify-center mb-4">
                       <Coffee className="w-10 h-10 text-midnight/40" />
                     </div>
-                    <h3 className="text-xl font-semibold text-midnight mb-2 font-serif">Noch keine Tees</h3>
+                    <h3 className="text-xl font-semibold text-midnight mb-2 font-sans">Noch keine Tees</h3>
                     <p className="text-midnight/60 text-center mb-6 font-sans">Beginne deine Tee-Sammlung</p>
                     <button onClick={() => { setIsFormOpen(true); setEditingTea(undefined); }}
                       className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans">

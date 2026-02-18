@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Thermometer, Package, Edit3, Trash2 } from 'lucide-react';
 import { Tea, TEA_TYPE_COLORS, TEA_TYPE_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
+import { StarRating } from '@/components/StarRating';
 
 interface TeaCardProps {
   tea: Tea;
@@ -69,18 +70,18 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
               {TEA_TYPE_LABELS[tea.teeArt]}
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-center mb-2 text-midnight font-serif">{tea.name}</h1>
+          <h1 className="text-4xl font-bold text-center mb-2 text-midnight font-sans">{tea.name}</h1>
           {tea.hersteller && (
             <p className="text-center text-midnight/60 text-lg mb-8">{tea.hersteller}</p>
           )}
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="bg-midnight/5 rounded-ios-lg px-6 py-4 flex flex-col items-center">
               <Thermometer className="w-6 h-6 mb-1" style={{ color: TEA_TYPE_COLORS[tea.teeArt] }} />
-              <span className="text-3xl font-bold text-midnight font-serif">{tea.bruehgrad}°</span>
+              <span className="text-3xl font-bold text-midnight font-sans">{tea.bruehgrad}°</span>
             </div>
             <div className="bg-midnight/5 rounded-ios-lg px-6 py-4 flex flex-col items-center">
               <Package className="w-6 h-6 mb-1" style={{ color: TEA_TYPE_COLORS[tea.teeArt] }} />
-              <span className="text-3xl font-bold text-midnight font-serif">{tea.grammAnzahl}g</span>
+              <span className="text-3xl font-bold text-midnight font-sans">{tea.grammAnzahl}g</span>
             </div>
           </div>
           {onDrink && (
@@ -125,12 +126,17 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
             <div className="flex items-center gap-2 mb-1">
               <div className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: TEA_TYPE_COLORS[tea.teeArt] }} />
-              <h3 className="font-semibold text-midnight text-base font-serif truncate">
+              <h3 className="font-semibold text-midnight text-base font-sans truncate">
                 {tea.name}
               </h3>
             </div>
             {tea.hersteller && (
               <p className="text-midnight/55 text-sm mb-2 truncate">{tea.hersteller}</p>
+            )}
+            {tea.rating && tea.rating > 0 && (
+              <div className="mb-2">
+                <StarRating value={tea.rating} readonly size="sm" />
+              </div>
             )}
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-1 text-midnight/60">

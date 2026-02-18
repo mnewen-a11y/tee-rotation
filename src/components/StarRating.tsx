@@ -9,7 +9,8 @@ interface StarRatingProps {
   value: number;           // 0 = not rated
   onChange?: (v: number) => void;
   readonly?: boolean;
-  size?: 'sm' | 'lg';
+  size?: 'sm' | 'md' | 'lg';
+  showLabel?: boolean;
 }
 
 export const StarRating = ({
@@ -17,24 +18,28 @@ export const StarRating = ({
   onChange,
   readonly = false,
   size = 'sm',
+  showLabel = false,
 }: StarRatingProps) => {
   const [hover, setHover] = useState(0);
   const active = hover || value;
-  const dim = size === 'lg' ? 'w-10 h-10' : 'w-5 h-5';
+  
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-8 h-8',
+  };
+  
+  const dim = sizeClasses[size];
 
   return (
-    <div
-      role={readonly ? undefined : 'radiogroup'}
-      aria-label="Bewertung"
-      className="flex items-center gap-1"
-    >
+    <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
           type="button"
           role={readonly ? undefined : 'radio'}
           aria-checked={value === n}
-          aria-label={`${n} von 5 Sternen auswählen`}
+          aria-label={`${n} von 5 Sternen${readonly ? '' : ' auswählen'}`}
           disabled={readonly}
           tabIndex={readonly ? -1 : 0}
           onClick={() => !readonly && onChange?.(n)}
@@ -59,6 +64,11 @@ export const StarRating = ({
           />
         </button>
       ))}
+      {showLabel && (
+        <span className="text-xs text-midnight/50 ml-1 font-sans">
+          {value > 0 ? `${value}/5` : '—'}
+        </span>
+      )}
     </div>
   );
 };

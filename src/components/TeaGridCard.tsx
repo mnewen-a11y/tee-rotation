@@ -5,6 +5,7 @@ import { Tea, TEA_TYPE_COLORS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useLongPress } from '@/hooks/useLongPress';
 import { ContextMenu } from '@/components/ContextMenu';
+import { StarRating } from '@/components/StarRating';
 
 interface TeaGridCardProps {
   tea: Tea;
@@ -80,7 +81,7 @@ export const TeaGridCard = ({ tea, onSelect, index, onEdit, onDelete }: TeaGridC
 
         {/* Tee-Name */}
         <h3
-          className="font-bold text-sm leading-tight text-midnight font-serif mb-0.5 overflow-hidden"
+          className="font-bold text-sm leading-tight text-midnight font-sans mb-0.5 overflow-hidden"
           style={{
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -95,6 +96,13 @@ export const TeaGridCard = ({ tea, onSelect, index, onEdit, onDelete }: TeaGridC
         {/* Hersteller */}
         {tea.hersteller && (
           <p className="text-xs text-midnight/50 truncate mb-1">{tea.hersteller}</p>
+        )}
+
+        {/* Rating */}
+        {tea.rating && tea.rating > 0 && (
+          <div className="mb-1">
+            <StarRating value={tea.rating} readonly size="sm" />
+          </div>
         )}
 
         {/* Temperatur · Gramm · Füllstand-Balken */}

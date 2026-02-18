@@ -111,7 +111,7 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-midnight">
               <div>
-                <h2 id={titleId} className="text-xl font-bold font-serif text-white">
+                <h2 id={titleId} className="text-xl font-bold font-sans text-white">
                   Royal-Tea
                 </h2>
                 <p className="text-xs text-white/50 font-sans mt-0.5">{RELEASE}</p>
@@ -131,7 +131,7 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
 
               {/* Aktuelle Funktionen */}
               <section aria-labelledby="info-features">
-                <h3 id="info-features" className="text-base font-semibold font-serif text-midnight mb-3">
+                <h3 id="info-features" className="text-base font-semibold font-sans text-midnight mb-3">
                   Aktuelle Funktionen
                 </h3>
                 <ul className="space-y-2" role="list">
@@ -148,7 +148,7 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
 
               {/* Roadmap */}
               <section aria-labelledby="info-roadmap">
-                <h3 id="info-roadmap" className="text-base font-semibold font-serif text-midnight mb-3">
+                <h3 id="info-roadmap" className="text-base font-semibold font-sans text-midnight mb-3">
                   Feature-Roadmap
                 </h3>
                 <div className="space-y-4">
@@ -158,7 +158,7 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
                         <span className="text-xs font-bold font-sans text-gold bg-midnight/8 px-2 py-0.5 rounded-md">
                           {release.version}
                         </span>
-                        <span className="text-sm font-semibold font-serif text-midnight">
+                        <span className="text-sm font-semibold font-sans text-midnight">
                           {release.label}
                         </span>
                       </div>
@@ -179,7 +179,7 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
 
               {/* Backup */}
               <section aria-labelledby="info-backup">
-                <h3 id="info-backup" className="text-base font-semibold font-serif text-midnight mb-3">
+                <h3 id="info-backup" className="text-base font-semibold font-sans text-midnight mb-3">
                   Datensicherung
                 </h3>
                 <div className="flex gap-3">
@@ -204,7 +204,7 @@ export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: I
 
               {/* Backup */}
               <section aria-labelledby="info-backup">
-                <h3 id="info-backup" className="text-base font-semibold font-serif text-midnight mb-3">
+                <h3 id="info-backup" className="text-base font-semibold font-sans text-midnight mb-3">
                   Datensicherung
                 </h3>
                 <div className="flex gap-3">

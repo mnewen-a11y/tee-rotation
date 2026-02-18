@@ -54,7 +54,7 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
           className="absolute top-8 left-8 z-10"
           style={{ opacity: useTransform(x, [-200, -50], [1, 0]) }}
         >
-          <div className="bg-ios-green text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg rotate-12 font-serif">
+          <div className="bg-ios-green text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg rotate-12 font-sans">
             <Check className="w-6 h-6" />
             Trinken!
           </div>
@@ -64,7 +64,7 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
           className="absolute top-8 right-8 z-10"
           style={{ opacity: useTransform(x, [50, 200], [0, 1]) }}
         >
-          <div className="bg-ios-red text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg -rotate-12 font-serif">
+          <div className="bg-ios-red text-white px-6 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 shadow-lg -rotate-12 font-sans">
             <X className="w-6 h-6" />
             Später
           </div>
@@ -83,7 +83,7 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
           </div>
 
           {/* Tea Name */}
-          <h2 className="text-4xl font-bold text-center mb-2 text-gold-text font-serif">
+          <h2 className="text-4xl font-bold text-center mb-2 text-gold-text font-sans">
             {tea.name}
           </h2>
 
@@ -99,14 +99,14 @@ export const SwipeCard = ({ tea, onSwipeLeft, onSwipeRight, zIndex }: SwipeCardP
             {/* Temperature */}
             <div className="bg-midnight/10 rounded-2xl p-6 flex flex-col items-center">
               <Thermometer className="w-8 h-8 mb-2" style={{ color: teaColor }} />
-              <span className="text-3xl font-bold text-gold-text font-serif">{tea.bruehgrad}°</span>
+              <span className="text-3xl font-bold text-gold-text font-sans">{tea.bruehgrad}°</span>
               <span className="text-xs text-gold-text/60 mt-1">Celsius</span>
             </div>
 
             {/* Gramm */}
             <div className="bg-midnight/10 rounded-2xl p-6 flex flex-col items-center">
               <Package className="w-8 h-8 mb-2" style={{ color: teaColor }} />
-              <span className="text-3xl font-bold text-gold-text font-serif">{tea.grammAnzahl}g</span>
+              <span className="text-3xl font-bold text-gold-text font-sans">{tea.grammAnzahl}g</span>
               <span className="text-xs text-gold-text/60 mt-1">pro Kanne</span>
             </div>
           </div>

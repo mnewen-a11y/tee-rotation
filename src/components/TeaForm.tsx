@@ -155,7 +155,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-midnight flex-shrink-0">
-              <h2 className="text-xl font-bold font-serif text-white">
+              <h2 className="text-xl font-bold font-sans text-white">
                 {editTea ? 'Tee bearbeiten' : 'Neuer Tee'}
               </h2>
               <button onClick={() => { haptic('light'); onClose(); }}
@@ -221,7 +221,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       <label className="text-xs font-semibold text-midnight/50 uppercase tracking-wide font-sans">
                         Brühtemperatur
                       </label>
-                      <span className="text-lg font-bold text-midnight font-serif">{bruehgrad}°C</span>
+                      <span className="text-lg font-bold text-midnight font-sans">{bruehgrad}°C</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <motion.button type="button" whileTap={{ scale: 0.88 }}
@@ -246,7 +246,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       <label className="text-xs font-semibold text-midnight/50 uppercase tracking-wide font-sans">
                         Gramm pro Kanne
                       </label>
-                      <span className="text-lg font-bold text-midnight font-serif">{grammAnzahl}g</span>
+                      <span className="text-lg font-bold text-midnight font-sans">{grammAnzahl}g</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <motion.button type="button" whileTap={{ scale: 0.88 }}
@@ -271,7 +271,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       <label className="text-xs font-semibold text-midnight/50 uppercase tracking-wide font-sans">
                         Füllstand
                       </label>
-                      <span className="text-lg font-bold text-midnight font-serif">{fuellstand}%</span>
+                      <span className="text-lg font-bold text-midnight font-sans">{fuellstand}%</span>
                     </div>
                     <input type="range" min={0} max={100} step={10} value={fuellstand}
                       onChange={e => setFuellstand(Number(e.target.value))}

@@ -17,6 +17,48 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R008.1** - v0.9.7.1 (2026-02-18)
+**Status:** Beta  
+**Codename:** All Sans-Serif
+
+#### 🎨 Design
+- ✅ Alle Texte auf Sans-Serif umgestellt
+- ✅ Kein Serif mehr (kein Times New Roman Look)
+- ✅ Voller iOS Native Look mit SF Pro überall
+
+#### 🔧 Technical
+- Alle `font-serif` → `font-sans` ersetzt (26 Stellen)
+- Konsistente Sans-Serif Typografie
+
+---
+
+### **R008** - v0.9.7 (2026-02-18)
+**Status:** Beta  
+**Codename:** Native Fonts
+
+#### ✨ Features
+- ✅ System Font Stack implementiert (SF Pro auf iOS/macOS)
+- ✅ Google Fonts entfernt (bessere Performance)
+- ✅ Native Look & Feel auf allen Plattformen
+
+#### 🎨 Design
+- iOS/macOS: Nutzt SF Pro (Apple's System Font)
+- Android: Nutzt Roboto
+- Windows: Nutzt Segoe UI
+- Serif: New York (iOS/macOS) / Georgia (andere)
+
+#### 🚀 Performance
+- Keine externen Font-Downloads mehr
+- Schnellere Ladezeit
+- Bessere Accessibility (respektiert System-Einstellungen)
+
+#### 🔧 Technical
+- tailwind.config.js: System Font Stack
+- index.html: Google Fonts Links entfernt
+- Nutzt -apple-system, BlinkMacSystemFont
+
+---
+
 ### **R007.1** - v0.9.6.1 (2026-02-18)
 **Status:** Hotfix  
 **Codename:** zuletztGetrunken Fix
