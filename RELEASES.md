@@ -17,6 +17,49 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R011** - v0.12.0 (2026-02-18)
+**Status:** Feature - Personalisierte Tageszeiten 🕐  
+**Codename:** Best Time of Day
+
+#### ✨ Features
+- ✅ **Datenmodell erweitert:** `bestTimeOfDay?: TimeOfDay[]`
+- ✅ **Edit-Dialog:** Checkboxen für Tageszeiten (Multiselect)
+  - ☀️ Morgen (6-11h)
+  - 🌤️ Mittag (11-15h)
+  - ☕ Nachmittag (15-18h)
+  - 🌙 Abend (18-6h)
+
+- ✅ **Smart Defaults:** Automatische Vorschläge basierend auf Tee-Typ
+  - Schwarztee → Morgen + Mittag
+  - Grüntee → Mittag + Nachmittag
+  - Kräutertee → Abend
+  - etc.
+
+- ✅ **Badges auf Kachel:** Emoji-Badges zeigen beste Zeiten
+- ✅ **Auto-Migration:** Alte Tees bekommen automatisch Defaults
+- ✅ **Persistenz:** Wird in localStorage + Supabase gespeichert
+
+#### 🎨 UI/UX
+- Checkboxen mit Gold-Highlight wenn ausgewählt
+- Emoji + Label für jede Tageszeit
+- "Mehrfachauswahl möglich" Hinweis
+- Badges auf SwipeCard (nur Emojis, kompakt)
+
+#### 🔧 Technical
+- Neue Typen: `TimeOfDay`, `TEA_TYPE_DEFAULT_TIMES`, `TIME_OF_DAY_LABELS`
+- Migration beim App-Start
+- Auto-Update zu Supabase nach Migration
+
+#### 📝 Datenmodell
+```typescript
+interface Tea {
+  // ... existing fields
+  bestTimeOfDay?: ('morning' | 'midday' | 'afternoon' | 'evening')[];
+}
+```
+
+---
+
 ### **R010.1** - v0.11.1 (2026-02-18)
 **Status:** Feature Branch - UX Improvements 🎯  
 **Codename:** Success & Loop
