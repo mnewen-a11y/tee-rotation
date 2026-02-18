@@ -314,7 +314,7 @@ function App() {
                         <SkeletonGrid count={4} />
                       ) : (
                         <div className="space-y-2">
-                          {sortedCategoryOrder.map(type => {
+                          {(sortedCategoryOrder as TeaType[]).map(type => {
                             const catTeas = teasByCategory[type];
                             if (catTeas.length === 0) return null;
                             const isRecommended = recommendedTypes.includes(type);
