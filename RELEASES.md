@@ -17,6 +17,20 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R007.1** - v0.9.6.1 (2026-02-18)
+**Status:** Hotfix  
+**Codename:** zuletztGetrunken Fix
+
+#### 🐛 Bug Fix
+- ✅ CRITICAL: Bearbeiten eines Tees setzt `zuletztGetrunken` nicht mehr zurück
+- Problem: Tee in "Zuletzt verwendet" sprang nach Rating-Änderung zurück zu "Verfügbar"
+- Lösung: `zuletztGetrunken` wird beim Speichern beibehalten
+
+#### 🔧 Technical
+- TeaForm.tsx: `zuletztGetrunken` wird von `editTea` übernommen
+
+---
+
 ### **R007** - v0.9.6 (2026-02-18)
 **Status:** Beta  
 **Codename:** Header Plus Button
