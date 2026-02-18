@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Sparkles, ChevronDown, Info, RefreshCw, Plus } from 'lucide-react';
 import { Tea, TeaType } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
-import { saveToSupabase, subscribeToSync } from '@/lib/supabase';
+import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { TeaCard } from '@/components/TeaCard';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { TeaForm } from '@/components/TeaForm';
@@ -47,14 +47,40 @@ function App() {
   const infoTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const data = loadData();
-    setTeas(data.teas);
-    setQueue(data.queue.length > 0 ? data.queue : data.teas.map(t => t.id));
-    setTimeout(() => setIsLoading(false), 400); // kurze Mindest-Ladezeit für Skeleton
+    const initData = async () => {
+      // 1. Versuche von Supabase zu laden
+      const supabaseData = await loadFromSupabase();
+      
+      if (supabaseData) {
+        // Supabase hat Daten → nutze diese
+        setTeas(supabaseData.teas);
+        setQueue(supabaseData.queue.length > 0 ? supabaseData.queue : supabaseData.teas.map(t => t.id));
+        // Speichere auch in localStorage als Backup
+        saveData({ teas: supabaseData.teas, queue: supabaseData.queue });
+      } else {
+        // 2. Fallback: Lade von localStorage
+        const localData = loadData();
+        setTeas(localData.teas);
+        setQueue(localData.queue.length > 0 ? localData.queue : localData.teas.map(t => t.id));
+      }
+      
+      setTimeout(() => setIsLoading(false), 400);
+    };
+    
+    initData();
   }, []);
 
   useEffect(() => {
-    if (teas.length > 0 || queue.length > 0) saveData({ teas, queue });
+    if (teas.length > 0 || queue.length > 0) {
+      saveData({ teas, queue });
+      // Auto-Sync zu Supabase (debounced mit 2 Sekunden Verzögerung)
+      const timer = setTimeout(() => {
+        if (teas.length > 0) {  // Nur syncen wenn Daten vorhanden!
+          saveToSupabase(teas, queue);
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
   }, [teas, queue]);
 
   // Realtime Subscription — aktualisiert App wenn Partner Änderungen macht
@@ -148,6 +174,12 @@ function App() {
   };
 
   const handleSync = async () => {
+    // KRITISCH: Verhindere Sync mit leeren Daten → würde Supabase überschreiben!
+    if (teas.length === 0) {
+      alert('⚠️ Keine Tees zum Synchronisieren vorhanden. Bitte lade erst Daten von Supabase oder füge neue Tees hinzu.');
+      return;
+    }
+    
     setSyncStatus('syncing');
     const ok = await saveToSupabase(teas, queue);
     setSyncStatus(ok ? 'ok' : 'error');
@@ -185,19 +217,21 @@ function App() {
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
 
-              {/* Sync-Button */}
+              {/* Sync-Button - Upload zu Supabase (nur wenn Daten vorhanden) */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={handleSync}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
-                aria-label="Mit Partner synchronisieren"
-                disabled={syncStatus === 'syncing'}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors disabled:opacity-50"
+                aria-label="Daten zu Supabase hochladen"
+                disabled={syncStatus === 'syncing' || teas.length === 0}
+                title={teas.length === 0 ? 'Keine Daten zum Hochladen' : 'Zu Supabase hochladen'}
               >
                 <RefreshCw
                   className={`w-5 h-5 transition-colors ${
                     syncStatus === 'syncing' ? 'text-gold animate-spin' :
                     syncStatus === 'ok'      ? 'text-green-400' :
                     syncStatus === 'error'   ? 'text-red-400' :
+                    teas.length === 0        ? 'text-white/30' :
                     'text-white'
                   }`}
                 />
