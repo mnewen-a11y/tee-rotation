@@ -122,6 +122,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
       hersteller: hersteller.trim() || undefined,
       teeArt, bruehgrad, grammAnzahl, fuellstand,
       rating: rating > 0 ? rating : undefined,
+      zuletztGetrunken: editTea?.zuletztGetrunken, // Bewahre Status (verwendet/verfügbar)
     });
     onClose();
   };
