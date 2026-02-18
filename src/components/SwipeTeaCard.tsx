@@ -5,7 +5,7 @@
 
 import { useRef } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
-import { Tea, TEA_TYPE_LABELS } from '@/types/tea';
+import { Tea, TEA_TYPE_LABELS, TIME_OF_DAY_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { StarRating } from '@/components/StarRating';
 
@@ -137,6 +137,23 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
             {tea.rating && (
               <div className="mb-6">
                 <StarRating value={tea.rating} readonly size="lg" />
+              </div>
+            )}
+
+            {/* Beste Tageszeiten Badges */}
+            {tea.bestTimeOfDay && tea.bestTimeOfDay.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {tea.bestTimeOfDay.map(time => {
+                  const { emoji } = TIME_OF_DAY_LABELS[time];
+                  return (
+                    <div 
+                      key={time}
+                      className="px-3 py-1.5 bg-gold/15 rounded-full flex items-center gap-1.5"
+                    >
+                      <span className="text-base">{emoji}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

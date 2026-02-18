@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import { X, Plus, Minus } from 'lucide-react';
-import { Tea, TeaType, TEA_TYPE_DEFAULTS, TEA_TYPE_LABELS } from '@/types/tea';
+import { Tea, TeaType, TimeOfDay, TEA_TYPE_DEFAULTS, TEA_TYPE_LABELS, TEA_TYPE_DEFAULT_TIMES, TIME_OF_DAY_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { StarRating, ratingLabel } from '@/components/StarRating';
 
@@ -21,6 +21,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
   const [grammAnzahl, setGrammAnzahl] = useState(8);
   const [fuellstand, setFuellstand] = useState(100);
   const [rating, setRating] = useState<number>(0);
+  const [bestTimeOfDay, setBestTimeOfDay] = useState<TimeOfDay[]>([]);
 
   // Sheet drag state
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -43,6 +44,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
       setGrammAnzahl(editTea.grammAnzahl);
       setFuellstand(editTea.fuellstand);
       setRating(editTea.rating || 0);
+      setBestTimeOfDay(editTea.bestTimeOfDay || TEA_TYPE_DEFAULT_TIMES[editTea.teeArt]);
     } else {
       setName('');
       setHersteller('');
@@ -52,6 +54,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
       setGrammAnzahl(d.gramm);
       setFuellstand(100);
       setRating(0);
+      setBestTimeOfDay(TEA_TYPE_DEFAULT_TIMES['schwarz']); // Smart Default
     }
   }, [editTea, isOpen]);
 
@@ -111,6 +114,10 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
     const d = TEA_TYPE_DEFAULTS[type];
     setBruehgrad(d.temp);
     setGrammAnzahl(d.gramm);
+    // Update Smart Default für Tageszeiten wenn Typ geändert wird
+    if (!editTea) { // Nur bei neuem Tee, nicht beim Editieren
+      setBestTimeOfDay(TEA_TYPE_DEFAULT_TIMES[type]);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -123,8 +130,18 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
       teeArt, bruehgrad, grammAnzahl, fuellstand,
       rating: rating > 0 ? rating : undefined,
       zuletztGetrunken: editTea?.zuletztGetrunken, // Bewahre Status (verwendet/verfügbar)
+      bestTimeOfDay: bestTimeOfDay.length > 0 ? bestTimeOfDay : undefined, // Speichere Tageszeiten
     });
     onClose();
+  };
+
+  const toggleTimeOfDay = (time: TimeOfDay) => {
+    setBestTimeOfDay(prev => 
+      prev.includes(time)
+        ? prev.filter(t => t !== time) // Remove
+        : [...prev, time] // Add
+    );
+    haptic('light');
   };
 
   return (
@@ -292,6 +309,51 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       </div>
                     </div>
                   )}
+
+                  {/* Beste Tageszeiten */}
+                  <div className="pt-2 pb-1">
+                    <label className="block text-xs font-semibold text-midnight/50 uppercase tracking-wide mb-3 font-sans">
+                      Beste Tageszeiten
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {(['morning', 'midday', 'afternoon', 'evening'] as TimeOfDay[]).map(time => {
+                        const { label, emoji } = TIME_OF_DAY_LABELS[time];
+                        const isSelected = bestTimeOfDay.includes(time);
+                        return (
+                          <motion.button
+                            key={time}
+                            type="button"
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => toggleTimeOfDay(time)}
+                            className={`
+                              flex items-center gap-3 p-4 rounded-ios-lg font-sans font-medium text-sm
+                              transition-all border-2
+                              ${isSelected 
+                                ? 'bg-gold/10 border-gold text-midnight' 
+                                : 'bg-white border-midnight/10 text-midnight/60'
+                              }
+                            `}
+                          >
+                            <div className={`
+                              w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0
+                              ${isSelected ? 'bg-gold border-gold' : 'bg-white border-midnight/20'}
+                            `}>
+                              {isSelected && (
+                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                            <span className="text-xl">{emoji}</span>
+                            <span>{label}</span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-midnight/40 font-sans mt-2">
+                      Mehrfachauswahl möglich
+                    </p>
+                  </div>
 
                   {/* Submit */}
                   <motion.button
