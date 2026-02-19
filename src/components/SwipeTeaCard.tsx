@@ -8,10 +8,10 @@ import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS, TIME_OF_DAY_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { StarRating } from '@/components/StarRating';
-import { SunriseIcon } from '../../Icons/SunriseIcon';
-import { SunIcon } from '../../Icons/SunIcon';
-import { SunHazeIcon } from '../../Icons/SunHazeIcon';
-import { MoonIcon } from '../../Icons/MoonIcon';
+import { SunriseIcon } from '../../icons/SunriseIcon';
+import { SunIcon } from '../../icons/SunIcon';
+import { SunHazeIcon } from '../../icons/SunHazeIcon';
+import { MoonIcon } from '../../icons/MoonIcon';
 
 interface SwipeTeaCardProps {
   tea: Tea;
