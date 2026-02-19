@@ -60,9 +60,9 @@ export const TEA_TYPE_DEFAULT_TIMES: Record<TeaType, TimeOfDay[]> = {
 };
 
 // Labels für Tageszeiten
-export const TIME_OF_DAY_LABELS: Record<TimeOfDay, { label: string; emoji: string }> = {
-  morning:   { label: 'Morgen',      emoji: '☀️' },
-  midday:    { label: 'Mittag',      emoji: '🌤️' },
-  afternoon: { label: 'Nachmittag',  emoji: '☕' },
-  evening:   { label: 'Abend',       emoji: '🌙' },
+export const TIME_OF_DAY_LABELS: Record<TimeOfDay, { label: string; emoji: string; icon: string }> = {
+  morning:   { label: 'Morgen',      emoji: '☀️', icon: 'sunrise' },
+  midday:    { label: 'Mittag',      emoji: '🌤️', icon: 'sun' },
+  afternoon: { label: 'Nachmittag',  emoji: '☕', icon: 'sunhaze' },
+  evening:   { label: 'Abend',       emoji: '🌙', icon: 'moon' },
 };
