@@ -8,7 +8,7 @@ import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS, TIME_OF_DAY_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { StarRating } from '@/components/StarRating';
-import { SunriseIcon, SunIcon, SunHazeIcon, MoonIcon } from '@/Icons';
+import { SunriseIcon, SunIcon, SunHazeIcon, MoonIcon } from '../../Icons';
 
 interface SwipeTeaCardProps {
   tea: Tea;

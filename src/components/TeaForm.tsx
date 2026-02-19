@@ -4,7 +4,7 @@ import { X, Plus, Minus } from 'lucide-react';
 import { Tea, TeaType, TimeOfDay, TEA_TYPE_DEFAULTS, TEA_TYPE_LABELS, TEA_TYPE_DEFAULT_TIMES, TIME_OF_DAY_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { StarRating, ratingLabel } from '@/components/StarRating';
-import { SunriseIcon, SunIcon, SunHazeIcon, MoonIcon } from '@/Icons';
+import { SunriseIcon, SunIcon, SunHazeIcon, MoonIcon } from '../../Icons';
 
 interface TeaFormProps {
   isOpen: boolean;
