@@ -137,17 +137,19 @@ function App() {
     haptic('light');
   };
 
-  const handleSaveTea = (tea: Tea) => {
-    if (editingTea) {
-      setTeas(prev => prev.map(t => t.id === tea.id ? tea : t));
-    } else {
-      setTeas(prev => [...prev, tea]);
-      setQueue(prev => [...prev, tea.id]);
-    }
-    setIsFormOpen(false);
-    setEditingTea(undefined);
-    haptic('success');
-  };
+  const handleSaveTea = (teaData: Omit<Tea, 'id'>) => {
+  if (editingTea) {
+    const updatedTea: Tea = { ...teaData, id: editingTea.id };
+    setTeas(prev => prev.map(t => t.id === editingTea.id ? updatedTea : t));
+  } else {
+    const newTea: Tea = { ...teaData, id: crypto.randomUUID() };
+    setTeas(prev => [...prev, newTea]);
+    setQueue(prev => [...prev, newTea.id]);
+  }
+  setIsFormOpen(false);
+  setEditingTea(undefined);
+  haptic('success');
+};
 
   const handleDeleteTea = (id: string) => {
     setTeas(prev => prev.filter(t => t.id !== id));
