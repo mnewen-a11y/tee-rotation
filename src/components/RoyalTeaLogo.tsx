@@ -5,59 +5,88 @@ interface RoyalTeaLogoProps {
 
 export const RoyalTeaLogo = ({ className = '', size = 'md' }: RoyalTeaLogoProps) => {
   const sizes = {
-    sm: 'w-36 h-10',
-    md: 'w-48 h-24',
-    lg: 'w-64 h-32',
+    sm: 'h-8',
+    md: 'h-12',
+    lg: 'h-16',
   };
 
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 1200 600" 
-      role="img" 
-      aria-label="Royal-Tea Logo"
-      className={`${sizes[size]} ${className}`}
-    >
-      <defs>
-        <style>
-          {`.word { fill: #ffffff; font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', serif; font-weight: 700; letter-spacing: 0.02em; }`}
-        </style>
-      </defs>
-      {/* Tea leaf above the hyphen */}
-      <g transform="translate(600,160)">
-        {/* Leaf body */}
-        <path 
-          d="M 0 -70 C 28 -60, 56 -28, 56 0 C 56 42, 20 78, 0 96 C -20 78, -56 42, -56 0 C -56 -28, -28 -60, 0 -70 Z"
-          fill="#c6b975"
-        />
-        {/* Central vein */}
-        <path 
-          d="M 0 -60 L 0 80" 
-          stroke="#a99e61" 
-          strokeWidth="4" 
-          strokeLinecap="round" 
-          opacity="0.7"
-        />
-        {/* Side veins */}
-        <path 
-          d="M 0 -24 C 18 -16, 30 -6, 42 10" 
-          stroke="#a99e61" 
-          strokeWidth="3" 
-          fill="none" 
-          opacity="0.5"
-        />
-        <path 
-          d="M 0 8 C -16 16, -28 28, -40 46" 
-          stroke="#a99e61" 
-          strokeWidth="3" 
-          fill="none" 
-          opacity="0.5"
-        />
-      </g>
-      {/* Wordmark - moved down significantly for more spacing */}
-      <text className="word" x="50%" y="450" fontSize="140" textAnchor="middle">
-        ROYAL-TEA
-      </text>
-    </svg>
+    <div className={`flex items-center gap-3 ${sizes[size]} ${className}`}>
+      {/* Rolex-Style Crown */}
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 100 100"
+        className="h-full w-auto"
+        role="img" 
+        aria-label="Crown"
+      >
+        <g transform="translate(50, 50)">
+          {/* Crown - Rolex Style (flat, elegant) */}
+          
+          {/* Base */}
+          <path 
+            d="M -35 20 L -30 25 L 30 25 L 35 20 Z"
+            fill="#C6B975"
+          />
+          
+          {/* Center Point */}
+          <path 
+            d="M 0 -35 L 8 -10 L -8 -10 Z"
+            fill="#C6B975"
+          />
+          
+          {/* Left Point */}
+          <path 
+            d="M -25 -20 L -17 0 L -33 0 Z"
+            fill="#C6B975"
+          />
+          
+          {/* Right Point */}
+          <path 
+            d="M 25 -20 L 33 0 L 17 0 Z"
+            fill="#C6B975"
+          />
+          
+          {/* Crown Body - connecting all points */}
+          <path 
+            d="M -33 0 L -30 20 L -10 15 L 0 -10 L 10 15 L 30 20 L 33 0 L 25 -20 L 10 -5 L 0 -35 L -10 -5 L -25 -20 Z"
+            fill="#C6B975"
+            opacity="0.95"
+          />
+          
+          {/* Highlight lines for depth (Rolex style) */}
+          <path 
+            d="M 0 -35 L 0 -10"
+            stroke="#D4C47E"
+            strokeWidth="1.5"
+            opacity="0.4"
+          />
+          <path 
+            d="M -25 -20 L -10 -5"
+            stroke="#D4C47E"
+            strokeWidth="1.5"
+            opacity="0.4"
+          />
+          <path 
+            d="M 25 -20 L 10 -5"
+            stroke="#D4C47E"
+            strokeWidth="1.5"
+            opacity="0.4"
+          />
+        </g>
+      </svg>
+      
+      {/* Royal-Tea Text */}
+      <span 
+        className="font-serif font-bold tracking-wide text-white"
+        style={{
+          fontFamily: '-apple-system, "Playfair Display", "Times New Roman", serif',
+          fontSize: size === 'sm' ? '1.125rem' : size === 'md' ? '1.5rem' : '2rem',
+          letterSpacing: '0.05em'
+        }}
+      >
+        Royal-Tea
+      </span>
+    </div>
   );
 };
