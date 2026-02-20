@@ -37,34 +37,46 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
 
   const handleDragStart = () => {
     isDragging.current = false;
+    // Blockiere Body-Scroll während Drag
+    document.body.style.overflow = 'hidden';
   };
 
   const handleDrag = () => {
     isDragging.current = true;
   };
-
-  // iOS: Verhindere Background-Scroll während Swipe
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging.current) {
-      e.preventDefault();
-    }
-  };
-
-  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const offset = info.offset.x;
+  
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Erlaube Body-Scroll wieder
+    document.body.style.overflow = '';
     
-    if (offset > SWIPE_THRESHOLD) {
-      // Swipe Right → Auswählen
-      haptic('success');
-      onSwipeRight();
-    } else if (offset < -SWIPE_THRESHOLD) {
-      // Swipe Left → Überspringen
-      haptic('light');
-      onSwipeLeft();
+    const swipeDistance = info.offset.x;
+    
+    if (Math.abs(swipeDistance) >= SWIPE_THRESHOLD) {
+      if (swipeDistance > 0) {
+        // Swipe Right → Select
+        haptic('success');
+        onSwipeRight();
+      } else {
+        // Swipe Left → Skip
+        haptic('light');
+        onSwipeLeft();
+      }
     } else {
       // Zurück zur Mitte
       x.set(0);
     }
+  };
+
+  // iOS: Verhindere Background-Scroll während Swipe - Multi-Layer Defense
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging.current) {
+      e.preventDefault(); // Verhindere Scroll
+      e.stopPropagation(); // Verhindere Event-Bubbling
+    }
+  };
+  
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation(); // Verhindere dass Touch zum Background durchgeht
   };
 
   const handleClick = () => {
@@ -89,9 +101,11 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
+      onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onClick={handleClick}
-      className="relative w-[75vw] max-w-[400px] mx-auto h-[450px] max-h-[55vh] min-h-[380px] cursor-grab active:cursor-grabbing sm:w-[70vw] sm:max-w-[440px]"
+      className="relative w-[75vw] max-w-[400px] mx-auto h-[430px] max-h-[50vh] min-h-[360px] cursor-grab active:cursor-grabbing sm:w-[70vw] sm:max-w-[440px]"
+      style={{ touchAction: 'pan-x' }}
     >
       {/* Card Background */}
       <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden border border-midnight/10">
