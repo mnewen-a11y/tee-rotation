@@ -217,7 +217,11 @@ function App() {
             </div>
           </div>
         </header>
-        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]" style={{ backgroundColor: '#FFFFF0' }}>
+        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]" style={{ 
+          backgroundColor: '#FFFFF0',
+          overscrollBehavior: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}>
           {isLoading ? (
             <div className="flex items-center justify-center h-96">
               <div className="animate-spin w-8 h-8 border-4 border-gold border-t-transparent rounded-full" />
@@ -321,10 +325,11 @@ function App() {
               )}
             </div>
           ) : (
-            <div className="flex flex-col" style={{ 
+            <div className="flex flex-col touch-pan-x" style={{ 
               paddingTop: 'max(1rem, env(safe-area-inset-top))',
               paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-              minHeight: 'calc(100vh - 80px)'
+              minHeight: 'calc(100vh - 80px)',
+              overscrollBehavior: 'none'
             }}>
               <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold font-sans text-midnight mb-2">{getGreeting()}</h1>
