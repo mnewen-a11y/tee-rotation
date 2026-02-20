@@ -13,6 +13,7 @@ import { InfoModal } from '@/components/InfoModal';
 import { InventorySheet } from '@/components/InventorySheet';
 import { TeaGridCard } from '@/components/TeaGridCard';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
 
 const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
 
@@ -42,6 +43,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   const { trigger: haptic } = useHaptic();
+  const { updateAvailable, applyUpdate } = useServiceWorkerUpdate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const infoTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -217,6 +219,30 @@ function App() {
             </div>
           </div>
         </header>
+
+        {/* Update Available Banner */}
+        <AnimatePresence>
+          {updateAvailable && (
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              className="bg-gold text-gold-text px-6 py-3 text-center text-sm font-sans font-medium sticky top-[calc(env(safe-area-inset-top)+56px)] z-10"
+            >
+              <div className="max-w-3xl mx-auto flex items-center justify-between">
+                <span>✨ Neue Version verfügbar!</span>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={applyUpdate}
+                  className="bg-midnight text-white px-4 py-1 rounded-full text-xs font-semibold"
+                >
+                  Jetzt aktualisieren
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]" style={{ 
           backgroundColor: '#FFFFF0',
           overscrollBehavior: 'none',
@@ -325,15 +351,15 @@ function App() {
               )}
             </div>
           ) : (
-            <div className="flex flex-col touch-pan-x" style={{ 
+            <div className="flex flex-col touch-pan-x justify-center" style={{ 
               paddingTop: 'env(safe-area-inset-top)',
-              paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-              minHeight: 'calc(100vh - 80px)',
+              paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
+              minHeight: 'calc(100vh - 60px)',
               overscrollBehavior: 'none'
             }}>
-              <div className="text-center mb-3 mt-2">
-                <h1 className="text-3xl font-bold font-sans text-midnight mb-2">{getGreeting()}</h1>
-                {recommendedTeas.length > 0 && <p className="text-sm font-sans text-midnight/60">Perfekt für jetzt</p>}
+              <div className="text-center mb-2">
+                <h1 className="text-2xl font-bold font-sans text-midnight mb-1">{getGreeting()}</h1>
+                {recommendedTeas.length > 0 && <p className="text-xs font-sans text-midnight/60">Perfekt für jetzt</p>}
               </div>
               {availableTeas.length === 0 ? (
                 <div className="text-center py-20">
