@@ -91,7 +91,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
       onDragEnd={handleDragEnd}
       onTouchMove={handleTouchMove}
       onClick={handleClick}
-      className="relative w-full max-w-sm mx-auto h-[480px] max-h-[60vh] min-h-[360px] cursor-grab active:cursor-grabbing sm:h-[520px] sm:max-h-[65vh]"
+      className="relative w-[75vw] max-w-[400px] mx-auto h-[450px] max-h-[55vh] min-h-[380px] cursor-grab active:cursor-grabbing sm:w-[70vw] sm:max-w-[440px]"
     >
       {/* Card Background */}
       <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden border border-midnight/10">
