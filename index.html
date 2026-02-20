@@ -39,6 +39,7 @@
     <!-- Windows: Segoe UI -->
 
     <meta name="description" content="Dein persönlicher Tee-Begleiter mit intelligentem Rotations-System." />
+    <meta name="app-version" content="0.13.0-r012.4">
     <title>Royal-Tea</title>
   </head>
   <body>
@@ -47,9 +48,15 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(() => console.log('✅ Royal-Tea SW registered'))
-            .catch(err => console.warn('SW:', err));
+          // Unregister ALL old service workers first
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(reg => reg.unregister());
+          }).then(() => {
+            // Register fresh
+            return navigator.serviceWorker.register('/sw.js?v=20250220-1200');
+          }).then(() => {
+            console.log('✅ Royal-Tea SW registered - v0.13.0-r012.4');
+          }).catch(err => console.warn('SW:', err));
         });
       }
     </script>
