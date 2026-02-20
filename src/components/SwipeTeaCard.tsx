@@ -1,26 +1,22 @@
 /**
- * SwipeTeaCard - Tinder-Style Tee-Auswahl
- * Apple UX: Single Card, Swipe Gestures, Haptic Feedback
+ * SwipeTeaCard - Premium Apple HIG Design
+ * Minimalistisch, luxuriös, viel Weißraum
  */
 
 import { useRef } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
-import { Tea, TEA_TYPE_LABELS, TIME_OF_DAY_LABELS } from '@/types/tea';
+import { Tea, TEA_TYPE_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
-import { StarRating } from '@/components/StarRating';
-import { SunriseIcon } from '@/icons/SunriseIcon';
-import { SunIcon } from '@/icons/SunIcon';
-import { SunHazeIcon } from '@/icons/SunHazeIcon';
-import { MoonIcon } from '@/icons/MoonIcon';
+import { Leaf, Thermometer, Scale } from 'lucide-react';
 
 interface SwipeTeaCardProps {
   tea: Tea;
-  onSwipeRight: () => void;  // Tee auswählen
-  onSwipeLeft: () => void;   // Nächster Tee
-  onTap: () => void;          // Details/Bearbeiten
+  onSwipeRight: () => void;
+  onSwipeLeft: () => void;
+  onTap: () => void;
 }
 
-const SWIPE_THRESHOLD = 100; // Mindest-Distance für Swipe
+const SWIPE_THRESHOLD = 100;
 
 export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTeaCardProps) => {
   const { trigger: haptic } = useHaptic();
@@ -28,16 +24,14 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
   const isDragging = useRef(false);
   
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
+  const rotate = useTransform(x, [-200, 0, 200], [-8, 0, 8]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0.5, 1, 1, 1, 0.5]);
   
-  // Farb-Overlay basierend auf Swipe-Richtung
   const acceptOpacity = useTransform(x, [0, SWIPE_THRESHOLD, 200], [0, 0.3, 0.8]);
   const rejectOpacity = useTransform(x, [-200, -SWIPE_THRESHOLD, 0], [0.8, 0.3, 0]);
 
   const handleDragStart = () => {
     isDragging.current = false;
-    // Blockiere Body-Scroll während Drag
     document.body.style.overflow = 'hidden';
   };
 
@@ -46,50 +40,43 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
   };
   
   const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // Erlaube Body-Scroll wieder
     document.body.style.overflow = '';
     
     const swipeDistance = info.offset.x;
     
     if (Math.abs(swipeDistance) >= SWIPE_THRESHOLD) {
       if (swipeDistance > 0) {
-        // Swipe Right → Select
         haptic('success');
         onSwipeRight();
       } else {
-        // Swipe Left → Skip
         haptic('light');
         onSwipeLeft();
       }
     } else {
-      // Zurück zur Mitte
       x.set(0);
     }
   };
 
-  // iOS: Verhindere Background-Scroll während Swipe - Multi-Layer Defense
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging.current) {
-      e.preventDefault(); // Verhindere Scroll
-      e.stopPropagation(); // Verhindere Event-Bubbling
-    }
-  };
-  
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.stopPropagation(); // Verhindere dass Touch zum Background durchgeht
-  };
-
   const handleClick = () => {
-    // Nur Tap-Action wenn nicht gedragged wurde
     if (!isDragging.current) {
       onTap();
     }
     isDragging.current = false;
   };
 
-  // Füllstand als Dots
-  const fullDots = Math.round(tea.fuellstand / 10);
-  const emptyDots = 10 - fullDots;
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+  
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+  };
+
+  // Füllstand Percentage
+  const fillPercentage = tea.fuellstand;
 
   return (
     <motion.div
@@ -104,151 +91,120 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onClick={handleClick}
-      className="relative w-[75vw] max-w-[400px] mx-auto h-[430px] max-h-[50vh] min-h-[360px] cursor-grab active:cursor-grabbing sm:w-[70vw] sm:max-w-[440px]"
+      className="relative w-[85vw] max-w-[400px] mx-auto cursor-grab active:cursor-grabbing"
     >
-      {/* Card Background */}
-      <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden border border-midnight/10">
-        
-        {/* Swipe Overlays - Improved Feedback */}
+      {/* Swipe Overlays */}
+      <motion.div 
+        style={{ opacity: acceptOpacity }}
+        className="absolute inset-0 bg-green-500/20 pointer-events-none flex items-center justify-end pr-12 rounded-[32px]"
+      >
         <motion.div 
-          style={{ opacity: acceptOpacity }}
-          className="absolute inset-0 bg-green-500/20 pointer-events-none flex items-center justify-end pr-12"
+          initial={{ scale: 0.8 }}
+          animate={{ scale: acceptOpacity.get() > 0.1 ? 1 : 0.8 }}
+          transition={{ duration: 0.15 }}
+          className="text-7xl font-bold text-green-600"
         >
-          <motion.div 
-            initial={{ scale: 0.8 }}
-            animate={{ scale: acceptOpacity.get() > 0.1 ? 1 : 0.8 }}
-            transition={{ duration: 0.15 }}
-            className="text-7xl font-bold text-green-600"
-          >
-            ✓
-          </motion.div>
+          ✓
         </motion.div>
-        
+      </motion.div>
+      
+      <motion.div 
+        style={{ opacity: rejectOpacity }}
+        className="absolute inset-0 bg-gray-300/10 pointer-events-none flex items-center justify-start pl-12 rounded-[32px]"
+      >
         <motion.div 
-          style={{ opacity: rejectOpacity }}
-          className="absolute inset-0 bg-gray-300/10 pointer-events-none flex items-center justify-start pl-12"
+          initial={{ scale: 0.8 }}
+          animate={{ scale: rejectOpacity.get() > 0.1 ? 1 : 0.8 }}
+          transition={{ duration: 0.15 }}
+          className="text-7xl font-bold text-gray-500"
         >
-          <motion.div 
-            initial={{ scale: 0.8 }}
-            animate={{ scale: rejectOpacity.get() > 0.1 ? 1 : 0.8 }}
-            transition={{ duration: 0.15 }}
-            className="text-7xl font-bold text-gray-500"
-          >
-            →
-          </motion.div>
+          →
         </motion.div>
+      </motion.div>
 
-        {/* Content */}
-        <div className="relative h-full flex flex-col justify-between p-8">
+      {/* Premium Card */}
+      <div 
+        className="bg-white rounded-[32px] overflow-hidden"
+        style={{
+          boxShadow: '0 20px 60px rgba(15, 23, 42, 0.12), 0 8px 24px rgba(15, 23, 42, 0.08)'
+        }}
+      >
+        {/* Card Content */}
+        <div className="px-8 py-10">
           
-          {/* Top Section */}
-          <div>
-            {/* Tea Type Badge */}
-            <div className="inline-block px-3 py-1 bg-midnight/5 rounded-full mb-4">
-              <div className="flex items-center gap-2">
-                <div 
-                  className="w-2 h-2 rounded-full" 
-                  style={{ backgroundColor: tea.teeArt === 'schwarz' ? '#8B4513' : 
-                                          tea.teeArt === 'grün' ? '#4CAF50' :
-                                          tea.teeArt === 'oolong' ? '#DAA520' :
-                                          tea.teeArt === 'chai' ? '#A0522D' :
-                                          tea.teeArt === 'jasmin' ? '#C77DFF' : '#2E8B57' }}
-                />
-                <span className="text-xs font-sans font-medium text-midnight/60">
-                  {TEA_TYPE_LABELS[tea.teeArt]}
-                </span>
-              </div>
-            </div>
-
-            {/* Tea Name */}
-            <h2 className="text-4xl font-bold font-sans text-midnight mb-2 leading-tight">
-              {tea.name}
-            </h2>
-
-            {/* Hersteller */}
-            {tea.hersteller && (
-              <p className="text-lg text-midnight/50 font-sans mb-4">
-                {tea.hersteller}
-              </p>
-            )}
-
-            {/* Rating */}
-            {tea.rating && (
-              <div className="mb-6">
-                <StarRating value={tea.rating} readonly size="lg" />
-              </div>
-            )}
-
-            {/* Beste Tageszeiten Badges */}
-            {tea.bestTimeOfDay && tea.bestTimeOfDay.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {tea.bestTimeOfDay.map(time => {
-                  const { icon } = TIME_OF_DAY_LABELS[time];
-                  const IconComponent = 
-                    icon === 'sunrise' ? SunriseIcon :
-                    icon === 'sun' ? SunIcon :
-                    icon === 'sunhaze' ? SunHazeIcon :
-                    MoonIcon;
-                  
-                  return (
-                    <div 
-                      key={time}
-                      className="px-2.5 py-1.5 bg-gold/15 rounded-full flex items-center"
-                      aria-label={TIME_OF_DAY_LABELS[time].label}
-                    >
-                      <IconComponent size={18} className="text-gold-text" />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+          {/* Tea Type Badge - Top */}
+          <div className="flex items-center gap-2 mb-6">
+            <Leaf className="w-4 h-4 text-[#0F172A]/60" strokeWidth={2} />
+            <span className="text-xs font-semibold tracking-wide uppercase text-[#0F172A]/60">
+              {TEA_TYPE_LABELS[tea.teeArt]}
+            </span>
           </div>
 
-          {/* Bottom Section */}
-          <div className="space-y-4">
-            {/* Brewing Info */}
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <span className="text-3xl">🌡️</span>
-                <span className="text-2xl font-bold font-sans text-midnight">
-                  {tea.bruehgrad}°C
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-3xl">⚖️</span>
-                <span className="text-2xl font-bold font-sans text-midnight">
-                  {tea.grammAnzahl}g
-                </span>
-              </div>
-            </div>
+          {/* Large Title */}
+          <h2 
+            className="text-4xl font-bold tracking-tight mb-2"
+            style={{ 
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
+              color: '#0F172A',
+              letterSpacing: '-0.02em'
+            }}
+          >
+            {tea.name}
+          </h2>
 
-            {/* Füllstand */}
-            <div>
-              <p className="text-xs font-sans font-medium text-midnight/40 uppercase tracking-wide mb-2">
+          {/* Subtitle */}
+          <p className="text-lg text-[#0F172A]/50 mb-8 font-medium">
+            {tea.hersteller}
+          </p>
+
+          {/* Inline Specs Row - Apple HIG Style */}
+          <div className="flex items-center gap-6 mb-10 text-[#0F172A]/70">
+            <div className="flex items-center gap-2">
+              <Thermometer className="w-5 h-5" strokeWidth={2} />
+              <span className="text-base font-semibold">{tea.bruehgrad}°C</span>
+            </div>
+            <span className="text-[#0F172A]/30">·</span>
+            <div className="flex items-center gap-2">
+              <Scale className="w-5 h-5" strokeWidth={2} />
+              <span className="text-base font-semibold">{tea.grammAnzahl}g</span>
+            </div>
+          </div>
+
+          {/* Füllstand Section */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <span 
+                className="text-xs font-semibold tracking-wider uppercase"
+                style={{ color: '#0F172A', opacity: 0.6 }}
+              >
                 Füllstand
-              </p>
-              <div className="flex gap-1">
-                {[...Array(fullDots)].map((_, i) => (
-                  <div key={`full-${i}`} className="w-4 h-4 rounded-full bg-gold" />
-                ))}
-                {[...Array(emptyDots)].map((_, i) => (
-                  <div key={`empty-${i}`} className="w-4 h-4 rounded-full bg-midnight/10" />
-                ))}
-              </div>
-              <p className="text-sm font-sans text-midnight/60 mt-1">
-                {tea.fuellstand}%
-              </p>
+              </span>
+              <span 
+                className="text-sm font-bold"
+                style={{ color: '#C9AE4D' }}
+              >
+                {fillPercentage}%
+              </span>
+            </div>
+            
+            {/* Premium Progress Bar */}
+            <div 
+              className="h-2 rounded-full overflow-hidden"
+              style={{ backgroundColor: '#0F172A', opacity: 0.08 }}
+            >
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${fillPercentage}%` }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+                className="h-full rounded-full"
+                style={{
+                  background: 'linear-gradient(90deg, #C9AE4D 0%, #B8952F 100%)'
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
-
-      {/* Shadow */}
-      <div className="absolute inset-0 rounded-3xl shadow-2xl pointer-events-none" 
-           style={{ 
-             boxShadow: '0 20px 60px rgba(0,0,0,0.3), 0 0 1px rgba(0,0,0,0.1)' 
-           }} 
-      />
     </motion.div>
   );
 };
