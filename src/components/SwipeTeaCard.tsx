@@ -171,7 +171,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
           </div>
 
           {/* Füllstand Section */}
-          <div>
+          <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
               <span 
                 className="text-xs font-semibold tracking-wider uppercase"
@@ -202,6 +202,37 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
                 }}
               />
             </div>
+          </div>
+
+          {/* Buttons - IN CARD */}
+          <div className="flex items-center gap-3 pt-6 border-t border-[#0F172A]/8">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwipeLeft();
+              }}
+              className="flex-1 py-4 rounded-2xl font-semibold text-base transition-all"
+              style={{
+                background: '#F8F9FA',
+                color: '#0F172A',
+                opacity: 0.8
+              }}
+            >
+              Skip
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwipeRight();
+              }}
+              className="flex-1 py-4 rounded-2xl font-semibold text-base transition-all shadow-lg"
+              style={{
+                background: 'linear-gradient(145deg, #C9AE4D, #B8952F)',
+                color: '#FFFFFF'
+              }}
+            >
+              Ok
+            </button>
           </div>
         </div>
       </div>
