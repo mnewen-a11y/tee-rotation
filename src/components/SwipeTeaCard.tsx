@@ -204,31 +204,36 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
             </div>
           </div>
 
-          {/* Buttons - IN CARD */}
-          <div className="flex items-center gap-3 pt-6 border-t border-[#0F172A]/8">
+          {/* Buttons - ECHTES Apple HIG Design */}
+          <div className="flex items-center gap-3 pt-6">
+            {/* Skip Button - Secondary (System Gray) */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onSwipeLeft();
               }}
-              className="flex-1 py-4 rounded-2xl font-semibold text-base transition-all"
+              className="flex-1 py-3.5 px-6 rounded-2xl font-semibold text-base transition-all active:scale-95"
               style={{
-                background: '#F8F9FA',
-                color: '#0F172A',
-                opacity: 0.8
+                background: 'rgba(120, 120, 128, 0.16)',
+                color: '#000000',
+                WebkitTapHighlightColor: 'transparent'
               }}
             >
               Skip
             </button>
+
+            {/* Ok Button - Primary (Tinted/Prominent) */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onSwipeRight();
               }}
-              className="flex-1 py-4 rounded-2xl font-semibold text-base transition-all shadow-lg"
+              className="flex-1 py-3.5 px-6 rounded-2xl font-semibold text-base transition-all active:scale-95"
               style={{
-                background: 'linear-gradient(145deg, #C9AE4D, #B8952F)',
-                color: '#FFFFFF'
+                background: 'linear-gradient(180deg, #C9AE4D 0%, #B8952F 100%)',
+                color: '#FFFFFF',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
+                WebkitTapHighlightColor: 'transparent'
               }}
             >
               Ok
