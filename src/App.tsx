@@ -321,8 +321,12 @@ function App() {
               )}
             </div>
           ) : (
-            <div>
-              <div className="text-center mb-8">
+            <div className="flex flex-col" style={{ 
+              paddingTop: 'max(1rem, env(safe-area-inset-top))',
+              paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+              minHeight: 'calc(100vh - 80px)'
+            }}>
+              <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold font-sans text-midnight mb-2">{getGreeting()}</h1>
                 {recommendedTeas.length > 0 && <p className="text-sm font-sans text-midnight/60">Perfekt für jetzt</p>}
               </div>
