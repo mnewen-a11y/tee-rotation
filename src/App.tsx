@@ -4,7 +4,7 @@ import { Info, RefreshCw, LayoutGrid } from 'lucide-react';
 import { Tea, TeaType, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
 import { loadData, saveData } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
-import { getGreeting, getRecommendedTeaTypes } from '@/lib/timeOfDay';
+import { getRecommendedTeaTypes } from '@/lib/timeOfDay';
 import { SwipeTeaCard } from '@/components/SwipeTeaCard';
 import { SuccessScreen } from '@/components/SuccessScreen';
 import { TeaForm } from '@/components/TeaForm';
@@ -138,18 +138,18 @@ function App() {
   };
 
   const handleSaveTea = (teaData: Omit<Tea, 'id'>) => {
-  if (editingTea) {
-    const updatedTea: Tea = { ...teaData, id: editingTea.id };
-    setTeas(prev => prev.map(t => t.id === editingTea.id ? updatedTea : t));
-  } else {
-    const newTea: Tea = { ...teaData, id: crypto.randomUUID() };
-    setTeas(prev => [...prev, newTea]);
-    setQueue(prev => [...prev, newTea.id]);
-  }
-  setIsFormOpen(false);
-  setEditingTea(undefined);
-  haptic('success');
-};
+    if (editingTea) {
+      const updatedTea: Tea = { ...teaData, id: editingTea.id };
+      setTeas(prev => prev.map(t => t.id === editingTea.id ? updatedTea : t));
+    } else {
+      const newTea: Tea = { ...teaData, id: crypto.randomUUID() };
+      setTeas(prev => [...prev, newTea]);
+      setQueue(prev => [...prev, newTea.id]);
+    }
+    setIsFormOpen(false);
+    setEditingTea(undefined);
+    haptic('success');
+  };
 
   const handleDeleteTea = (id: string) => {
     setTeas(prev => prev.filter(t => t.id !== id));
@@ -358,16 +358,14 @@ function App() {
               )}
             </div>
           ) : (
-            <div className="flex flex-col touch-pan-x justify-center" style={{ 
-              paddingTop: 'env(safe-area-inset-top)',
+            <div className="flex flex-col touch-pan-x items-center justify-center" style={{ 
+              paddingTop: '2rem',
               paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
               minHeight: 'calc(100vh - 60px)',
               overscrollBehavior: 'none'
             }}>
-              <div className="text-center mb-2">
-                <h1 className="text-2xl font-bold font-sans text-midnight mb-1">{getGreeting()}</h1>
-                {recommendedTeas.length > 0 && <p className="text-xs font-sans text-midnight/60">Perfekt für jetzt</p>}
-              </div>
+              {/* Premium UI - keine Begrüßung */}
+              
               {availableTeas.length === 0 ? (
                 <div className="text-center py-20">
                   <div className="text-6xl mb-4">🎉</div>
@@ -404,26 +402,6 @@ function App() {
                     onSwipeLeft={handleSkipTea}
                     onTap={() => handleSelectTea(currentTea)}
                   />
-                  <div className="flex justify-center items-center gap-4 mt-8">
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleSkipTea}
-                      className="flex-1 max-w-[140px] py-3 px-6 bg-midnight/5 hover:bg-midnight/10 active:bg-midnight/15 rounded-ios-lg font-sans font-medium text-midnight/70 transition-colors"
-                    >
-                      Skip
-                    </motion.button>
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleSelectTea(currentTea)}
-                      className="flex-1 max-w-[140px] py-3 px-6 rounded-ios-lg font-sans font-semibold text-white transition-all"
-                      style={{
-                        background: 'linear-gradient(145deg, #d4c47e, #b8a85a)',
-                        boxShadow: '0 2px 8px rgba(198,185,117,0.4)',
-                      }}
-                    >
-                      Ok
-                    </motion.button>
-                  </div>
                   <div className="text-center mt-6">
                     <motion.button
                       whileTap={{ scale: 0.95 }}
@@ -454,11 +432,11 @@ function App() {
       <AnimatePresence>
         {isFormOpen && (
           <TeaForm
-  isOpen={isFormOpen}
-  onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }}
-  onSave={handleSaveTea}
-  editTea={editingTea}
-/>
+            isOpen={isFormOpen}
+            onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }}
+            onSave={handleSaveTea}
+            editTea={editingTea}
+          />
         )}
       </AnimatePresence>
 
