@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, RefreshCw, LayoutGrid } from 'lucide-react';
 import { Tea, TeaType, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
-import { loadData, saveData, generateId } from '@/lib/storage';
+import { loadData, saveData } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getGreeting, getRecommendedTeaTypes } from '@/lib/timeOfDay';
 import { SwipeTeaCard } from '@/components/SwipeTeaCard';
@@ -477,9 +477,10 @@ function App() {
             isOpen={isInventoryOpen}
             onClose={() => setIsInventoryOpen(false)}
             teas={teas}
-            onAddTea={() => { setIsInventoryOpen(false); setIsFormOpen(true); }}
-            onEditTea={handleEditTea}
-            onDeleteTea={handleDeleteTea}
+            queue={queue}
+            onEdit={handleEditTea}
+            onDelete={handleDeleteTea}
+            onAddNew={() => { setIsInventoryOpen(false); setIsFormOpen(true); }}
           />
         )}
       </AnimatePresence>
