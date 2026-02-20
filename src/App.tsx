@@ -223,30 +223,100 @@ function App() {
               <div className="animate-spin w-8 h-8 border-4 border-gold border-t-transparent rounded-full" />
             </div>
           ) : showAllTeas ? (
-            <div>
-              <div className="flex items-center justify-between mb-6">
+            <div className="space-y-8">
+              <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold font-sans text-midnight">Alle Tees</h2>
                 <button onClick={() => setShowAllTeas(false)} className="text-sm font-sans text-midnight/60 hover:text-midnight transition-colors">← Zurück</button>
               </div>
-              {availableTeas.length === 0 ? (
-                <div className="text-center py-12"><p className="text-midnight/60">Alle Tees wurden verwendet! 🎉</p></div>
-              ) : (
-                <div className="space-y-6">
-                  {TEA_CATEGORY_ORDER.map(type => {
-                    const catTeas = teasByCategory[type];
-                    if (catTeas.length === 0) return null;
-                    return (
-                      <div key={type}>
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }} />
-                          <h3 className="font-sans font-semibold text-midnight">{TEA_CATEGORY_LABELS[type]} ({catTeas.length})</h3>
+              
+              {/* Verfügbare Tees */}
+              {availableTeas.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold font-sans text-midnight mb-4">
+                    Verfügbar ({availableTeas.length})
+                  </h3>
+                  <div className="space-y-6">
+                    {TEA_CATEGORY_ORDER.map(type => {
+                      const catTeas = teasByCategory[type];
+                      if (catTeas.length === 0) return null;
+                      return (
+                        <div key={type}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }} />
+                            <h4 className="font-sans font-semibold text-midnight text-sm">{TEA_CATEGORY_LABELS[type]} ({catTeas.length})</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {catTeas.map((tea, i) => <TeaGridCard key={tea.id} tea={tea} index={i} onSelect={() => handleSelectTea(tea)} />)}
+                          </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          {catTeas.map((tea, i) => <TeaGridCard key={tea.id} tea={tea} index={i} onSelect={() => handleSelectTea(tea)} />)}
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Bereits verwendet - Separator nur wenn beide Sections haben */}
+              {availableTeas.length > 0 && teas.filter(t => t.zuletztGetrunken).length > 0 && (
+                <div className="border-t border-midnight/10 pt-6" />
+              )}
+
+              {/* Bereits verwendet */}
+              {teas.filter(t => t.zuletztGetrunken).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold font-sans text-midnight mb-4">
+                    Bereits verwendet ({teas.filter(t => t.zuletztGetrunken).length})
+                  </h3>
+                  <div className="space-y-3">
+                    {teas.filter(t => t.zuletztGetrunken).map((tea) => {
+                      const lastUsed = tea.zuletztGetrunken ? new Date(tea.zuletztGetrunken) : null;
+                      const timeAgo = lastUsed ? (() => {
+                        const now = new Date();
+                        const diffMs = now.getTime() - lastUsed.getTime();
+                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                        const diffDays = Math.floor(diffHours / 24);
+                        
+                        if (diffDays > 0) return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`;
+                        if (diffHours > 0) return `vor ${diffHours} Std`;
+                        return 'gerade eben';
+                      })() : '';
+
+                      return (
+                        <div 
+                          key={tea.id}
+                          onClick={() => {
+                            if (confirm(`"${tea.name}" erneut verwenden?`)) {
+                              setTeas(prev => prev.map(t => 
+                                t.id === tea.id ? { ...t, zuletztGetrunken: undefined } : t
+                              ));
+                              haptic('success');
+                            }
+                          }}
+                          className="bg-white rounded-ios-lg p-4 border border-midnight/10 cursor-pointer hover:bg-midnight/5 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-sans font-semibold text-midnight">{tea.name}</p>
+                              <p className="text-xs text-midnight/50 font-sans mt-1">
+                                ⏱️ {timeAgo}
+                              </p>
+                            </div>
+                            <div className="text-midnight/30">
+                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {availableTeas.length === 0 && teas.filter(t => t.zuletztGetrunken).length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-midnight/60">Keine Tees vorhanden</p>
                 </div>
               )}
             </div>
@@ -316,7 +386,7 @@ function App() {
                       onClick={handleSkipTea}
                       className="flex-1 max-w-[140px] py-3 px-6 bg-midnight/5 hover:bg-midnight/10 active:bg-midnight/15 rounded-ios-lg font-sans font-medium text-midnight/70 transition-colors"
                     >
-                      Überspringen
+                      Skip
                     </motion.button>
 
                     {/* Select Button */}
@@ -329,7 +399,7 @@ function App() {
                         boxShadow: '0 2px 8px rgba(198,185,117,0.4)',
                       }}
                     >
-                      Auswählen
+                      Ok
                     </motion.button>
                   </div>
 
@@ -340,7 +410,7 @@ function App() {
                       onClick={() => setShowAllTeas(true)}
                       className="py-2 px-4 bg-midnight/5 hover:bg-midnight/10 active:bg-midnight/15 rounded-ios font-sans text-sm font-medium text-midnight/60 transition-colors"
                     >
-                      Alle Tees anzeigen
+                      Alle Tees
                     </motion.button>
                   </div>
                 </>

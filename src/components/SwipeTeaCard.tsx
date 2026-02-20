@@ -8,6 +8,10 @@ import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS, TIME_OF_DAY_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { StarRating } from '@/components/StarRating';
+import { SunriseIcon } from '@/icons/SunriseIcon';
+import { SunIcon } from '@/icons/SunIcon';
+import { SunHazeIcon } from '@/icons/SunHazeIcon';
+import { MoonIcon } from '@/icons/MoonIcon';
 
 interface SwipeTeaCardProps {
   tea: Tea;
@@ -37,6 +41,13 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
 
   const handleDrag = () => {
     isDragging.current = true;
+  };
+
+  // iOS: Verhindere Background-Scroll während Swipe
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging.current) {
+      e.preventDefault();
+    }
   };
 
   const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -78,25 +89,40 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
+      onTouchMove={handleTouchMove}
       onClick={handleClick}
-      className="relative w-full max-w-sm mx-auto aspect-[3/4] cursor-grab active:cursor-grabbing"
+      className="relative w-[75vw] max-w-[400px] mx-auto h-[450px] max-h-[55vh] min-h-[380px] cursor-grab active:cursor-grabbing sm:w-[70vw] sm:max-w-[440px]"
     >
       {/* Card Background */}
       <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden border border-midnight/10">
         
-        {/* Swipe Overlays */}
+        {/* Swipe Overlays - Improved Feedback */}
         <motion.div 
           style={{ opacity: acceptOpacity }}
-          className="absolute inset-0 bg-status-good/10 pointer-events-none flex items-center justify-center"
+          className="absolute inset-0 bg-green-500/20 pointer-events-none flex items-center justify-end pr-12"
         >
-          <div className="text-6xl rotate-12 font-bold text-status-good">✓</div>
+          <motion.div 
+            initial={{ scale: 0.8 }}
+            animate={{ scale: acceptOpacity.get() > 0.1 ? 1 : 0.8 }}
+            transition={{ duration: 0.15 }}
+            className="text-7xl font-bold text-green-600"
+          >
+            ✓
+          </motion.div>
         </motion.div>
         
         <motion.div 
           style={{ opacity: rejectOpacity }}
-          className="absolute inset-0 bg-midnight/10 pointer-events-none flex items-center justify-center"
+          className="absolute inset-0 bg-gray-300/10 pointer-events-none flex items-center justify-start pl-12"
         >
-          <div className="text-6xl -rotate-12 font-bold text-midnight/40">→</div>
+          <motion.div 
+            initial={{ scale: 0.8 }}
+            animate={{ scale: rejectOpacity.get() > 0.1 ? 1 : 0.8 }}
+            transition={{ duration: 0.15 }}
+            className="text-7xl font-bold text-gray-500"
+          >
+            →
+          </motion.div>
         </motion.div>
 
         {/* Content */}
@@ -144,13 +170,20 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
             {tea.bestTimeOfDay && tea.bestTimeOfDay.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {tea.bestTimeOfDay.map(time => {
-                  const { emoji } = TIME_OF_DAY_LABELS[time];
+                  const { icon } = TIME_OF_DAY_LABELS[time];
+                  const IconComponent = 
+                    icon === 'sunrise' ? SunriseIcon :
+                    icon === 'sun' ? SunIcon :
+                    icon === 'sunhaze' ? SunHazeIcon :
+                    MoonIcon;
+                  
                   return (
                     <div 
                       key={time}
-                      className="px-3 py-1.5 bg-gold/15 rounded-full flex items-center gap-1.5"
+                      className="px-2.5 py-1.5 bg-gold/15 rounded-full flex items-center"
+                      aria-label={TIME_OF_DAY_LABELS[time].label}
                     >
-                      <span className="text-base">{emoji}</span>
+                      <IconComponent size={18} className="text-gold-text" />
                     </div>
                   );
                 })}

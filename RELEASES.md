@@ -17,6 +17,96 @@ Version 0.9.0 | Release R001
 
 ## 📋 **Release History**
 
+### **R012** - v0.13.0 (2026-02-18)
+**Status:** UX Quick Wins 🎯  
+**Codename:** Dinner Out
+
+#### ✅ Quick Wins Delivered
+
+**0. SwipeCard Size Fix (CRITICAL)**
+- ✅ Feste Höhe: 480px (max-h: 60vh)
+- ✅ Responsive: 360-520px basierend auf Screen
+- ✅ Buttons jetzt immer sichtbar
+- ✅ Problem: App war nicht bedienbar → FIXED
+
+**1. Tageszeit-Icons (SVG statt Emoji)**
+- ✅ Eigene minimalistische SVG Icons
+  - Sunrise (Morgen)
+  - Sun (Mittag)
+  - SunHaze (Nachmittag)
+  - Moon (Abend)
+- ✅ Strichstärke: 2px, currentColor
+- ✅ Dark/Light Mode tauglich
+- ✅ WCAG AA Kontrast
+- ✅ Verwendet in: SwipeCard Badges + TeaForm Checkboxen
+
+**2. Button-Texte angepasst**
+- ✅ "Überspringen" → "Skip"
+- ✅ "Auswählen" → "Ok"
+- ✅ "Alle Tees anzeigen" → "Alle Tees"
+- ✅ Kürzer, klarer, iOS-like
+
+**3. Background Scroll Fix (iOS)**
+- ✅ `position: fixed` auf Root Container
+- ✅ `overscroll-behavior: none`
+- ✅ `touchmove` preventDefault während Swipe
+- ✅ `-webkit-overflow-scrolling: touch`
+- ✅ iOS Safari: Background scrollt nicht mehr beim Swipen
+
+**4. Swipe-Feedback verbessert**
+- ✅ Farb-Overlays:
+  - Right: Grün (`bg-green-500/20`)
+  - Left: Grau (`bg-gray-300/10`)
+- ✅ Icons positioniert (rechts/links statt zentriert)
+- ✅ Scale-Animation auf Icons
+- ✅ Sichtbar ab 10% Swipe
+- ✅ 60 fps Performance
+
+**5. "Alle Tees" mit zwei Sections**
+- ✅ Section "Verfügbar" (oben)
+  - Zeigt !zuletztGetrunken Tees
+  - Gruppiert nach Kategorie
+  - Grid Layout (2 Spalten)
+  
+- ✅ Section "Bereits verwendet" (unten)
+  - Zeigt zuletztGetrunken Tees
+  - Mit Timestamp ("vor X Std/Tagen")
+  - List Layout (Karten)
+  - Klick → "Erneut verwenden?" Confirm
+  
+- ✅ Separator zwischen Sections
+- ✅ Keine Duplikate
+- ✅ Empty States für beide Sections
+
+#### 🎨 UI/UX Improvements
+- Kartengröße endlich bedienbar
+- Saubere SVG Icons (kein Emoji)
+- iOS Scroll-Fix (keine Bounce-Störung mehr)
+- Besseres Swipe-Feedback (Farbe + Position)
+- Klare Trennung: Verfügbar vs. Verwendet
+
+#### 🔧 Technical
+- Neue Komponenten:
+  - `src/components/icons/SunriseIcon.tsx`
+  - `src/components/icons/SunIcon.tsx`
+  - `src/components/icons/SunHazeIcon.tsx`
+  - `src/components/icons/MoonIcon.tsx`
+  - `src/components/icons/index.tsx`
+  
+- Geändert:
+  - `src/components/SwipeTeaCard.tsx` (Size + Icons + Touch + Overlays)
+  - `src/components/TeaForm.tsx` (Icons)
+  - `src/App.tsx` (Fixed Layout + Buttons + Alle Tees Split)
+  - `src/types/tea.ts` (Icon-Namen in Labels)
+
+#### 📊 Performance
+- ✅ 60 fps Swipe maintained
+- ✅ iOS overscroll fixed
+- ✅ Touch-Handler optimiert
+- ✅ Keine Layout Thrashes
+
+---
+
 ### **R011** - v0.12.0 (2026-02-18)
 **Status:** Feature - Personalisierte Tageszeiten 🕐  
 **Codename:** Best Time of Day

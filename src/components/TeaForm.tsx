@@ -4,6 +4,10 @@ import { X, Plus, Minus } from 'lucide-react';
 import { Tea, TeaType, TimeOfDay, TEA_TYPE_DEFAULTS, TEA_TYPE_LABELS, TEA_TYPE_DEFAULT_TIMES, TIME_OF_DAY_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { StarRating, ratingLabel } from '@/components/StarRating';
+import { SunriseIcon } from '@/icons/SunriseIcon';
+import { SunIcon } from '@/icons/SunIcon';
+import { SunHazeIcon } from '@/icons/SunHazeIcon';
+import { MoonIcon } from '@/icons/MoonIcon';
 
 interface TeaFormProps {
   isOpen: boolean;
@@ -317,8 +321,14 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {(['morning', 'midday', 'afternoon', 'evening'] as TimeOfDay[]).map(time => {
-                        const { label, emoji } = TIME_OF_DAY_LABELS[time];
+                        const { label, icon } = TIME_OF_DAY_LABELS[time];
                         const isSelected = bestTimeOfDay.includes(time);
+                        const IconComponent = 
+                          icon === 'sunrise' ? SunriseIcon :
+                          icon === 'sun' ? SunIcon :
+                          icon === 'sunhaze' ? SunHazeIcon :
+                          MoonIcon;
+                        
                         return (
                           <motion.button
                             key={time}
@@ -344,7 +354,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                                 </svg>
                               )}
                             </div>
-                            <span className="text-xl">{emoji}</span>
+                            <IconComponent size={20} className={isSelected ? 'text-gold-text' : 'text-midnight/50'} />
                             <span>{label}</span>
                           </motion.button>
                         );
