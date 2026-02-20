@@ -454,10 +454,11 @@ function App() {
       <AnimatePresence>
         {isFormOpen && (
           <TeaForm
-            onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }}
-            onSave={handleSaveTea}
-            editTea={editingTea}
-          />
+  isOpen={isFormOpen}
+  onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }}
+  onSave={handleSaveTea}
+  editTea={editingTea}
+/>
         )}
       </AnimatePresence>
 
