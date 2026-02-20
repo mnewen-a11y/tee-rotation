@@ -1,0 +1,10 @@
+# In App.tsx, Zeile ~340-345, ERSETZE:
+
+# VORHER:
+<div className="text-center mb-2">
+  <h1 className="text-2xl font-bold font-sans text-midnight mb-1">{getGreeting()}</h1>
+  {recommendedTeas.length > 0 && <p className="text-xs font-sans text-midnight/60">Perfekt für jetzt</p>}
+</div>
+
+# NACHHER:
+{/* KEINE Begrüßung - direkt zur Card */}
