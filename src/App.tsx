@@ -193,10 +193,10 @@ function App() {
   };
 
   return (
-    <div className="fixed inset-0 bg-midnight text-white font-sans overflow-hidden">
+    <div className="min-h-screen bg-midnight text-white font-sans">
       <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
-      <div className="h-full flex flex-col" style={{ overscrollBehavior: 'none' }}>
-        <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 z-20 flex-shrink-0">
+      <div className="min-h-screen pb-8">
+        <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
@@ -217,7 +217,7 @@ function App() {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto overflow-x-hidden max-w-3xl mx-auto px-6 py-8" style={{ backgroundColor: '#FFFFF0', WebkitOverflowScrolling: 'touch' }}>
+        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]" style={{ backgroundColor: '#FFFFF0' }}>
           {isLoading ? (
             <div className="flex items-center justify-center h-96">
               <div className="animate-spin w-8 h-8 border-4 border-gold border-t-transparent rounded-full" />
