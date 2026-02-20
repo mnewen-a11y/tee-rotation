@@ -45,7 +45,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
     isDragging.current = true;
   };
   
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     // Erlaube Body-Scroll wieder
     document.body.style.overflow = '';
     
@@ -94,7 +94,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
   return (
     <motion.div
       ref={cardRef}
-      style={{ x, rotate, opacity }}
+      style={{ x, rotate, opacity, touchAction: 'pan-x' }}
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.7}
@@ -105,7 +105,6 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
       onTouchMove={handleTouchMove}
       onClick={handleClick}
       className="relative w-[75vw] max-w-[400px] mx-auto h-[430px] max-h-[50vh] min-h-[360px] cursor-grab active:cursor-grabbing sm:w-[70vw] sm:max-w-[440px]"
-      style={{ touchAction: 'pan-x' }}
     >
       {/* Card Background */}
       <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl overflow-hidden border border-midnight/10">
