@@ -116,7 +116,12 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
 
       {/* Karte — swipeable */}
       <motion.div
-        style={{ x }}
+        style={{ 
+          x,
+          borderBottomWidth: '1px', 
+          marginLeft: '16px', 
+          marginRight: '16px' 
+        }}
         drag="x"
         dragDirectionLock
         dragConstraints={{ left: -160, right: 0 }}
@@ -125,7 +130,6 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
         onDragEnd={handleDragEnd}
         onDragTransitionEnd={() => setSwiping(false)}
         className="relative bg-white rounded-ios-lg p-4 shadow-ios border-b border-midnight/10 cursor-grab active:cursor-grabbing"
-        style={{ borderBottomWidth: '1px', marginLeft: '16px', marginRight: '16px' }}
       >
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0" onClick={deleteRevealed ? resetSwipe : undefined}>
