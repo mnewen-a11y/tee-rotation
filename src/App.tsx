@@ -5,7 +5,7 @@ import { Tea, TeaType, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getRecommendedTeaTypes } from '@/lib/timeOfDay';
-import { TeaCard } from '@/components/TeaCard';
+import { SwipeTeaCard } from '@/components/SwipeTeaCard';
 import { SuccessScreen } from '@/components/SuccessScreen';
 import { TeaForm } from '@/components/TeaForm';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
@@ -15,18 +15,6 @@ import { TabBar, type TabId } from '@/components/TabBar';
 import { CollectionView } from '@/components/CollectionView';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
-
-const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
-
-const TEA_CATEGORY_LABELS: Record<TeaType, string> = {
-  schwarz: 'Schwarztee', grün: 'Grüntee', oolong: 'Oolong',
-  chai: 'Chai', jasmin: 'Jasmin', kräuter: 'Kräuter',
-};
-
-const TEA_CATEGORY_COLORS: Record<TeaType, string> = {
-  schwarz: '#8B4513', grün: '#4CAF50', oolong: '#DAA520',
-  chai: '#A0522D', jasmin: '#C77DFF', kräuter: '#2E8B57',
-};
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error';
 
@@ -54,11 +42,6 @@ function App() {
   const suggestedTeas = recommendedTeas.length > 0 ? recommendedTeas : availableTeas;
   
   const currentTea = suggestedTeas.length > 0 ? suggestedTeas[currentIndex % suggestedTeas.length] : null;
-
-  const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
-    acc[type] = availableTeas.filter(t => t.teeArt === type);
-    return acc;
-  }, {} as Record<TeaType, Tea[]>);
 
   useEffect(() => {
     const initData = async () => {
@@ -339,7 +322,7 @@ function App() {
                 <>
                   {currentTea ? (
                     <AnimatePresence mode="wait">
-                      <TeaCard
+                      <SwipeTeaCard
                         key={`${currentTea.id}-${currentIndex}`}
                         tea={currentTea} 
                         onSelect={() => handleSelectTea(currentTea)}
