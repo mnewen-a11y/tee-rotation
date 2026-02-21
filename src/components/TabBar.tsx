@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
 
 export type TabId = 'today' | 'collection';
