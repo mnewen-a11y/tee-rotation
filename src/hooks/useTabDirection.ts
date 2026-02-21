@@ -5,10 +5,10 @@
 import { useRef } from 'react';
 import type { TabId } from '@/components/TabBar';
 
-const TAB_ORDER: TabId[] = ['heute', 'list'];
+const TAB_ORDER: TabId[] = ['today', 'collection'];
 
 export const useTabDirection = () => {
-  const prevTab = useRef<TabId>('heute');
+  const prevTab = useRef<TabId>('today');
 
   const getDirection = (nextTab: TabId): number => {
     const prev = TAB_ORDER.indexOf(prevTab.current);
