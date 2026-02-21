@@ -278,6 +278,7 @@ function App() {
           ) : activeTab === 'today' ? (
             <div className="flex flex-col touch-pan-x items-center justify-center" style={{ 
               paddingTop: '0rem',
+              marginTop: '-2rem',
               paddingBottom: 'max(8rem, env(safe-area-inset-bottom))',
               minHeight: 'calc(100vh - 60px)',
               overscrollBehavior: 'none'
