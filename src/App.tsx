@@ -335,7 +335,7 @@ function App() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.2 }}
-                    className="text-3xl font-bold mb-4"
+                    className="text-3xl font-bold mb-16"
                     style={{
                       fontFamily: ds.typography.fontFamily.system,
                       color: ds.colors.text.primary,
@@ -345,25 +345,11 @@ function App() {
                     Rotation abgeschlossen
                   </motion.h3>
 
-                  {/* Subtext */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.4 }}
-                    className="text-lg mb-16"
-                    style={{ 
-                      color: ds.colors.text.secondary,
-                      fontFamily: ds.typography.fontFamily.system
-                    }}
-                  >
-                    {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} genossen
-                  </motion.p>
-
                   {/* Action Button */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.6 }}
+                    transition={{ delay: 1.4 }}
                     className="w-full max-w-[280px]"
                   >
                     <motion.button 
