@@ -366,7 +366,7 @@ function App() {
             </div>
           ) : (
             <div className="flex flex-col touch-pan-x items-center justify-center" style={{ 
-              paddingTop: '2rem',
+              paddingTop: '1rem',
               paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
               minHeight: 'calc(100vh - 60px)',
               overscrollBehavior: 'none'
