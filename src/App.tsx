@@ -211,7 +211,8 @@ function App() {
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
               <motion.button 
-                whileTap={{ scale: 0.9 }} 
+                whileTap={{ scale: 0.9, opacity: 0.8 }} 
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 onClick={() => { setIsInventoryOpen(true); haptic('light'); }}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors" 
                 aria-label="Inventar öffnen"
@@ -219,7 +220,8 @@ function App() {
                 <LayoutGrid className="w-5 h-5 text-white" aria-hidden="true" />
               </motion.button>
               <motion.button 
-                whileTap={{ scale: 0.9 }} 
+                whileTap={{ scale: 0.9, opacity: 0.8 }} 
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 onClick={handleSync}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors disabled:opacity-50"
                 disabled={syncStatus === 'syncing' || teas.length === 0}
@@ -238,7 +240,8 @@ function App() {
               </motion.button>
               <motion.button 
                 ref={infoTriggerRef} 
-                whileTap={{ scale: 0.9 }} 
+                whileTap={{ scale: 0.9, opacity: 0.8 }} 
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 onClick={() => { haptic('light'); setIsInfoOpen(true); }}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
                 aria-label="App-Informationen anzeigen"
@@ -261,7 +264,8 @@ function App() {
               <div className="max-w-3xl mx-auto flex items-center justify-between">
                 <span>✨ Neue Version verfügbar!</span>
                 <motion.button
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.95, opacity: 0.85 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                   onClick={() => { haptic('success'); applyUpdate(); }}
                   className="bg-midnight text-white px-4 py-1 rounded-full text-xs font-semibold"
                   aria-label="App jetzt aktualisieren"
@@ -294,11 +298,13 @@ function App() {
             <div className="space-y-8">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold font-sans text-midnight">Alle Tees</h2>
-                <button 
+                <motion.button 
                   onClick={() => { haptic('light'); setShowAllTeas(false); }} 
+                  whileTap={{ scale: 0.95, opacity: 0.85 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                   className="text-sm font-sans text-midnight/60 hover:text-midnight transition-colors"
                   aria-label="Zurück zur Tee-Übersicht"
-                >← Zurück</button>
+                >← Zurück</motion.button>
               </div>
               
               {/* Verfügbare Tees */}
@@ -407,7 +413,8 @@ function App() {
                   <p className="text-midnight/60 mb-6">Starte eine neue Rotation</p>
                   <div className="flex justify-center gap-4">
                     <motion.button 
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.95, opacity: 0.85 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => {
                         setTeas(prev => prev.map(t => ({ ...t, zuletztGetrunken: undefined })));
                         setCurrentIndex(0);
@@ -419,7 +426,8 @@ function App() {
                       Rotation neu starten
                     </motion.button>
                     <motion.button 
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.95, opacity: 0.85 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => setIsInventoryOpen(true)} 
                       className="bg-midnight/5 hover:bg-midnight/10 px-6 py-3 rounded-ios-lg font-medium font-sans text-midnight/70"
                       aria-label="Inventar öffnen"
@@ -457,7 +465,8 @@ function App() {
                   {/* Nur "Alle Tees" Link - Buttons sind in Card */}
                   <div className="text-center mt-6">
                     <motion.button
-                      whileTap={{ scale: 0.98 }}
+                      whileTap={{ scale: 0.98, opacity: 0.85 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => { haptic('light'); setShowAllTeas(true); }}
                       className="py-2 px-4 bg-midnight/5 hover:bg-midnight/10 active:bg-midnight/15 rounded-ios font-sans text-sm font-medium text-midnight/60 transition-colors"
                       aria-label="Alle verfügbaren Tees anzeigen"
