@@ -286,13 +286,18 @@ function App() {
               <span className="sr-only">Lädt Tee-Daten...</span>
             </div>
           ) : activeTab === 'today' ? (
-            <div className="flex flex-col touch-pan-x items-center justify-center" style={{ 
-              paddingTop: '0rem',
-              marginTop: '-2rem',
-              paddingBottom: 'max(8rem, env(safe-area-inset-bottom))',
-              minHeight: 'calc(100vh - 60px)',
-              overscrollBehavior: 'none'
-            }}>
+            <div 
+              className="flex flex-col touch-pan-x items-center justify-center overflow-y-auto" 
+              style={{ 
+                paddingTop: '0rem',
+                marginTop: '-2rem',
+                paddingBottom: 'max(8rem, env(safe-area-inset-bottom))',
+                height: 'calc(100vh - 48px - 64px)', // header + tabbar
+                maxHeight: 'calc(100vh - 48px - 64px)',
+                overscrollBehavior: 'none',
+                WebkitOverflowScrolling: 'touch',
+              }}
+            >
               {availableTeas.length === 0 ? (
                 <motion.div 
                   initial={{ opacity: 0 }}
