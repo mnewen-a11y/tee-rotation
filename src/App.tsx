@@ -118,10 +118,18 @@ function App() {
   };
 
   const handleSelectTea = (tea: Tea) => {
-    setTeas(prev => prev.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t));
-    setQueue(prev => { const filtered = prev.filter(id => id !== tea.id); return [...filtered, tea.id]; });
+    const updatedTeas = teas.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t);
+    const updatedQueue = [...queue.filter(id => id !== tea.id), tea.id];
+    
+    setTeas(updatedTeas);
+    setQueue(updatedQueue);
     setSelectedTea(tea);
     haptic('success');
+    
+    // Sofort zu Supabase syncen (nicht warten)
+    saveToSupabase(updatedTeas, updatedQueue).catch(err => {
+      console.error('Supabase sync failed:', err);
+    });
   };
 
   const handleSkipTea = () => { 
@@ -357,9 +365,15 @@ function App() {
                       whileTap={{ scale: 0.96 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => {
-                        setTeas(prev => prev.map(t => ({ ...t, zuletztGetrunken: undefined })));
+                        const updatedTeas = teas.map(t => ({ ...t, zuletztGetrunken: undefined }));
+                        setTeas(updatedTeas);
                         setCurrentIndex(0);
                         haptic('success');
+                        
+                        // Sofort zu Supabase syncen
+                        saveToSupabase(updatedTeas, queue).catch(err => {
+                          console.error('Supabase sync failed:', err);
+                        });
                       }}
                       style={{
                         width: '100%',
@@ -410,8 +424,15 @@ function App() {
               teas={teas}
               onTeaSelect={(tea) => {
                 if (tea.zuletztGetrunken) {
-                  setTeas(prev => prev.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: undefined } : t));
+                  // Reset used tea
+                  const updatedTeas = teas.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: undefined } : t);
+                  setTeas(updatedTeas);
                   haptic('success');
+                  
+                  // Sofort zu Supabase syncen
+                  saveToSupabase(updatedTeas, queue).catch(err => {
+                    console.error('Supabase sync failed:', err);
+                  });
                 } else {
                   handleSelectTea(tea);
                   setActiveTab('today');
