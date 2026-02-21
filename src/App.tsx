@@ -15,6 +15,7 @@ import { TabBar, type TabId } from '@/components/TabBar';
 import { CollectionView } from '@/components/CollectionView';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
+import { designSystem as ds } from '@/design/design-tokens';
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error';
 
@@ -407,7 +408,6 @@ function App() {
                         tea={currentTea} 
                         onSelect={() => handleSelectTea(currentTea)}
                         onSkip={handleSkipTea}
-                        onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} 
                       />
                     </AnimatePresence>
                   ) : (
