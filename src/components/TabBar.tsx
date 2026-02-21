@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
 
 export type TabId = 'today' | 'collection';
@@ -17,91 +16,73 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
   ];
 
   return (
-    <div
-      className="fixed bottom-0 left-0 right-0 z-30 flex justify-center"
-      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}
+    <nav
+      aria-label="Hauptnavigation"
+      className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around"
+      style={{
+        height: '64px',
+        paddingBottom: 'env(safe-area-inset-bottom, 0)',
+        background: 'rgba(15, 23, 42, 0.95)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        borderTop: '0.5px solid rgba(255, 255, 255, 0.1)',
+      }}
     >
-      {/* Dunkles Glas — midnight, immer lesbar */}
-      <nav
-        aria-label="Hauptnavigation"
-        className="relative flex items-center gap-1 px-3 py-2 rounded-full"
-        style={{
-          background: 'rgba(18, 24, 48, 0.85)',
-          backdropFilter: 'blur(40px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(160%)',
-          boxShadow: [
-            '0 8px 32px rgba(0,0,0,0.30)',
-            '0 2px 8px rgba(0,0,0,0.20)',
-            'inset 0 1px 0 rgba(255,255,255,0.10)',
-            'inset 0 -1px 0 rgba(0,0,0,0.15)',
-          ].join(', '),
-          border: '1px solid rgba(255,255,255,0.10)',
-        }}
-      >
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          const Icon = tab.icon;
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.id;
+        const Icon = tab.icon;
 
-          return (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              aria-label={tab.label}
-              aria-current={isActive ? 'page' : undefined}
-              className="relative flex flex-col items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 rounded-full"
-              style={{ minWidth: '68px', padding: '6px 4px' }}
-            >
-              {/* Active pill */}
-              {isActive && (
-                <motion.div
-                  layoutId="tabPill"
-                  className="absolute inset-0 rounded-full"
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            aria-label={tab.label}
+            aria-current={isActive ? 'page' : undefined}
+            className="relative flex flex-col items-center justify-center gap-1 flex-1 focus:outline-none transition-all duration-200"
+            style={{
+              minHeight: '48px',
+              maxWidth: '200px',
+            }}
+          >
+            {/* Icon with badge */}
+            <div className="relative">
+              <Icon
+                className="w-6 h-6 transition-colors duration-200"
+                style={{ 
+                  color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.4)',
+                  strokeWidth: 2,
+                }}
+              />
+              
+              {/* Badge count */}
+              {tab.count !== undefined && tab.count > 0 && (
+                <div
+                  className="absolute -top-2 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold"
                   style={{
-                    background: 'rgba(255,255,255,0.12)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                    background: '#EF4444',
+                    color: '#FFFFFF',
+                    padding: '0 4px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                   }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                />
-              )}
-
-              <motion.div
-                animate={{ scale: isActive ? 1.08 : 1, y: isActive ? -1 : 0 }}
-                transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                className="relative z-10"
-              >
-                <div className="relative">
-                  <Icon
-                    className="w-[22px] h-[22px]"
-                    style={{ color: isActive ? '#c6b975' : 'rgba(255,255,255,0.60)' }}
-                    strokeWidth={isActive ? 2 : 1.75}
-                  />
-                  
-                  {/* Badge count */}
-                  {tab.count !== undefined && tab.count > 0 && (
-                    <div
-                      className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-[9px] font-bold"
-                      style={{
-                        background: isActive ? '#c6b975' : '#EF4444',
-                        color: '#FFFFFF',
-                        padding: '0 3px',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-                      }}
-                    >
-                      {tab.count}
-                    </div>
-                  )}
+                >
+                  {tab.count}
                 </div>
-              </motion.div>
-              <span
-                className="text-[10px] font-sans font-medium mt-0.5 relative z-10 leading-none"
-                style={{ color: isActive ? '#c6b975' : 'rgba(255,255,255,0.55)' }}
-              >
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
-    </div>
+              )}
+            </div>
+
+            {/* Label */}
+            <span
+              className="text-[11px] font-medium transition-colors duration-200"
+              style={{
+                color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.4)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              }}
+            >
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
   );
 };
