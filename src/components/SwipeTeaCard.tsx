@@ -191,7 +191,7 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
               }}
               aria-label="Diesen Tee überspringen"
             >
-              Skip
+              Weiter
             </motion.button>
 
             {/* Select Button - Primary */}

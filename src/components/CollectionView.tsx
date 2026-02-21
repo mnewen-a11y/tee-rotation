@@ -5,7 +5,7 @@
 
 import { motion } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS } from '@/types/tea';
-import { Thermometer, Scale, Edit3 } from 'lucide-react';
+import { Thermometer, Scale } from 'lucide-react';
 import { designSystem as ds } from '@/design/design-tokens';
 
 interface CollectionViewProps {
@@ -24,10 +24,10 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit }: CollectionViewP
       {availableTeas.length > 0 && (
         <div className="mb-8">
           <h2 
-            className="text-xl font-bold mb-4 px-6"
+            className="text-xs font-semibold mb-3 px-6 uppercase tracking-wide"
             style={{
               fontFamily: ds.typography.fontFamily.system,
-              color: ds.colors.text.primary
+              color: ds.colors.text.tertiary
             }}
           >
             Verfügbar ({availableTeas.length})
@@ -50,10 +50,10 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit }: CollectionViewP
       {usedTeas.length > 0 && (
         <div>
           <h2 
-            className="text-xl font-bold mb-4 px-6"
+            className="text-xs font-semibold mb-3 px-6 uppercase tracking-wide"
             style={{
               fontFamily: ds.typography.fontFamily.system,
-              color: ds.colors.text.primary
+              color: ds.colors.text.tertiary
             }}
           >
             Verwendet ({usedTeas.length})
@@ -208,27 +208,17 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
           )}
 
           {/* Right: Edit button (immer) */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
             }}
-            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ml-auto"
-            style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-            }}
+            className="text-[11px] font-medium"
+            style={{ color: ds.colors.brand.gold }}
             aria-label="Tee bearbeiten"
           >
-            <Edit3 
-              className="w-3.5 h-3.5" 
-              style={{ color: ds.colors.text.secondary }}
-            />
-          </motion.button>
+            Bearbeiten
+          </button>
         </div>
       </div>
     </motion.div>
