@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info, RefreshCw } from 'lucide-react';
-import { Tea, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
+import { Info, RefreshCw, LayoutGrid } from 'lucide-react';
+import { Tea, TeaType, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getRecommendedTeaTypes } from '@/lib/timeOfDay';
@@ -11,11 +11,21 @@ import { TeaForm } from '@/components/TeaForm';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
 import { InventorySheet } from '@/components/InventorySheet';
-import { TabBar, type TabId } from '@/components/TabBar';
-import { CollectionView } from '@/components/CollectionView';
+import { TeaGridCard } from '@/components/TeaGridCard';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
-import { designSystem as ds } from '@/design/design-tokens';
+
+const TEA_CATEGORY_ORDER: TeaType[] = ['schwarz', 'grün', 'oolong', 'chai', 'jasmin', 'kräuter'];
+
+const TEA_CATEGORY_LABELS: Record<TeaType, string> = {
+  schwarz: 'Schwarztee', grün: 'Grüntee', oolong: 'Oolong',
+  chai: 'Chai', jasmin: 'Jasmin', kräuter: 'Kräuter',
+};
+
+const TEA_CATEGORY_COLORS: Record<TeaType, string> = {
+  schwarz: '#8B4513', grün: '#4CAF50', oolong: '#DAA520',
+  chai: '#A0522D', jasmin: '#C77DFF', kräuter: '#2E8B57',
+};
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error';
 
@@ -28,7 +38,7 @@ function App() {
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabId>('today');
+  const [showAllTeas, setShowAllTeas] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,15 +52,23 @@ function App() {
   const recommendedTeas = availableTeas.filter(t => recommendedTypes.includes(t.teeArt));
   const suggestedTeas = recommendedTeas.length > 0 ? recommendedTeas : availableTeas;
   
+  // Endlos-Loop: Modulo für Index
   const currentTea = suggestedTeas.length > 0 ? suggestedTeas[currentIndex % suggestedTeas.length] : null;
+
+  const teasByCategory = TEA_CATEGORY_ORDER.reduce((acc, type) => {
+    acc[type] = availableTeas.filter(t => t.teeArt === type);
+    return acc;
+  }, {} as Record<TeaType, Tea[]>);
 
   useEffect(() => {
     const initData = async () => {
       const supabaseData = await loadFromSupabase();
       
+      // Migration-Funktion: Füge bestTimeOfDay zu alten Tees hinzu
       const migrateTeas = (teas: Tea[]): Tea[] => {
         return teas.map(tea => {
           if (!tea.bestTimeOfDay || tea.bestTimeOfDay.length === 0) {
+            // Auto-migrate basierend auf Tee-Typ
             return {
               ...tea,
               bestTimeOfDay: TEA_TYPE_DEFAULT_TIMES[tea.teeArt]
@@ -65,6 +83,7 @@ function App() {
         setTeas(migratedTeas);
         setQueue(supabaseData.queue.length > 0 ? supabaseData.queue : migratedTeas.map(t => t.id));
         saveData({ teas: migratedTeas, queue: supabaseData.queue });
+        // Speichere migrierte Daten zurück zu Supabase
         if (migratedTeas.some((t, i) => t.bestTimeOfDay !== supabaseData.teas[i].bestTimeOfDay)) {
           saveToSupabase(migratedTeas, supabaseData.queue);
         }
@@ -119,18 +138,18 @@ function App() {
   const handleSelectTea = (tea: Tea) => {
     setTeas(prev => prev.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t));
     setQueue(prev => { const filtered = prev.filter(id => id !== tea.id); return [...filtered, tea.id]; });
-    setSelectedTea(tea);
+    setSelectedTea(tea); // Zeige Success Screen
     haptic('success');
   };
 
   const handleSkipTea = () => { 
-    setCurrentIndex(prev => prev + 1);
+    setCurrentIndex(prev => prev + 1); // Endlos-Loop via Modulo
     haptic('light'); 
   };
 
   const handleBackFromSuccess = () => {
     setSelectedTea(null);
-    setCurrentIndex(0);
+    setCurrentIndex(0); // Reset zu erstem empfohlenen Tee
   };
 
   const handlePickAnother = () => {
@@ -155,40 +174,29 @@ function App() {
     a.download = `royal-tea-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    haptic('success');
   };
 
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const importedData = JSON.parse(ev.target?.result as string);
-        if (importedData.teas && Array.isArray(importedData.teas)) {
-          setTeas(importedData.teas);
-          setQueue(importedData.queue || importedData.teas.map((t: Tea) => t.id));
-          haptic('success');
-          alert('✅ Import erfolgreich!');
+        const parsed = JSON.parse(ev.target?.result as string);
+        if (!parsed.teas || !Array.isArray(parsed.teas)) { alert('Ungültige Datei.'); return; }
+        if (confirm(`${parsed.teas.length} Tees importieren? Bestehende Daten werden überschrieben.`)) {
+          setTeas(parsed.teas);
+          setQueue(parsed.queue ?? parsed.teas.map((t: Tea) => t.id));
         }
-      } catch {
-        alert('❌ Ungültige Datei');
-      }
+      } catch { alert('Datei konnte nicht gelesen werden.'); }
     };
     reader.readAsText(file);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    e.target.value = '';
   };
 
   return (
     <div className="min-h-screen bg-midnight text-white font-sans">
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={handleImport}
-        accept="application/json"
-        className="hidden" 
-      />
-      
+      <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
       <div className="min-h-screen pb-8">
         <header 
           className="border-b border-white/10 sticky top-0 z-20"
@@ -199,12 +207,19 @@ function App() {
           }}
         >
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
-          <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
               <motion.button 
-                whileTap={{ scale: 0.9, opacity: 0.8 }} 
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                whileTap={{ scale: 0.9 }} 
+                onClick={() => { setIsInventoryOpen(true); haptic('light'); }}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors" 
+                aria-label="Inventar öffnen"
+              >
+                <LayoutGrid className="w-5 h-5 text-white" aria-hidden="true" />
+              </motion.button>
+              <motion.button 
+                whileTap={{ scale: 0.9 }} 
                 onClick={handleSync}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors disabled:opacity-50"
                 disabled={syncStatus === 'syncing' || teas.length === 0}
@@ -223,8 +238,7 @@ function App() {
               </motion.button>
               <motion.button 
                 ref={infoTriggerRef} 
-                whileTap={{ scale: 0.9, opacity: 0.8 }} 
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                whileTap={{ scale: 0.9 }} 
                 onClick={() => { haptic('light'); setIsInfoOpen(true); }}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
                 aria-label="App-Informationen anzeigen"
@@ -235,6 +249,7 @@ function App() {
           </div>
         </header>
 
+        {/* Update Available Banner */}
         <AnimatePresence>
           {updateAvailable && (
             <motion.div
@@ -246,8 +261,7 @@ function App() {
               <div className="max-w-3xl mx-auto flex items-center justify-between">
                 <span>✨ Neue Version verfügbar!</span>
                 <motion.button
-                  whileTap={{ scale: 0.95, opacity: 0.85 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => { haptic('success'); applyUpdate(); }}
                   className="bg-midnight text-white px-4 py-1 rounded-full text-xs font-semibold"
                   aria-label="App jetzt aktualisieren"
@@ -259,7 +273,7 @@ function App() {
           )}
         </AnimatePresence>
 
-        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)] pb-28" style={{ 
+        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]" style={{ 
           backgroundColor: '#FFFFF0',
           overscrollBehavior: 'none',
           WebkitOverflowScrolling: 'touch'
@@ -276,184 +290,190 @@ function App() {
               />
               <span className="sr-only">Lädt Tee-Daten...</span>
             </div>
-          ) : activeTab === 'today' ? (
+          ) : showAllTeas ? (
+            <div className="space-y-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold font-sans text-midnight">Alle Tees</h2>
+                <button 
+                  onClick={() => { haptic('light'); setShowAllTeas(false); }} 
+                  className="text-sm font-sans text-midnight/60 hover:text-midnight transition-colors"
+                  aria-label="Zurück zur Tee-Übersicht"
+                >← Zurück</button>
+              </div>
+              
+              {/* Verfügbare Tees */}
+              {availableTeas.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold font-sans text-midnight mb-4">
+                    Verfügbar ({availableTeas.length})
+                  </h3>
+                  <div className="space-y-6">
+                    {TEA_CATEGORY_ORDER.map(type => {
+                      const catTeas = teasByCategory[type];
+                      if (catTeas.length === 0) return null;
+                      return (
+                        <div key={type}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: TEA_CATEGORY_COLORS[type] }} />
+                            <h4 className="font-sans font-semibold text-midnight text-sm">{TEA_CATEGORY_LABELS[type]} ({catTeas.length})</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {catTeas.map((tea, i) => <TeaGridCard key={tea.id} tea={tea} index={i} onSelect={() => handleSelectTea(tea)} />)}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Bereits verwendet - Separator nur wenn beide Sections haben */}
+              {availableTeas.length > 0 && teas.filter(t => t.zuletztGetrunken).length > 0 && (
+                <div className="border-t border-midnight/10 pt-6" />
+              )}
+
+              {/* Bereits verwendet */}
+              {teas.filter(t => t.zuletztGetrunken).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold font-sans text-midnight mb-4">
+                    Bereits verwendet ({teas.filter(t => t.zuletztGetrunken).length})
+                  </h3>
+                  <div className="space-y-3">
+                    {teas.filter(t => t.zuletztGetrunken).map((tea) => {
+                      const lastUsed = tea.zuletztGetrunken ? new Date(tea.zuletztGetrunken) : null;
+                      const timeAgo = lastUsed ? (() => {
+                        const now = new Date();
+                        const diffMs = now.getTime() - lastUsed.getTime();
+                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                        const diffDays = Math.floor(diffHours / 24);
+                        
+                        if (diffDays > 0) return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`;
+                        if (diffHours > 0) return `vor ${diffHours} Std`;
+                        return 'gerade eben';
+                      })() : '';
+
+                      return (
+                        <div 
+                          key={tea.id}
+                          onClick={() => {
+                            if (confirm(`"${tea.name}" erneut verwenden?`)) {
+                              setTeas(prev => prev.map(t => 
+                                t.id === tea.id ? { ...t, zuletztGetrunken: undefined } : t
+                              ));
+                              haptic('success');
+                            }
+                          }}
+                          className="bg-white rounded-ios-lg p-4 border border-midnight/10 cursor-pointer hover:bg-midnight/5 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-sans font-semibold text-midnight">{tea.name}</p>
+                              <p className="text-xs text-midnight/50 font-sans mt-1">
+                                ⏱️ {timeAgo}
+                              </p>
+                            </div>
+                            <div className="text-midnight/30">
+                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {availableTeas.length === 0 && teas.filter(t => t.zuletztGetrunken).length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-midnight/60">Keine Tees vorhanden</p>
+                </div>
+              )}
+            </div>
+          ) : (
             <div className="flex flex-col touch-pan-x items-center justify-center" style={{ 
-              paddingTop: '0rem',
-              marginTop: '-2rem',
-              paddingBottom: 'max(8rem, env(safe-area-inset-bottom))',
+              paddingTop: '0.5rem',
+              paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
               minHeight: 'calc(100vh - 60px)',
               overscrollBehavior: 'none'
             }}>
+              {/* Premium UI - keine Begrüßung */}
               {availableTeas.length === 0 ? (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6 }}
-                  className="flex flex-col items-center justify-center text-center px-8"
-                  style={{ paddingTop: '4rem' }}
-                >
-                  {/* Minimalist Checkmark */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ 
-                      type: 'spring',
-                      stiffness: 200,
-                      damping: 20,
-                      delay: 0.2
-                    }}
-                    className="mb-12"
-                  >
-                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-                      <motion.circle
-                        cx="60"
-                        cy="60"
-                        r="58"
-                        stroke={ds.colors.brand.gold}
-                        strokeWidth="2"
-                        fill="none"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 1, delay: 0.3 }}
-                      />
-                      <motion.path
-                        d="M 35 60 L 52 77 L 85 44"
-                        stroke={ds.colors.brand.gold}
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        fill="none"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.6, delay: 0.8 }}
-                      />
-                    </svg>
-                  </motion.div>
-
-                  {/* Heading */}
-                  <motion.h3
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.2 }}
-                    className="text-3xl font-bold mb-16"
-                    style={{
-                      fontFamily: ds.typography.fontFamily.system,
-                      color: ds.colors.text.primary,
-                      letterSpacing: '-0.02em'
-                    }}
-                  >
-                    Rotation abgeschlossen
-                  </motion.h3>
-
-                  {/* Action Button */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.4 }}
-                    className="w-full max-w-[280px]"
-                  >
+                <div className="text-center py-20">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h3 className="text-xl font-semibold text-midnight mb-2 font-sans">Alle Tees verwendet!</h3>
+                  <p className="text-midnight/60 mb-6">Starte eine neue Rotation</p>
+                  <div className="flex justify-center gap-4">
                     <motion.button 
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => {
                         setTeas(prev => prev.map(t => ({ ...t, zuletztGetrunken: undefined })));
                         setCurrentIndex(0);
                         haptic('success');
                       }}
-                      style={{
-                        width: '100%',
-                        background: ds.colors.brand.gold,
-                        color: ds.colors.text.inverse,
-                        borderRadius: ds.radius.md,
-                        padding: `${ds.spacing[3.5]} ${ds.spacing[6]}`,
-                        fontWeight: ds.typography.fontWeight.semibold,
-                        fontSize: ds.typography.fontSize.body,
-                        minHeight: ds.touchTarget.medium,
-                        boxShadow: '0 4px 16px rgba(201, 174, 77, 0.25)',
-                        fontFamily: ds.typography.fontFamily.system,
-                        border: 'none'
-                      }}
-                      aria-label="Rotation zurücksetzen"
+                      className="bg-gold text-gold-text px-6 py-3 rounded-ios-lg font-medium font-sans"
+                      aria-label="Tee-Rotation neu starten - alle Tees zurücksetzen"
                     >
-                      Zurücksetzen
+                      Rotation neu starten
                     </motion.button>
-                  </motion.div>
-                </motion.div>
+                    <motion.button 
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setIsInventoryOpen(true)} 
+                      className="bg-midnight/5 hover:bg-midnight/10 px-6 py-3 rounded-ios-lg font-medium font-sans text-midnight/70"
+                      aria-label="Inventar öffnen"
+                    >
+                      Inventar öffnen
+                    </motion.button>
+                  </div>
+                </div>
               ) : selectedTea ? (
+                /* SUCCESS SCREEN */
                 <SuccessScreen 
                   tea={selectedTea}
                   onBack={handleBackFromSuccess}
                   onPickAnother={handlePickAnother}
                 />
               ) : (
+                /* SWIPE VIEW */
                 <>
                   {currentTea ? (
                     <AnimatePresence mode="wait">
-                      <SwipeTeaCard
+                      <SwipeTeaCard 
                         key={`${currentTea.id}-${currentIndex}`}
                         tea={currentTea} 
-                        onSelect={() => handleSelectTea(currentTea)}
-                        onSkip={handleSkipTea}
+                        onSwipeRight={() => handleSelectTea(currentTea)} 
+                        onSwipeLeft={handleSkipTea} 
+                        onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} 
                       />
                     </AnimatePresence>
                   ) : (
                     <div className="text-center py-12 text-midnight/60">
-                      Keine Tees verfügbar
+                      Debug: Keine Karte! (Index: {currentIndex}, Teas: {suggestedTeas.length})
                     </div>
                   )}
+                  
+                  {/* Nur "Alle Tees" Link - Buttons sind in Card */}
+                  <div className="text-center mt-6">
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => { haptic('light'); setShowAllTeas(true); }}
+                      className="py-2 px-4 bg-midnight/5 hover:bg-midnight/10 active:bg-midnight/15 rounded-ios font-sans text-sm font-medium text-midnight/60 transition-colors"
+                      aria-label="Alle verfügbaren Tees anzeigen"
+                    >
+                      Alle Tees
+                    </motion.button>
+                  </div>
                 </>
               )}
             </div>
-          ) : (
-            <CollectionView 
-              teas={teas}
-              onTeaSelect={(tea) => {
-                if (tea.zuletztGetrunken) {
-                  setTeas(prev => prev.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: undefined } : t));
-                  haptic('success');
-                } else {
-                  handleSelectTea(tea);
-                  setActiveTab('today');
-                }
-              }}
-              onTeaEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); }}
-            />
           )}
         </main>
       </div>
-
-      <TabBar 
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          haptic('light');
-        }}
-        todayCount={availableTeas.length}
-        collectionCount={teas.length}
-      />
-
-      <TeaForm 
-        isOpen={isFormOpen} 
-        onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }} 
-        onSave={editingTea ? handleUpdateTea : handleAddTea} 
-        editTea={editingTea} 
-      />
-      <InfoModal 
-        isOpen={isInfoOpen} 
-        onClose={() => setIsInfoOpen(false)} 
-        triggerRef={infoTriggerRef} 
-        onExport={handleExport} 
-        onImport={() => fileInputRef.current?.click()} 
-      />
-      <InventorySheet 
-        isOpen={isInventoryOpen} 
-        onClose={() => setIsInventoryOpen(false)} 
-        teas={teas} 
-        queue={queue} 
-        onEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); setIsInventoryOpen(false); }} 
-        onDelete={handleDeleteTea} 
-        onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }} 
-      />
+      <TeaForm isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }} onSave={editingTea ? handleUpdateTea : handleAddTea} editTea={editingTea} />
+      <InfoModal isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} triggerRef={infoTriggerRef} onExport={handleExport} onImport={() => fileInputRef.current?.click()} />
+      <InventorySheet isOpen={isInventoryOpen} onClose={() => setIsInventoryOpen(false)} teas={teas} queue={queue} onEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); setIsInventoryOpen(false); }} onDelete={handleDeleteTea} onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }} />
     </div>
   );
 }
