@@ -117,46 +117,16 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
         opacity: isUsed ? 0.6 : 1
       }}
     >
-      <div className="p-4 relative">
-        {/* Tea Type Badge + Edit Button - Flex Row */}
-        <div className="flex items-center justify-between mb-3">
-          {/* Badge */}
-          <div 
-            className="px-3 py-1 rounded-full text-xs font-medium"
-            style={{
-              background: ds.colors.brand.gold,
-              color: ds.colors.text.inverse,
-              maxWidth: '60%',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            {TEA_TYPE_LABELS[tea.teeArt]}
-          </div>
-
-          {/* Edit Button */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-            }}
-            aria-label="Tee bearbeiten"
-          >
-            <Edit3 
-              className="w-3.5 h-3.5" 
-              style={{ color: ds.colors.text.secondary }}
-            />
-          </motion.button>
+      <div className="p-4">
+        {/* Tea Type Badge - Nur Info */}
+        <div 
+          className="inline-block px-3 py-1 rounded-full mb-3 text-xs font-medium"
+          style={{
+            background: ds.colors.brand.gold,
+            color: ds.colors.text.inverse
+          }}
+        >
+          {TEA_TYPE_LABELS[tea.teeArt]}
         </div>
 
         {/* Tea Name */}
@@ -219,9 +189,10 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
           {tea.fuellstand}% Füllstand
         </p>
 
-        {/* Used Actions Row ODER Spacer für gleiche Höhe */}
-        {isUsed && tea.zuletztGetrunken ? (
-          <div className="flex items-center justify-between mt-2">
+        {/* Action Row - IMMER VORHANDEN */}
+        <div className="flex items-center justify-between mt-2">
+          {/* Left: Reset button (nur bei used) */}
+          {isUsed && tea.zuletztGetrunken ? (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -232,10 +203,33 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
             >
               Zurücksetzen
             </button>
-          </div>
-        ) : (
-          <div className="mt-2 h-4" aria-hidden="true" />
-        )}
+          ) : (
+            <div />
+          )}
+
+          {/* Right: Edit button (immer) */}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ml-auto"
+            style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+            }}
+            aria-label="Tee bearbeiten"
+          >
+            <Edit3 
+              className="w-3.5 h-3.5" 
+              style={{ color: ds.colors.text.secondary }}
+            />
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   );
