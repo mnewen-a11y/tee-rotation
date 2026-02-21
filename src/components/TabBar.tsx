@@ -20,12 +20,12 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
       aria-label="Hauptnavigation"
       className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around"
       style={{
-        height: '68px',
+        height: '72px',
         paddingBottom: 'env(safe-area-inset-bottom, 0)',
-        background: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '0.5px solid rgba(255, 255, 255, 0.1)',
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.06)',
       }}
     >
       {tabs.map((tab) => {
@@ -38,14 +38,18 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
             onClick={() => onTabChange(tab.id)}
             aria-label={tab.label}
             aria-current={isActive ? 'page' : undefined}
-            className="relative flex flex-col items-center justify-center gap-1 flex-1 h-full focus:outline-none"
+            className="relative flex flex-col items-center justify-center gap-1 flex-1 focus:outline-none"
+            style={{
+              height: '56px',
+              paddingBottom: '4px',
+            }}
           >
             {/* Icon with badge */}
             <div className="relative">
               <Icon
-                className="w-6 h-6"
+                className="w-5 h-5"
                 style={{ 
-                  color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.5)',
+                  color: isActive ? '#C9AE4D' : 'rgba(0, 0, 0, 0.4)',
                   strokeWidth: 2,
                 }}
               />
@@ -68,9 +72,9 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
 
             {/* Label */}
             <span
-              className="text-[11px] font-medium"
+              className="text-[10px] font-medium"
               style={{
-                color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.5)',
+                color: isActive ? '#C9AE4D' : 'rgba(0, 0, 0, 0.4)',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
               }}
             >
