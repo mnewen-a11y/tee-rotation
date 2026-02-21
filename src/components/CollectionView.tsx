@@ -191,8 +191,8 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
           {tea.fuellstand}% Füllstand
         </p>
 
-        {/* Used Badge mit Reset Hint */}
-        {isUsed && tea.zuletztGetrunken && (
+        {/* Used Badge mit Reset Hint ODER Spacer für gleiche Höhe */}
+        {isUsed && tea.zuletztGetrunken ? (
           <div 
             className="mt-2 text-[10px] font-medium flex items-center gap-1"
             style={{ color: ds.colors.text.tertiary }}
@@ -200,6 +200,8 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
             <span>Verwendet</span>
             <span style={{ color: ds.colors.brand.gold }}>• Tippen zum Zurücksetzen</span>
           </div>
+        ) : (
+          <div className="mt-2 h-4" aria-hidden="true" />
         )}
 
         {/* Edit Button - Bottom Right */}
