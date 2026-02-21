@@ -14,10 +14,9 @@ interface SwipeTeaCardProps {
   tea: Tea;
   onSelect: () => void;
   onSkip: () => void;
-  onTap: () => void;
 }
 
-export const SwipeTeaCard = ({ tea, onSelect, onSkip, onTap }: SwipeTeaCardProps) => {
+export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
   const { trigger: haptic } = useHaptic();
   
   const fillPercentage = tea.fuellstand;
