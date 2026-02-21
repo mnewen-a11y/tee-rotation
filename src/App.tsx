@@ -209,7 +209,14 @@ function App() {
     <div className="min-h-screen bg-midnight text-white font-sans">
       <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
       <div className="min-h-screen pb-8">
-        <header className="bg-midnight/80 backdrop-blur-ios border-b border-white/10 sticky top-0 z-20">
+       <header 
+  className="border-b border-white/10 sticky top-0 z-20"
+  style={{
+    background: 'rgba(15, 23, 42, 0.7)',
+    backdropFilter: 'blur(20px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+  }}
+>
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
