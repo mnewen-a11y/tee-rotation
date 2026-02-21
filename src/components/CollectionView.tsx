@@ -23,7 +23,7 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit }: CollectionViewP
       className="overflow-y-auto pt-4"
       style={{
         height: 'calc(100vh - 48px)', // header only
-        paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0))', // TabBar space
+        paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0))', // TabBar space
         WebkitOverflowScrolling: 'touch',
       }}
     >

@@ -18,10 +18,10 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
   return (
     <nav
       aria-label="Hauptnavigation"
-      className="fixed bottom-0 left-0 right-0 z-30 flex items-stretch justify-around"
+      className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around"
       style={{
-        paddingTop: '8px',
-        paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0))',
+        height: 'calc(56px + env(safe-area-inset-bottom, 0))',
+        paddingBottom: 'env(safe-area-inset-bottom, 0)',
         background: 'rgba(255, 255, 255, 0.7)',
         backdropFilter: 'blur(40px) saturate(180%)',
         WebkitBackdropFilter: 'blur(40px) saturate(180%)',
@@ -39,6 +39,9 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
             aria-label={tab.label}
             aria-current={isActive ? 'page' : undefined}
             className="relative flex flex-col items-center justify-center gap-1 flex-1 focus:outline-none"
+            style={{
+              height: '56px',
+            }}
           >
             {/* Icon with badge */}
             <div className="relative">
