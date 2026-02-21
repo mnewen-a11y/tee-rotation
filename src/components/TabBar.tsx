@@ -20,8 +20,7 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
       aria-label="Hauptnavigation"
       className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around"
       style={{
-        height: 'calc(56px + env(safe-area-inset-bottom, 0))',
-        paddingBottom: 'env(safe-area-inset-bottom, 0)',
+        height: '64px',
         background: 'rgba(255, 255, 255, 0.7)',
         backdropFilter: 'blur(40px) saturate(180%)',
         WebkitBackdropFilter: 'blur(40px) saturate(180%)',
@@ -38,10 +37,7 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
             onClick={() => onTabChange(tab.id)}
             aria-label={tab.label}
             aria-current={isActive ? 'page' : undefined}
-            className="relative flex flex-col items-center justify-center gap-1 flex-1 focus:outline-none"
-            style={{
-              height: '56px',
-            }}
+            className="relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full focus:outline-none"
           >
             {/* Icon with badge */}
             <div className="relative">
@@ -56,11 +52,11 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
               {/* Badge count */}
               {tab.count !== undefined && tab.count > 0 && (
                 <div
-                  className="absolute -top-2 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold"
+                  className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-[9px] font-bold"
                   style={{
                     background: '#EF4444',
                     color: '#FFFFFF',
-                    padding: '0 4px',
+                    padding: '0 3px',
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
                   }}
                 >
