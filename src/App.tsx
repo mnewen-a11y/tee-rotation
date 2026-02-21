@@ -284,114 +284,114 @@ function App() {
               overscrollBehavior: 'none'
             }}>
               {availableTeas.length === 0 ? (
-                <div className="flex flex-col items-center justify-center" style={{ paddingTop: '2rem' }}>
-                  {/* Sophisticated Celebration - Liquid Glass Card */}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="flex flex-col items-center justify-center text-center px-8"
+                  style={{ paddingTop: '4rem' }}
+                >
+                  {/* Minimalist Checkmark */}
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="w-[85vw] max-w-[400px] rounded-[32px] overflow-hidden"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ 
+                      type: 'spring',
+                      stiffness: 200,
+                      damping: 20,
+                      delay: 0.2
+                    }}
+                    className="mb-12"
+                  >
+                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                      <motion.circle
+                        cx="60"
+                        cy="60"
+                        r="58"
+                        stroke={ds.colors.brand.gold}
+                        strokeWidth="2"
+                        fill="none"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 1, delay: 0.3 }}
+                      />
+                      <motion.path
+                        d="M 35 60 L 52 77 L 85 44"
+                        stroke={ds.colors.brand.gold}
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="none"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 0.6, delay: 0.8 }}
+                      />
+                    </svg>
+                  </motion.div>
+
+                  {/* Heading */}
+                  <motion.h3
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2 }}
+                    className="text-3xl font-bold mb-4"
                     style={{
-                      background: ds.glass.card.background,
-                      backdropFilter: ds.glass.card.backdropFilter,
-                      WebkitBackdropFilter: ds.glass.card.WebkitBackdropFilter,
-                      border: ds.glass.card.border,
-                      boxShadow: ds.shadows.glass
+                      fontFamily: ds.typography.fontFamily.system,
+                      color: ds.colors.text.primary,
+                      letterSpacing: '-0.02em'
                     }}
                   >
-                    <div className="px-8 py-12 text-center">
-                      {/* Circular Progress - Complete */}
-                      <motion.div
-                        initial={{ scale: 0, rotate: -90 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ 
-                          type: 'spring', 
-                          stiffness: 200, 
-                          damping: 15,
-                          delay: 0.1 
-                        }}
-                        className="w-20 h-20 rounded-full mx-auto mb-8 flex items-center justify-center relative"
-                        style={{
-                          background: `conic-gradient(${ds.colors.brand.gold} 100%, rgba(0,0,0,0.05) 0%)`,
-                          padding: '4px'
-                        }}
-                      >
-                        <div 
-                          className="w-full h-full rounded-full flex items-center justify-center"
-                          style={{ background: ds.colors.background.primary }}
-                        >
-                          <motion.span
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
-                            className="text-2xl font-bold"
-                            style={{ color: ds.colors.brand.gold }}
-                          >
-                            {teas.length}
-                          </motion.span>
-                        </div>
-                      </motion.div>
+                    Rotation abgeschlossen
+                  </motion.h3>
 
-                      {/* Heading */}
-                      <motion.h3
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="text-2xl font-bold mb-3"
-                        style={{
-                          fontFamily: ds.typography.fontFamily.system,
-                          color: ds.colors.text.primary,
-                          letterSpacing: ds.typography.letterSpacing.tight
-                        }}
-                      >
-                        Rotation abgeschlossen
-                      </motion.h3>
+                  {/* Subtext */}
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.4 }}
+                    className="text-lg mb-16"
+                    style={{ 
+                      color: ds.colors.text.secondary,
+                      fontFamily: ds.typography.fontFamily.system
+                    }}
+                  >
+                    {teas.length} {teas.length === 1 ? 'Tee' : 'Tees'} genossen
+                  </motion.p>
 
-                      {/* Description */}
-                      <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="text-base mb-8"
-                        style={{ color: ds.colors.text.secondary }}
-                      >
-                        Alle {teas.length} Tees wurden verwendet
-                      </motion.p>
-
-                      {/* Button */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                      >
-                        <motion.button 
-                          whileTap={{ scale: 0.95, opacity: 0.85 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                          onClick={() => {
-                            setTeas(prev => prev.map(t => ({ ...t, zuletztGetrunken: undefined })));
-                            setCurrentIndex(0);
-                            haptic('success');
-                          }}
-                          className="w-full"
-                          style={{
-                            background: ds.colors.brand.gold,
-                            color: ds.colors.text.inverse,
-                            borderRadius: ds.radius.md,
-                            padding: `${ds.spacing[3.5]} ${ds.spacing[6]}`,
-                            fontWeight: ds.typography.fontWeight.semibold,
-                            fontSize: ds.typography.fontSize.body,
-                            minHeight: ds.touchTarget.medium,
-                            boxShadow: ds.shadows.sm,
-                            fontFamily: ds.typography.fontFamily.system
-                          }}
-                          aria-label="Rotation neu starten"
-                        >
-                          Neu starten
-                        </motion.button>
-                      </motion.div>
-                    </div>
+                  {/* Action Button */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.6 }}
+                    className="w-full max-w-[280px]"
+                  >
+                    <motion.button 
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                      onClick={() => {
+                        setTeas(prev => prev.map(t => ({ ...t, zuletztGetrunken: undefined })));
+                        setCurrentIndex(0);
+                        haptic('success');
+                      }}
+                      style={{
+                        width: '100%',
+                        background: ds.colors.brand.gold,
+                        color: ds.colors.text.inverse,
+                        borderRadius: ds.radius.md,
+                        padding: `${ds.spacing[3.5]} ${ds.spacing[6]}`,
+                        fontWeight: ds.typography.fontWeight.semibold,
+                        fontSize: ds.typography.fontSize.body,
+                        minHeight: ds.touchTarget.medium,
+                        boxShadow: '0 4px 16px rgba(201, 174, 77, 0.25)',
+                        fontFamily: ds.typography.fontFamily.system,
+                        border: 'none'
+                      }}
+                      aria-label="Rotation neu starten"
+                    >
+                      Neu starten
+                    </motion.button>
                   </motion.div>
-                </div>
+                </motion.div>
               ) : selectedTea ? (
                 <SuccessScreen 
                   tea={selectedTea}
