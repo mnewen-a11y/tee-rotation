@@ -443,9 +443,8 @@ function App() {
                       <SwipeTeaCard 
                         key={`${currentTea.id}-${currentIndex}`}
                         tea={currentTea} 
-                        onSwipeRight={() => handleSelectTea(currentTea)} 
-                        onSwipeLeft={handleSkipTea} 
-                        onTap={() => { setEditingTea(currentTea); setIsFormOpen(true); }} 
+                        onSelect={() => handleSelectTea(currentTea)}
+                        onSkip={handleSkipTea}
                       />
                     </AnimatePresence>
                   ) : (
