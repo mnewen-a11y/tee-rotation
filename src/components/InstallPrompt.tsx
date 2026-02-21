@@ -11,10 +11,12 @@ export const InstallPrompt = () => {
       || (window.navigator as any).standalone 
       || document.referrer.includes('android-app://');
 
-    // Check if user already dismissed
-    const dismissed = localStorage.getItem('install-prompt-dismissed');
+    // Check if user dismissed recently (within 7 days)
+    const dismissedAt = localStorage.getItem('install-prompt-dismissed-at');
+    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const recentlyDismissed = dismissedAt && parseInt(dismissedAt) > sevenDaysAgo;
 
-    if (!isStandalone && !dismissed) {
+    if (!isStandalone && !recentlyDismissed) {
       // Show after 2s
       setTimeout(() => setShowPrompt(true), 2000);
     }
@@ -22,7 +24,7 @@ export const InstallPrompt = () => {
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    localStorage.setItem('install-prompt-dismissed', 'true');
+    localStorage.setItem('install-prompt-dismissed-at', Date.now().toString());
   };
 
   return (

@@ -19,7 +19,13 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit }: CollectionViewP
   const usedTeas = teas.filter(t => t.zuletztGetrunken);
 
   return (
-    <div className="pb-24 pt-4">
+    <div 
+      className="overflow-y-auto pb-24 pt-4"
+      style={{
+        height: 'calc(100vh - 48px - 64px)', // 100vh - header(48px) - tabbar(64px)
+        WebkitOverflowScrolling: 'touch',
+      }}
+    >
       {/* Verfügbare Tees */}
       {availableTeas.length > 0 && (
         <div className="mb-8">
