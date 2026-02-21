@@ -5,7 +5,7 @@
 
 import { motion } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS } from '@/types/tea';
-import { Thermometer, Scale, Edit3 } from 'lucide-react';
+import { Thermometer, Scale } from 'lucide-react';
 import { designSystem as ds } from '@/design/design-tokens';
 
 interface CollectionViewProps {
@@ -24,10 +24,10 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit }: CollectionViewP
       {availableTeas.length > 0 && (
         <div className="mb-8">
           <h2 
-            className="text-xl font-bold mb-4 px-6"
+            className="text-xs font-semibold mb-3 px-6 uppercase tracking-wide"
             style={{
               fontFamily: ds.typography.fontFamily.system,
-              color: ds.colors.text.primary
+              color: ds.colors.text.tertiary
             }}
           >
             Verfügbar ({availableTeas.length})
@@ -50,10 +50,10 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit }: CollectionViewP
       {usedTeas.length > 0 && (
         <div>
           <h2 
-            className="text-xl font-bold mb-4 px-6"
+            className="text-xs font-semibold mb-3 px-6 uppercase tracking-wide"
             style={{
               fontFamily: ds.typography.fontFamily.system,
-              color: ds.colors.text.primary
+              color: ds.colors.text.tertiary
             }}
           >
             Verwendet ({usedTeas.length})
@@ -207,28 +207,30 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
             <div />
           )}
 
-          {/* Right: Edit button (immer) */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          {/* Right: Edit button - Minimal Icon */}
+          <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
             }}
-            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ml-auto"
-            style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-            }}
+            className="flex-shrink-0 p-1"
+            style={{ color: ds.colors.brand.gold }}
             aria-label="Tee bearbeiten"
           >
-            <Edit3 
-              className="w-3.5 h-3.5" 
-              style={{ color: ds.colors.text.secondary }}
-            />
-          </motion.button>
+            <svg 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+          </button>
         </div>
       </div>
     </motion.div>
