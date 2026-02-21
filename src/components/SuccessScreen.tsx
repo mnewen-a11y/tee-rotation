@@ -107,9 +107,11 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
             transition={{ delay: 0.4 }}
             className="flex items-center gap-3"
           >
-            <button
+            <motion.button
               onClick={onBack}
-              className="flex-1 transition-all active:scale-95"
+              whileTap={{ scale: 0.95, opacity: 0.85 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="flex-1"
               style={{
                 ...buttonVariants.secondary,
                 WebkitTapHighlightColor: 'transparent'
@@ -117,10 +119,12 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
               aria-label="Zurück zur Tee-Auswahl"
             >
               Zurück
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={onPickAnother}
-              className="flex-1 transition-all active:scale-95"
+              whileTap={{ scale: 0.95, opacity: 0.85 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="flex-1"
               style={{
                 background: ds.colors.brand.gold,
                 color: ds.colors.text.inverse,
@@ -135,7 +139,7 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
               aria-label="Anderen Tee auswählen"
             >
               Neuer Tee
-            </button>
+            </motion.button>
           </motion.div>
         </div>
       </motion.div>

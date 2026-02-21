@@ -1,6 +1,6 @@
 /**
  * SwipeTeaCard - Premium Apple HIG Design
- * PHASE 1: Typography, Buttons, Accessibility
+ * BATCH 1: Spring Animations + Button Press Feedback
  */
 
 import { useRef } from 'react';
@@ -105,7 +105,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
         <motion.div 
           initial={{ scale: 0.8 }}
           animate={{ scale: acceptOpacity.get() > 0.1 ? 1 : 0.8 }}
-          transition={{ duration: 0.15 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           className="text-7xl font-bold text-green-600"
         >
           ✓
@@ -120,7 +120,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
         <motion.div 
           initial={{ scale: 0.8 }}
           animate={{ scale: rejectOpacity.get() > 0.1 ? 1 : 0.8 }}
-          transition={{ duration: 0.15 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           className="text-7xl font-bold text-gray-500"
         >
           →
@@ -237,7 +237,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${fillPercentage}%` }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
+                transition={{ type: 'spring', stiffness: 200, damping: 30, delay: 0.1 }}
                 style={{
                   ...progressBarStyles.fill,
                   width: `${fillPercentage}%`
@@ -249,13 +249,15 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
           {/* PHASE 1: Buttons mit Design System */}
           <div className="flex items-center gap-3 pt-6">
             {/* Skip Button - Secondary */}
-            <button
+            <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 haptic('light');
                 onSwipeLeft();
               }}
-              className="flex-1 transition-all active:scale-95"
+              whileTap={{ scale: 0.95, opacity: 0.85 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="flex-1"
               style={{
                 ...buttonVariants.secondary,
                 WebkitTapHighlightColor: 'transparent'
@@ -263,16 +265,18 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
               aria-label="Diesen Tee überspringen"
             >
               Skip
-            </button>
+            </motion.button>
 
             {/* Ok Button - Primary (Flat Gold per HIG) */}
-            <button
+            <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 haptic('success');
                 onSwipeRight();
               }}
-              className="flex-1 transition-all active:scale-95"
+              whileTap={{ scale: 0.95, opacity: 0.85 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="flex-1"
               style={{
                 background: ds.colors.brand.gold,
                 color: ds.colors.text.inverse,
@@ -287,7 +291,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
               aria-label="Diesen Tee auswählen"
             >
               Ok
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>

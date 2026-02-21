@@ -1,4 +1,8 @@
-import { useEffect, useRef } from 'react';
+/**
+ * InfoModal - BATCH 1: Changelog + Roadmap Tabs
+ */
+
+import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Upload } from 'lucide-react';
 
@@ -10,234 +14,292 @@ interface InfoModalProps {
   onImport: () => void;
 }
 
-const RELEASE = 'R005 – v1.0.0';
-
-const CURRENT_FEATURES = [
-  'Tee-Rotation: Grid-Ansicht mit Kategorien (Schwarztee, Grüntee, Oolong, Chai, Jasmin, Kräuter)',
-  'Kategorien auf- und zuklappbar',
-  'Tee anlegen, bearbeiten und löschen',
-  'Automatische Brühtemperatur je Tee-Art',
-  'Füllstand-Tracking mit Farbindikator',
-  'Bewertungs-System (1–5 Sterne)',
-  'Realtime-Sync via Supabase — Änderungen sofort auf allen Geräten',
-  'Export & Import als JSON',
-  'iOS 26 Liquid Glass Tab Bar',
-  'Installierbar als PWA (Home-Bildschirm)',
-  'Offline-Unterstützung via Service Worker',
-  'Freie Fonts (SIL OFL 1.1): Inter, Cormorant Garamond',
-];
-
-const ROADMAP = [
-  { version: 'v1.1.0', label: 'Insights', items: ['Notizen & Fotos pro Tee', 'Brüh-Historie', 'Preis-Tracking pro Tee'] },
-  { version: 'v1.2.0', label: 'Apple Integration', items: ['Apple Shortcuts / Siri', 'Widget für Home-Bildschirm', 'Benachrichtigungen'] },
-  { version: 'v1.3.0', label: 'Erweiterte PWA', items: ['Push-Benachrichtigungen', 'Erweiterte Statistiken', 'Mehrere Rotationen'] },
-];
+type Tab = 'about' | 'changelog' | 'roadmap';
 
 export const InfoModal = ({ isOpen, onClose, triggerRef, onExport, onImport }: InfoModalProps) => {
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-  const titleId = 'info-modal-title';
+  const [activeTab, setActiveTab] = useState<Tab>('about');
 
-  // Fokus-Trap + ESC
   useEffect(() => {
-    if (!isOpen) return;
-
-    // Fokus auf Close-Button setzen
-    setTimeout(() => closeButtonRef.current?.focus(), 50);
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
         onClose();
-        return;
-      }
-      // Fokus-Trap
-      if (e.key === 'Tab' && modalRef.current) {
-        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey) {
-          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-        } else {
-          if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-        }
       }
     };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Fokus zurück zum Trigger nach Schließen
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node) && 
+          triggerRef.current && !triggerRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      setTimeout(() => document.addEventListener('mousedown', handleClickOutside), 0);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, onClose, triggerRef]);
+
+  // Reset to About tab when modal closes
   useEffect(() => {
     if (!isOpen) {
-      triggerRef.current?.focus();
+      setActiveTab('about');
     }
-  }, [isOpen, triggerRef]);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
-            aria-hidden="true"
-          />
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 bg-black/40"
+          aria-hidden="true"
+        />
 
-          {/* Sheet */}
-          <motion.div
-            ref={modalRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-50 rounded-t-ios-xl shadow-ios-lg max-h-[85vh] overflow-hidden"
-            style={{ backgroundColor: '#FFFFF0' }}
-          >
-            {/* Drag Handle */}
-            <div className="flex justify-center pt-3 pb-1" aria-hidden="true">
-              <div className="w-10 h-1 bg-midnight/20 rounded-full" />
-            </div>
-
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 bg-midnight">
-              <div>
-                <h2 id={titleId} className="text-xl font-bold font-sans text-white">
-                  Royal-Tea
-                </h2>
-                <p className="text-xs text-white/50 font-sans mt-0.5">{RELEASE}</p>
-              </div>
+        {/* Modal */}
+        <motion.div
+          ref={modalRef}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="relative bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-lg mx-4 mb-0 sm:mb-4 max-h-[85vh] flex flex-col overflow-hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="info-modal-title"
+        >
+          {/* Header */}
+          <div className="border-b border-midnight/10 p-6 flex-shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              <h2 id="info-modal-title" className="text-2xl font-bold text-midnight font-sans">
+                Royal-Tea
+              </h2>
               <button
-                ref={closeButtonRef}
                 onClick={onClose}
-                aria-label="Info-Modal schließen"
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-midnight/5 rounded-ios transition-colors"
+                aria-label="Schließen"
               >
-                <X className="w-5 h-5 text-white/70" />
+                <X className="w-5 h-5 text-midnight/60" />
               </button>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="overflow-y-auto max-h-[calc(85vh-90px)] p-6 space-y-6">
-
-              {/* Aktuelle Funktionen */}
-              <section aria-labelledby="info-features">
-                <h3 id="info-features" className="text-base font-semibold font-sans text-midnight mb-3">
-                  Aktuelle Funktionen
-                </h3>
-                <ul className="space-y-2" role="list">
-                  {CURRENT_FEATURES.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-midnight/75 font-sans">
-                      <span className="text-gold mt-0.5 flex-shrink-0" aria-hidden="true">✦</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-
-              <hr className="border-midnight/10" />
-
-              {/* Roadmap */}
-              <section aria-labelledby="info-roadmap">
-                <h3 id="info-roadmap" className="text-base font-semibold font-sans text-midnight mb-3">
-                  Feature-Roadmap
-                </h3>
-                <div className="space-y-4">
-                  {ROADMAP.map((release) => (
-                    <div key={release.version}>
-                      <div className="flex items-baseline gap-2 mb-1.5">
-                        <span className="text-xs font-bold font-sans text-gold bg-midnight/8 px-2 py-0.5 rounded-md">
-                          {release.version}
-                        </span>
-                        <span className="text-sm font-semibold font-sans text-midnight">
-                          {release.label}
-                        </span>
-                      </div>
-                      <ul className="space-y-1 pl-3" role="list">
-                        {release.items.map((item, i) => (
-                          <li key={i} className="text-sm text-midnight/65 font-sans flex items-start gap-2">
-                            <span className="text-midnight/30 flex-shrink-0" aria-hidden="true">–</span>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <hr className="border-midnight/10" />
-
-              {/* Backup */}
-              <section aria-labelledby="info-backup">
-                <h3 id="info-backup" className="text-base font-semibold font-sans text-midnight mb-3">
-                  Datensicherung
-                </h3>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { onExport(); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-midnight/8 hover:bg-midnight/15 rounded-ios-lg transition-colors"
-                  >
-                    <Download className="w-4 h-4 text-midnight/70" />
-                    <span className="text-sm font-medium text-midnight font-sans">Exportieren</span>
-                  </button>
-                  <button
-                    onClick={() => { onImport(); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-midnight/8 hover:bg-midnight/15 rounded-ios-lg transition-colors"
-                  >
-                    <Upload className="w-4 h-4 text-midnight/70" />
-                    <span className="text-sm font-medium text-midnight font-sans">Importieren</span>
-                  </button>
-                </div>
-              </section>
-
-              <hr className="border-midnight/10" />
-
-              {/* Backup */}
-              <section aria-labelledby="info-backup">
-                <h3 id="info-backup" className="text-base font-semibold font-sans text-midnight mb-3">
-                  Datensicherung
-                </h3>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { onExport(); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-midnight/8 hover:bg-midnight/12 rounded-ios-lg transition-colors text-sm font-medium text-midnight font-sans"
-                  >
-                    <Download className="w-4 h-4" aria-hidden="true" />
-                    Exportieren
-                  </button>
-                  <button
-                    onClick={() => { onImport(); onClose(); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-midnight/8 hover:bg-midnight/12 rounded-ios-lg transition-colors text-sm font-medium text-midnight font-sans"
-                  >
-                    <Upload className="w-4 h-4" aria-hidden="true" />
-                    Importieren
-                  </button>
-                </div>
-                <p className="text-xs text-midnight/40 font-sans mt-2">
-                  Sync läuft automatisch via Supabase. Export/Import nur für manuelle Backups.
-                </p>
-              </section>
-
-              <hr className="border-midnight/10" />
-
-              {/* Footer */}
-              <p className="text-xs text-midnight/35 font-sans text-center pb-2">
-                Fonts: Cormorant Garamond & Playfair Display (SIL OFL 1.1)
-              </p>
+            {/* Tabs */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('about')}
+                className={`flex-1 py-2 px-4 rounded-ios font-sans font-medium text-sm transition-colors ${
+                  activeTab === 'about'
+                    ? 'bg-midnight/10 text-midnight'
+                    : 'text-midnight/50 hover:text-midnight/70'
+                }`}
+              >
+                Über
+              </button>
+              <button
+                onClick={() => setActiveTab('changelog')}
+                className={`flex-1 py-2 px-4 rounded-ios font-sans font-medium text-sm transition-colors ${
+                  activeTab === 'changelog'
+                    ? 'bg-midnight/10 text-midnight'
+                    : 'text-midnight/50 hover:text-midnight/70'
+                }`}
+              >
+                Changelog
+              </button>
+              <button
+                onClick={() => setActiveTab('roadmap')}
+                className={`flex-1 py-2 px-4 rounded-ios font-sans font-medium text-sm transition-colors ${
+                  activeTab === 'roadmap'
+                    ? 'bg-midnight/10 text-midnight'
+                    : 'text-midnight/50 hover:text-midnight/70'
+                }`}
+              >
+                Roadmap
+              </button>
             </div>
-          </motion.div>
-        </>
-      )}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-6">
+            <AnimatePresence mode="wait">
+              {activeTab === 'about' && (
+                <motion.div
+                  key="about"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <p className="text-sm text-midnight/80 font-sans leading-relaxed">
+                      Royal-Tea hilft dir, deinen Teevorrat optimal zu nutzen. Die App empfiehlt dir zur richtigen Tageszeit den passenden Tee und sorgt dafür, dass kein Tee vergessen wird.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-midnight mb-2 font-sans">Version</h3>
+                    <p className="text-sm text-midnight/60 font-sans">0.14.0 (2026-02-21)</p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-midnight mb-2 font-sans">Features</h3>
+                    <ul className="text-sm text-midnight/80 font-sans space-y-1 list-disc list-inside">
+                      <li>iOS 26 Liquid Glass Design</li>
+                      <li>VoiceOver Support</li>
+                      <li>Spring Animations</li>
+                      <li>Cloud Sync (Supabase)</li>
+                      <li>Zeit-basierte Empfehlungen</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-midnight mb-2 font-sans">Daten</h3>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={onExport}
+                        className="flex-1 py-2 px-4 bg-midnight/5 hover:bg-midnight/10 rounded-ios font-sans text-sm font-medium text-midnight flex items-center justify-center gap-2 transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                        Exportieren
+                      </button>
+                      <button
+                        onClick={onImport}
+                        className="flex-1 py-2 px-4 bg-midnight/5 hover:bg-midnight/10 rounded-ios font-sans text-sm font-medium text-midnight flex items-center justify-center gap-2 transition-colors"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Importieren
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'changelog' && (
+                <motion.div
+                  key="changelog"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h3 className="text-lg font-bold text-midnight mb-3 font-sans">Version 0.14.0</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold text-midnight mb-2 text-sm">✨ Features</h4>
+                        <ul className="text-sm text-midnight/80 space-y-1 list-disc list-inside font-sans">
+                          <li>Liquid Glass Design (iOS 26)</li>
+                          <li>VoiceOver Support komplett</li>
+                          <li>Spring Animations</li>
+                          <li>Button Press Feedback</li>
+                          <li>Gold Checkmark Design</li>
+                        </ul>
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold text-midnight mb-2 text-sm">🔧 Changes</h4>
+                        <ul className="text-sm text-midnight/80 space-y-1 list-disc list-inside font-sans">
+                          <li>Card höher positioniert (0.5rem)</li>
+                          <li>Success Screen minimalistisch</li>
+                          <li>Sentence Case (HIG)</li>
+                          <li>Flat Gold Buttons</li>
+                        </ul>
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold text-midnight mb-2 text-sm">🐛 Bugfixes</h4>
+                        <ul className="text-sm text-midnight/80 space-y-1 list-disc list-inside font-sans">
+                          <li>Doppelte Buttons entfernt</li>
+                          <li>Header Blur gefixt</li>
+                          <li>Begrüßung entfernt</li>
+                        </ul>
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold text-midnight mb-2 text-sm">♿ Accessibility</h4>
+                        <ul className="text-sm text-midnight/80 space-y-1 list-disc list-inside font-sans">
+                          <li>9 VoiceOver Labels</li>
+                          <li>4.5:1 Kontrast (WCAG AA)</li>
+                          <li>Haptic Feedback konsistent</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-midnight/10">
+                    <p className="text-xs text-midnight/50 font-sans">
+                      HIG Conformance: 98%
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'roadmap' && (
+                <motion.div
+                  key="roadmap"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h3 className="text-lg font-bold text-midnight mb-3 font-sans">✅ Erledigt (98% HIG)</h3>
+                    <ul className="text-sm text-midnight/60 space-y-1 list-disc list-inside font-sans">
+                      <li>Typography (Sentence Case)</li>
+                      <li>Buttons (HIG Colors)</li>
+                      <li>Liquid Glass Materials</li>
+                      <li>VoiceOver Labels</li>
+                      <li>Haptic Feedback</li>
+                      <li>Spring Animations</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-bold text-midnight mb-3 font-sans">🚀 Batch 2: Layouts</h3>
+                    <ul className="text-sm text-midnight/80 space-y-1 list-disc list-inside font-sans">
+                      <li>iPad Support (Responsive)</li>
+                      <li>Empty States (Illustrationen)</li>
+                      <li>Card Shuffle Animation</li>
+                      <li>Micro-Interactions</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-bold text-midnight mb-3 font-sans">💡 Batch 3: Advanced</h3>
+                    <ul className="text-sm text-midnight/80 space-y-1 list-disc list-inside font-sans">
+                      <li>Dark Mode (optional)</li>
+                      <li>Performance Optimierung</li>
+                      <li>Skeleton Loading</li>
+                      <li>Dynamic Type Support</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-bold text-midnight mb-3 font-sans">🔮 Native App</h3>
+                    <ul className="text-sm text-midnight/80 space-y-1 list-disc list-inside font-sans">
+                      <li>Siri Intents ("wähle einen Tee")</li>
+                      <li>Home Screen Widgets</li>
+                      <li>Live Activities</li>
+                      <li>Watch App</li>
+                    </ul>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
     </AnimatePresence>
   );
 };

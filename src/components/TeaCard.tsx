@@ -1,3 +1,8 @@
+/**
+ * TeaCard Component
+ * BATCH 1: List Separators (HIG Inset)
+ */
+
 import { useRef, useState } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Thermometer, Package, Edit3, Trash2 } from 'lucide-react';
@@ -119,7 +124,8 @@ export const TeaCard = ({ tea, onDrink, onEdit, onDelete, variant = 'list' }: Te
         onDragStart={() => setSwiping(true)}
         onDragEnd={handleDragEnd}
         onDragTransitionEnd={() => setSwiping(false)}
-        className="relative bg-white rounded-ios-lg p-4 shadow-ios border border-midnight/10 cursor-grab active:cursor-grabbing"
+        className="relative bg-white rounded-ios-lg p-4 shadow-ios border-b border-midnight/10 cursor-grab active:cursor-grabbing"
+        style={{ borderBottomWidth: '1px', marginLeft: '16px', marginRight: '16px' }}
       >
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0" onClick={deleteRevealed ? resetSwipe : undefined}>
