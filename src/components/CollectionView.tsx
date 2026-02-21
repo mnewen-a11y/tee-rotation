@@ -20,9 +20,9 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit }: CollectionViewP
 
   return (
     <div 
-      className="overflow-y-auto pb-24 pt-4"
+      className="overflow-y-auto pb-32 pt-4"
       style={{
-        height: 'calc(100vh - 48px - 64px)', // 100vh - header(48px) - tabbar(64px)
+        height: 'calc(100vh - 48px)', // Only subtract header
         WebkitOverflowScrolling: 'touch',
       }}
     >
