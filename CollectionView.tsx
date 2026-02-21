@@ -5,7 +5,7 @@
 
 import { motion } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS } from '@/types/tea';
-import { Thermometer, Scale } from 'lucide-react';
+import { Thermometer, Scale, Edit3 } from 'lucide-react';
 import { designSystem as ds } from '@/design/design-tokens';
 
 interface CollectionViewProps {
@@ -107,27 +107,58 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
         damping: 30,
         delay: index * 0.05 
       }}
-      onClick={onEdit}
-      className="rounded-2xl overflow-hidden cursor-pointer"
+      onClick={isUsed ? onSelect : undefined}
+      className="rounded-2xl overflow-hidden relative"
       style={{
         background: ds.glass.card.background,
         backdropFilter: ds.glass.card.backdropFilter,
         WebkitBackdropFilter: ds.glass.card.WebkitBackdropFilter,
         border: ds.glass.card.border,
         boxShadow: ds.shadows.glass,
-        opacity: isUsed ? 0.6 : 1
+        opacity: isUsed ? 0.6 : 1,
+        cursor: isUsed ? 'pointer' : 'default'
       }}
     >
-      <div className="p-4">
-        {/* Tea Type Badge */}
-        <div 
-          className="inline-block px-3 py-1 rounded-full mb-3 text-xs font-medium"
-          style={{
-            background: ds.colors.brand.gold,
-            color: ds.colors.text.inverse
-          }}
-        >
-          {TEA_TYPE_LABELS[tea.teeArt]}
+      <div className="p-4 relative">
+        {/* Tea Type Badge + Edit Button - Flex Row */}
+        <div className="flex items-center justify-between mb-3">
+          {/* Badge */}
+          <div 
+            className="px-3 py-1 rounded-full text-xs font-medium"
+            style={{
+              background: ds.colors.brand.gold,
+              color: ds.colors.text.inverse,
+              maxWidth: '60%',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {TEA_TYPE_LABELS[tea.teeArt]}
+          </div>
+
+          {/* Edit Button */}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+            }}
+            aria-label="Tee bearbeiten"
+          >
+            <Edit3 
+              className="w-3.5 h-3.5" 
+              style={{ color: ds.colors.text.secondary }}
+            />
+          </motion.button>
         </div>
 
         {/* Tea Name */}
@@ -177,7 +208,7 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
         </div>
 
         {/* Füllstand */}
-        <div className="relative h-1 rounded-full overflow-hidden" style={{ background: ds.colors.neutral[200] }}>
+        <div className="relative h-1 rounded-full overflow-hidden" style={{ background: 'rgba(0, 0, 0, 0.1)' }}>
           <div 
             className="absolute inset-y-0 left-0 rounded-full"
             style={{ 
@@ -190,14 +221,17 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
           {tea.fuellstand}% Füllstand
         </p>
 
-        {/* Used Badge */}
-        {isUsed && tea.zuletztGetrunken && (
+        {/* Used Badge mit Reset Hint ODER Spacer für gleiche Höhe */}
+        {isUsed && tea.zuletztGetrunken ? (
           <div 
-            className="mt-2 text-[10px] font-medium"
+            className="mt-2 text-[10px] font-medium flex items-center gap-1"
             style={{ color: ds.colors.text.tertiary }}
           >
-            Verwendet
+            <span>Verwendet</span>
+            <span style={{ color: ds.colors.brand.gold }}>• Tippen zum Zurücksetzen</span>
           </div>
+        ) : (
+          <div className="mt-2 h-4" aria-hidden="true" />
         )}
       </div>
     </motion.div>
