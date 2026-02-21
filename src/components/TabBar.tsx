@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { RefreshCw, Grid3x3 } from 'lucide-react';
+import { RefreshCw, LayoutGrid } from 'lucide-react';
 import { designSystem as ds } from '@/design/design-tokens';
 
 export type TabId = 'today' | 'collection';
@@ -81,7 +81,7 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
           aria-current={activeTab === 'collection' ? 'page' : undefined}
         >
           <div className="relative">
-            <Grid3x3 
+            <LayoutGrid 
               className="w-6 h-6"
               style={{ 
                 color: activeTab === 'collection' ? ds.colors.brand.gold : ds.colors.text.tertiary,
