@@ -5,7 +5,7 @@
 
 import { motion } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS } from '@/types/tea';
-import { Thermometer, Scale } from 'lucide-react';
+import { Thermometer, Scale, Edit3 } from 'lucide-react';
 import { designSystem as ds } from '@/design/design-tokens';
 
 interface CollectionViewProps {
@@ -107,18 +107,41 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
         damping: 30,
         delay: index * 0.05 
       }}
-      onClick={isUsed ? onSelect : onEdit}
-      className="rounded-2xl overflow-hidden cursor-pointer"
+      onClick={isUsed ? onSelect : undefined}
+      className="rounded-2xl overflow-hidden relative"
       style={{
         background: ds.glass.card.background,
         backdropFilter: ds.glass.card.backdropFilter,
         WebkitBackdropFilter: ds.glass.card.WebkitBackdropFilter,
         border: ds.glass.card.border,
         boxShadow: ds.shadows.glass,
-        opacity: isUsed ? 0.6 : 1
+        opacity: isUsed ? 0.6 : 1,
+        cursor: isUsed ? 'pointer' : 'default'
       }}
     >
       <div className="p-4">
+        {/* Edit Button - Top Right */}
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+          style={{
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          }}
+          aria-label="Tee bearbeiten"
+        >
+          <Edit3 
+            className="w-4 h-4" 
+            style={{ color: ds.colors.text.secondary }}
+          />
+        </motion.button>
+
         {/* Tea Type Badge */}
         <div 
           className="inline-block px-3 py-1 rounded-full mb-3 text-xs font-medium"
