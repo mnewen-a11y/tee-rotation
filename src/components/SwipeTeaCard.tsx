@@ -23,8 +23,7 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip, onTap }: SwipeTeaCardProps
   const fillPercentage = tea.fuellstand;
 
   return (
-    <div style={{ paddingTop: '1rem' }}>
-      <motion.div
+    <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -238,6 +237,5 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip, onTap }: SwipeTeaCardProps
         </div>
       </div>
     </motion.div>
-    </div>
   );
 };
