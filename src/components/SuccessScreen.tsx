@@ -17,8 +17,8 @@ interface SuccessScreenProps {
 
 export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps) => {
   return (
-    <div className="flex flex-col items-center justify-center" style={{ paddingTop: '2rem' }}>
-      {/* Card mit Success Content - HÖHER positioniert */}
+    <div className="flex flex-col items-center justify-center" style={{ paddingTop: '0.5rem' }}>
+      {/* Card mit Success Content - HÖHER positioniert (0.5rem) */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -35,7 +35,7 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
       >
         {/* Card Content */}
         <div className="px-8 py-10">
-          {/* Apple-Style Success Icon - subtiler */}
+          {/* Gold Checkmark - Creme Circle + Gold Border + Gold Check */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -47,11 +47,16 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
             }}
             className="w-16 h-16 rounded-full flex items-center justify-center mb-8 mx-auto"
             style={{ 
-              background: ds.colors.semantic.success,
-              boxShadow: '0 4px 16px rgba(52, 199, 89, 0.2)'
+              background: ds.colors.background.primary,
+              border: `1px solid ${ds.colors.brand.gold}`,
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
             }}
           >
-            <Check className="w-8 h-8 text-white" strokeWidth={2.5} />
+            <Check 
+              className="w-8 h-8" 
+              strokeWidth={2.5}
+              style={{ color: ds.colors.brand.gold }}
+            />
           </motion.div>
 
           {/* Tee Name */}
@@ -95,13 +100,12 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
             </div>
           </motion.div>
 
-          {/* Buttons IN Card - wie SwipeCard */}
+          {/* Buttons IN Card - KEIN Separator */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="flex items-center gap-3 pt-6 border-t"
-            style={{ borderColor: ds.colors.text.primary, opacity: 0.08 }}
+            className="flex items-center gap-3"
           >
             <button
               onClick={onBack}
@@ -110,6 +114,7 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
                 ...buttonVariants.secondary,
                 WebkitTapHighlightColor: 'transparent'
               }}
+              aria-label="Zurück zur Tee-Auswahl"
             >
               Zurück
             </button>
@@ -127,6 +132,7 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
                 boxShadow: ds.shadows.sm,
                 WebkitTapHighlightColor: 'transparent'
               }}
+              aria-label="Anderen Tee auswählen"
             >
               Neuer Tee
             </button>
