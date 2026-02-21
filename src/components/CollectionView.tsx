@@ -207,18 +207,35 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
             <div />
           )}
 
-          {/* Right: Edit button (immer) */}
-          <button
+          {/* Right: Edit button (immer) - Compact Icon Button */}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
             }}
-            className="text-[11px] font-medium"
-            style={{ color: ds.colors.brand.gold }}
+            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'rgba(201, 174, 77, 0.15)',
+              border: `1px solid ${ds.colors.brand.gold}`,
+            }}
             aria-label="Tee bearbeiten"
           >
-            Bearbeiten
-          </button>
+            <svg 
+              width="14" 
+              height="14" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke={ds.colors.brand.gold}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+          </motion.button>
         </div>
       </div>
     </motion.div>
