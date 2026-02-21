@@ -371,7 +371,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                     whileTap={{ scale: 0.97 }}
                     className="w-full bg-midnight text-white py-4 rounded-ios-lg font-semibold text-base font-sans mt-2 shadow-ios-md"
                   >
-                    {editTea ? 'Änderungen speichern' : 'Tee hinzufügen'}
+                    {editTea ? 'Speichern' : 'Hinzufügen'}
                   </motion.button>
 
                   <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 24px)' }} />
