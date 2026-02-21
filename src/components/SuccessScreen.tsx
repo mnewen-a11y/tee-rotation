@@ -136,9 +136,9 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
                 boxShadow: ds.shadows.sm,
                 WebkitTapHighlightColor: 'transparent'
               }}
-              aria-label="Anderen Tee auswählen"
+              aria-label="Weiter zum nächsten Tee"
             >
-              Neuer Tee
+              Weiter
             </motion.button>
           </motion.div>
         </div>
