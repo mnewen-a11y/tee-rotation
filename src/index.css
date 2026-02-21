@@ -42,7 +42,6 @@
 
 /* Normal styles */
 html {
-  overflow: hidden;
   height: 100%;
   /* Safari mobile browser fix */
   height: -webkit-fill-available;
@@ -60,6 +59,8 @@ body {
   min-height: 100%;
   min-height: -webkit-fill-available;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* iOS Safe Area - Only bottom for Tab Bar */
