@@ -1,11 +1,5 @@
-/**
- * TabBar - iOS Native Tab Bar Pattern
- * Apple HIG Compliant
- */
-
 import { motion } from 'framer-motion';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
-import { designSystem as ds } from '@/design/design-tokens';
 
 export type TabId = 'today' | 'collection';
 
@@ -17,102 +11,80 @@ interface TabBarProps {
 }
 
 export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: TabBarProps) => {
+  const tabs: { id: TabId; icon: typeof RefreshCw; label: string; count?: number }[] = [
+    { id: 'today',      icon: RefreshCw,    label: 'Rotation',  count: todayCount },
+    { id: 'collection', icon: LayoutGrid,   label: 'Sammlung',  count: collectionCount },
+  ];
+
   return (
-    <div 
-      className="fixed bottom-0 left-0 right-0 z-30 border-t"
+    <nav
+      aria-label="Hauptnavigation"
+      className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-center gap-2 px-6"
       style={{
-        background: 'rgba(255, 255, 240, 0.7)',
+        height: '64px',
+        paddingBottom: 'env(safe-area-inset-bottom, 0)',
+        background: 'rgba(15, 23, 42, 0.85)',
         backdropFilter: 'blur(40px) saturate(180%)',
         WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        borderColor: 'rgba(0, 0, 0, 0.1)',
-        paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        boxShadow: '0 -2px 16px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <div className="flex items-center justify-around px-4 pt-2 pb-1">
-        {/* Tab 1: Rotation */}
-        <motion.button
-          onClick={() => onTabChange('today')}
-          whileTap={{ scale: 0.9 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="flex-1 flex flex-col items-center gap-1 py-2 relative"
-          aria-label="Rotation Tab"
-          aria-current={activeTab === 'today' ? 'page' : undefined}
-        >
-          <div className="relative">
-            <RefreshCw 
-              className="w-6 h-6"
-              style={{ 
-                color: activeTab === 'today' ? ds.colors.brand.gold : ds.colors.text.tertiary,
-                strokeWidth: activeTab === 'today' ? 2.5 : 2
-              }}
-              aria-hidden="true"
-            />
-            {todayCount !== undefined && todayCount > 0 && (
-              <div 
-                className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold"
-                style={{
-                  background: ds.colors.semantic.error,
-                  color: ds.colors.text.inverse
-                }}
-                aria-label={`${todayCount} Tees verfügbar`}
-              >
-                {todayCount > 9 ? '9+' : todayCount}
-              </div>
-            )}
-          </div>
-          <span 
-            className="text-[10px] font-medium"
-            style={{
-              fontFamily: ds.typography.fontFamily.system,
-              color: activeTab === 'today' ? ds.colors.brand.gold : ds.colors.text.tertiary
-            }}
-          >
-            Rotation
-          </span>
-        </motion.button>
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.id;
+        const Icon = tab.icon;
 
-        {/* Tab 2: Sammlung */}
-        <motion.button
-          onClick={() => onTabChange('collection')}
-          whileTap={{ scale: 0.9 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="flex-1 flex flex-col items-center gap-1 py-2 relative"
-          aria-label="Sammlung Tab"
-          aria-current={activeTab === 'collection' ? 'page' : undefined}
-        >
-          <div className="relative">
-            <LayoutGrid 
-              className="w-6 h-6"
-              style={{ 
-                color: activeTab === 'collection' ? ds.colors.brand.gold : ds.colors.text.tertiary,
-                strokeWidth: activeTab === 'collection' ? 2.5 : 2
-              }}
-              aria-hidden="true"
-            />
-            {collectionCount !== undefined && collectionCount > 0 && (
-              <div 
-                className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold"
-                style={{
-                  background: ds.colors.text.tertiary,
-                  color: ds.colors.text.inverse
-                }}
-                aria-label={`${collectionCount} Tees in Sammlung`}
-              >
-                {collectionCount > 99 ? '99+' : collectionCount}
-              </div>
-            )}
-          </div>
-          <span 
-            className="text-[10px] font-medium"
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            aria-label={tab.label}
+            aria-current={isActive ? 'page' : undefined}
+            className="relative flex-1 flex flex-col items-center justify-center gap-1 focus:outline-none transition-all duration-200"
             style={{
-              fontFamily: ds.typography.fontFamily.system,
-              color: activeTab === 'collection' ? ds.colors.brand.gold : ds.colors.text.tertiary
+              maxWidth: '120px',
+              minHeight: '48px',
             }}
           >
-            Sammlung
-          </span>
-        </motion.button>
-      </div>
-    </div>
+            {/* Icon with badge */}
+            <div className="relative">
+              <Icon
+                className="w-6 h-6 transition-all duration-200"
+                style={{ 
+                  color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.5)',
+                  strokeWidth: isActive ? 2.5 : 2,
+                }}
+              />
+              
+              {/* Badge count */}
+              {tab.count !== undefined && tab.count > 0 && (
+                <div
+                  className="absolute -top-2 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold"
+                  style={{
+                    background: isActive ? '#C9AE4D' : '#EF4444',
+                    color: '#FFFFFF',
+                    padding: '0 4px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                  }}
+                >
+                  {tab.count}
+                </div>
+              )}
+            </div>
+
+            {/* Label */}
+            <span
+              className="text-[11px] font-medium transition-all duration-200"
+              style={{
+                color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.5)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              }}
+            >
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
   );
 };
