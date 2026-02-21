@@ -294,7 +294,7 @@ export const TeaForm = ({ isOpen, onClose, onSave, editTea }: TeaFormProps) => {
                       </label>
                       <span className="text-lg font-bold text-midnight font-sans">{fuellstand}%</span>
                     </div>
-                    <input type="range" min={0} max={100} step={10} value={fuellstand}
+                    <input type="range" min={0} max={100} step={5} value={fuellstand}
                       onChange={e => setFuellstand(Number(e.target.value))}
                       className="w-full accent-gold" />
                   </div>

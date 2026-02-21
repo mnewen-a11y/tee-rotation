@@ -96,7 +96,7 @@ interface TeaGridItemProps {
   isUsed?: boolean;
 }
 
-const TeaGridItem = ({ tea, index, onEdit, isUsed }: TeaGridItemProps) => {
+const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -107,7 +107,7 @@ const TeaGridItem = ({ tea, index, onEdit, isUsed }: TeaGridItemProps) => {
         damping: 30,
         delay: index * 0.05 
       }}
-      onClick={onEdit}
+      onClick={isUsed ? onSelect : onEdit}
       className="rounded-2xl overflow-hidden cursor-pointer"
       style={{
         background: ds.glass.card.background,
@@ -190,13 +190,14 @@ const TeaGridItem = ({ tea, index, onEdit, isUsed }: TeaGridItemProps) => {
           {tea.fuellstand}% Füllstand
         </p>
 
-        {/* Used Badge */}
+        {/* Used Badge mit Reset Hint */}
         {isUsed && tea.zuletztGetrunken && (
           <div 
-            className="mt-2 text-[10px] font-medium"
+            className="mt-2 text-[10px] font-medium flex items-center gap-1"
             style={{ color: ds.colors.text.tertiary }}
           >
-            Verwendet
+            <span>Verwendet</span>
+            <span style={{ color: ds.colors.brand.gold }}>• Tippen zum Zurücksetzen</span>
           </div>
         )}
       </div>
