@@ -10,7 +10,7 @@ interface InfoModalProps {
   onImport: () => void;
 }
 
-const RELEASE = 'R015 – v0.15.0';
+const RELEASE = 'R100 – v1.0.0';
 
 const CURRENT_FEATURES = [
   'Tee-Rotation mit zeitbasierter Empfehlung',
