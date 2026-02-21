@@ -10,6 +10,7 @@ import { SuccessScreen } from '@/components/SuccessScreen';
 import { TeaForm } from '@/components/TeaForm';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
 import { InfoModal } from '@/components/InfoModal';
+import { InstallPrompt } from '@/components/InstallPrompt';
 import { InventorySheet } from '@/components/InventorySheet';
 import { TabBar, type TabId } from '@/components/TabBar';
 import { CollectionView } from '@/components/CollectionView';
@@ -454,6 +455,9 @@ function App() {
         onDelete={handleDeleteTea} 
         onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }} 
       />
+
+      {/* Install Prompt - nur im Browser */}
+      <InstallPrompt />
     </div>
   );
 }
