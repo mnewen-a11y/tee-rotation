@@ -20,11 +20,11 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
       aria-label="Hauptnavigation"
       className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around"
       style={{
-        height: '64px',
+        height: '68px',
         paddingBottom: 'env(safe-area-inset-bottom, 0)',
-        background: 'rgba(15, 23, 42, 0.95)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        background: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         borderTop: '0.5px solid rgba(255, 255, 255, 0.1)',
       }}
     >
@@ -38,18 +38,14 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
             onClick={() => onTabChange(tab.id)}
             aria-label={tab.label}
             aria-current={isActive ? 'page' : undefined}
-            className="relative flex flex-col items-center justify-center gap-1 flex-1 focus:outline-none transition-all duration-200"
-            style={{
-              minHeight: '48px',
-              maxWidth: '200px',
-            }}
+            className="relative flex flex-col items-center justify-center gap-1 flex-1 h-full focus:outline-none"
           >
             {/* Icon with badge */}
             <div className="relative">
               <Icon
-                className="w-6 h-6 transition-colors duration-200"
+                className="w-6 h-6"
                 style={{ 
-                  color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.4)',
+                  color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.5)',
                   strokeWidth: 2,
                 }}
               />
@@ -62,7 +58,7 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
                     background: '#EF4444',
                     color: '#FFFFFF',
                     padding: '0 4px',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
                   }}
                 >
                   {tab.count}
@@ -72,9 +68,9 @@ export const TabBar = ({ activeTab, onTabChange, todayCount, collectionCount }: 
 
             {/* Label */}
             <span
-              className="text-[11px] font-medium transition-colors duration-200"
+              className="text-[11px] font-medium"
               style={{
-                color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.4)',
+                color: isActive ? '#C9AE4D' : 'rgba(255, 255, 255, 0.5)',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
               }}
             >
