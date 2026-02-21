@@ -199,7 +199,7 @@ function App() {
           }}
         >
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
-          <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
               <motion.button 
