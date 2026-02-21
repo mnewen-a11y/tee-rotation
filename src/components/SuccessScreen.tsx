@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Thermometer, Scale } from 'lucide-react';
 import { Tea } from '@/types/tea';
 import { designSystem as ds } from '@/design/design-tokens';
 import { buttonVariants } from '@/design/component-utils';
@@ -84,19 +84,45 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
             </p>
           </motion.div>
 
-          {/* Brüh-Info */}
+          {/* Brüh-Info mit Icons */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-center mb-8"
+            className="flex items-center justify-center gap-6 mb-8"
           >
-            <div 
-              className="flex items-center justify-center gap-4 text-2xl font-bold"
-              style={{ color: ds.colors.text.primary }}
-            >
-              <span>🌡️ {tea.bruehgrad}°C</span>
-              <span>⚖️ {tea.grammAnzahl}g</span>
+            <div className="flex items-center gap-2">
+              <Thermometer 
+                className="w-5 h-5" 
+                style={{ color: ds.colors.brand.gold }}
+                aria-hidden="true"
+              />
+              <span 
+                className="text-xl font-bold"
+                style={{ 
+                  color: ds.colors.text.primary,
+                  fontFamily: ds.typography.fontFamily.system
+                }}
+              >
+                {tea.bruehgrad}°
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Scale 
+                className="w-5 h-5" 
+                style={{ color: ds.colors.brand.gold }}
+                aria-hidden="true"
+              />
+              <span 
+                className="text-xl font-bold"
+                style={{ 
+                  color: ds.colors.text.primary,
+                  fontFamily: ds.typography.fontFamily.system
+                }}
+              >
+                {tea.grammAnzahl}g
+              </span>
             </div>
           </motion.div>
 

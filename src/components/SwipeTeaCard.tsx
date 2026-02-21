@@ -96,16 +96,16 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip, onTap }: SwipeTeaCardProps
             </p>
           )}
 
-          {/* Brewing Info */}
-          <div className="flex justify-center gap-8 mb-8">
-            <div className="flex flex-col items-center">
+          {/* Brewing Info - Eine Reihe, zentriert */}
+          <div className="flex justify-center items-center gap-6 mb-8">
+            <div className="flex items-center gap-2">
               <Thermometer 
-                className="w-6 h-6 mb-2" 
+                className="w-5 h-5" 
                 style={{ color: ds.colors.brand.gold }}
                 aria-hidden="true"
               />
               <span 
-                className="text-2xl font-bold mb-1"
+                className="text-xl font-bold"
                 style={{ 
                   color: ds.colors.text.primary,
                   fontFamily: ds.typography.fontFamily.system
@@ -113,34 +113,22 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip, onTap }: SwipeTeaCardProps
               >
                 {tea.bruehgrad}°
               </span>
-              <span 
-                className="text-xs"
-                style={{ color: ds.colors.text.tertiary }}
-              >
-                Celsius
-              </span>
             </div>
 
-            <div className="flex flex-col items-center">
+            <div className="flex items-center gap-2">
               <Scale 
-                className="w-6 h-6 mb-2" 
+                className="w-5 h-5" 
                 style={{ color: ds.colors.brand.gold }}
                 aria-hidden="true"
               />
               <span 
-                className="text-2xl font-bold mb-1"
+                className="text-xl font-bold"
                 style={{ 
                   color: ds.colors.text.primary,
                   fontFamily: ds.typography.fontFamily.system
                 }}
               >
                 {tea.grammAnzahl}g
-              </span>
-              <span 
-                className="text-xs"
-                style={{ color: ds.colors.text.tertiary }}
-              >
-                Gramm
               </span>
             </div>
           </div>
