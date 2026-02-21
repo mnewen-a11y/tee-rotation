@@ -127,11 +127,15 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
         </motion.div>
       </motion.div>
 
-      {/* Premium Card */}
+      {/* Premium Card - PHASE 2: Liquid Glass */}
       <div 
-        className="bg-white rounded-[32px] overflow-hidden"
+        className="rounded-[32px] overflow-hidden"
         style={{
-          boxShadow: ds.shadows.xl
+          background: ds.glass.card.background,
+          backdropFilter: ds.glass.card.backdropFilter,
+          WebkitBackdropFilter: ds.glass.card.WebkitBackdropFilter,
+          border: ds.glass.card.border,
+          boxShadow: ds.shadows.glass
         }}
       >
         {/* Card Content */}
