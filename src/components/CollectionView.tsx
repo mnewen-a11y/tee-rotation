@@ -119,29 +119,7 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
         cursor: isUsed ? 'pointer' : 'default'
       }}
     >
-      <div className="p-4">
-        {/* Edit Button - Top Right */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit();
-          }}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
-          style={{
-            background: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(10px)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-          }}
-          aria-label="Tee bearbeiten"
-        >
-          <Edit3 
-            className="w-4 h-4" 
-            style={{ color: ds.colors.text.secondary }}
-          />
-        </motion.button>
-
+      <div className="p-4 relative">
         {/* Tea Type Badge */}
         <div 
           className="inline-block px-3 py-1 rounded-full mb-3 text-xs font-medium"
@@ -223,6 +201,29 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
             <span style={{ color: ds.colors.brand.gold }}>• Tippen zum Zurücksetzen</span>
           </div>
         )}
+
+        {/* Edit Button - Bottom Right */}
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center z-10"
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)'
+          }}
+          aria-label="Tee bearbeiten"
+        >
+          <Edit3 
+            className="w-4 h-4" 
+            style={{ color: ds.colors.text.secondary }}
+          />
+        </motion.button>
       </div>
     </motion.div>
   );

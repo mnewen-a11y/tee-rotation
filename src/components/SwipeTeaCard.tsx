@@ -34,8 +34,7 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip, onTap }: SwipeTeaCardProps
     >
       {/* Card Container - Liquid Glass */}
       <div
-        onClick={onTap}
-        className="rounded-[32px] overflow-hidden cursor-pointer"
+        className="rounded-[32px] overflow-hidden"
         style={{
           background: ds.glass.card.background,
           backdropFilter: ds.glass.card.backdropFilter,
