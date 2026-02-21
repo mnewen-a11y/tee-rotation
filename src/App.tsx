@@ -292,8 +292,7 @@ function App() {
                 paddingTop: '0rem',
                 marginTop: '-2rem',
                 paddingBottom: 'max(8rem, env(safe-area-inset-bottom))',
-                height: 'calc(100vh - 48px - 64px)', // header + tabbar
-                maxHeight: 'calc(100vh - 48px - 64px)',
+                minHeight: 'calc(100vh - 48px)',
                 overscrollBehavior: 'none',
                 WebkitOverflowScrolling: 'touch',
               }}
