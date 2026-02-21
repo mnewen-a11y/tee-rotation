@@ -62,11 +62,6 @@ body {
   overflow: hidden;
 }
 
-/* iOS Safe Area - Only bottom for Tab Bar */
-body {
-  padding-bottom: env(safe-area-inset-bottom, 0);
-}
-
 #root {
   height: 100vh;
   height: -webkit-fill-available;
