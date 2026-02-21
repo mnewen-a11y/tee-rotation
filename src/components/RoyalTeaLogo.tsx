@@ -5,13 +5,13 @@ interface RoyalTeaLogoProps {
 
 export const RoyalTeaLogo = ({ className = '', size = 'md' }: RoyalTeaLogoProps) => {
   const sizes = {
-    sm: 'h-8',
+    sm: 'h-7',
     md: 'h-12',
     lg: 'h-16',
   };
 
   return (
-    <div className={`flex items-center gap-3 ${sizes[size]} ${className}`}>
+    <div className={`flex items-center gap-2 ${sizes[size]} ${className}`}>
       {/* Rolex-Style Crown */}
       <svg 
         xmlns="http://www.w3.org/2000/svg" 
