@@ -373,9 +373,9 @@ function App() {
                         fontFamily: ds.typography.fontFamily.system,
                         border: 'none'
                       }}
-                      aria-label="Rotation neu starten"
+                      aria-label="Rotation zurücksetzen"
                     >
-                      Neu starten
+                      Zurücksetzen
                     </motion.button>
                   </motion.div>
                 </motion.div>
