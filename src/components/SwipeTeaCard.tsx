@@ -1,10 +1,9 @@
 /**
- * SwipeTeaCard - Premium Apple HIG Design
- * BATCH 1: Spring Animations + Button Press Feedback
+ * SwipeTeaCard - Apple HIG Design (NO SWIPE - Buttons Only)
+ * Creative Director Decision: Clear affordance > Hidden gestures
  */
 
-import { useRef } from 'react';
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Tea, TEA_TYPE_LABELS } from '@/types/tea';
 import { useHaptic } from '@/hooks/useHaptic';
 import { Leaf, Thermometer, Scale } from 'lucide-react';
@@ -13,123 +12,30 @@ import { buttonVariants, progressBarStyles } from '@/design/component-utils';
 
 interface SwipeTeaCardProps {
   tea: Tea;
-  onSwipeRight: () => void;
-  onSwipeLeft: () => void;
+  onSelect: () => void;
+  onSkip: () => void;
   onTap: () => void;
 }
 
-const SWIPE_THRESHOLD = 100;
-
-export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTeaCardProps) => {
+export const SwipeTeaCard = ({ tea, onSelect, onSkip, onTap }: SwipeTeaCardProps) => {
   const { trigger: haptic } = useHaptic();
-  const cardRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
   
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 0, 200], [-8, 0, 8]);
-  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0.5, 1, 1, 1, 0.5]);
-  
-  const acceptOpacity = useTransform(x, [0, SWIPE_THRESHOLD, 200], [0, 0.3, 0.8]);
-  const rejectOpacity = useTransform(x, [-200, -SWIPE_THRESHOLD, 0], [0.8, 0.3, 0]);
-
-  const handleDragStart = () => {
-    isDragging.current = false;
-    document.body.style.overflow = 'hidden';
-  };
-
-  const handleDrag = () => {
-    isDragging.current = true;
-  };
-  
-  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    document.body.style.overflow = '';
-    
-    const swipeDistance = info.offset.x;
-    
-    if (Math.abs(swipeDistance) >= SWIPE_THRESHOLD) {
-      if (swipeDistance > 0) {
-        haptic('success');
-        onSwipeRight();
-      } else {
-        haptic('light');
-        onSwipeLeft();
-      }
-    } else {
-      x.set(0);
-    }
-  };
-
-  const handleClick = () => {
-    if (!isDragging.current) {
-      onTap();
-    }
-    isDragging.current = false;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging.current) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  };
-  
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.stopPropagation();
-  };
-
   const fillPercentage = tea.fuellstand;
 
   return (
     <motion.div
-      ref={cardRef}
-      style={{ x, rotate, opacity, touchAction: 'pan-x' }}
-      drag="x"
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.7}
-      onDragStart={handleDragStart}
-      onDrag={handleDrag}
-      onDragEnd={handleDragEnd}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onClick={handleClick}
-      className="relative w-[85vw] max-w-[400px] mx-auto cursor-grab active:cursor-grabbing"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      className="relative w-[85vw] max-w-[400px] mx-auto"
       role="article"
       aria-label={`Tee-Karte für ${tea.name}`}
     >
-      {/* Swipe Overlays */}
-      <motion.div 
-        style={{ opacity: acceptOpacity }}
-        className="absolute inset-0 bg-green-500/20 pointer-events-none flex items-center justify-end pr-12 rounded-[32px]"
-        aria-hidden="true"
-      >
-        <motion.div 
-          initial={{ scale: 0.8 }}
-          animate={{ scale: acceptOpacity.get() > 0.1 ? 1 : 0.8 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="text-7xl font-bold text-green-600"
-        >
-          ✓
-        </motion.div>
-      </motion.div>
-      
-      <motion.div 
-        style={{ opacity: rejectOpacity }}
-        className="absolute inset-0 bg-gray-300/10 pointer-events-none flex items-center justify-start pl-12 rounded-[32px]"
-        aria-hidden="true"
-      >
-        <motion.div 
-          initial={{ scale: 0.8 }}
-          animate={{ scale: rejectOpacity.get() > 0.1 ? 1 : 0.8 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="text-7xl font-bold text-gray-500"
-        >
-          →
-        </motion.div>
-      </motion.div>
-
-      {/* Premium Card - PHASE 2: Liquid Glass */}
-      <div 
-        className="rounded-[32px] overflow-hidden"
+      {/* Card Container - Liquid Glass */}
+      <div
+        onClick={onTap}
+        className="rounded-[32px] overflow-hidden cursor-pointer"
         style={{
           background: ds.glass.card.background,
           backdropFilter: ds.glass.card.backdropFilter,
@@ -139,28 +45,35 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
         }}
       >
         {/* Card Content */}
-        <div className="px-8 py-10">
-          
-          {/* Tea Type Badge - PHASE 1: Sentence Case */}
-          <div className="flex items-center gap-2 mb-6">
-            <Leaf 
-              className="w-4 h-4"
-              style={{ color: ds.colors.text.secondary }}
-              strokeWidth={2}
-              aria-hidden="true"
-            />
-            <span 
-              className="text-xs font-semibold tracking-wide"
-              style={{ color: ds.colors.text.secondary }}
+        <div className="p-8">
+          {/* Tea Type Badge */}
+          <div className="flex justify-center mb-6">
+            <div 
+              className="px-5 py-2 rounded-full flex items-center gap-2"
+              style={{
+                background: ds.colors.brand.gold,
+                color: ds.colors.text.inverse
+              }}
             >
-              {TEA_TYPE_LABELS[tea.teeArt]}
-            </span>
+              <Leaf className="w-4 h-4" aria-hidden="true" />
+              <span 
+                className="font-medium text-sm"
+                style={{ 
+                  fontFamily: ds.typography.fontFamily.system,
+                  letterSpacing: ds.typography.letterSpacing.wide
+                }}
+              >
+                {TEA_TYPE_LABELS[tea.teeArt]}
+              </span>
+            </div>
           </div>
 
-          {/* Large Title */}
+          {/* Tea Name */}
           <h2 
-            className="text-4xl font-bold tracking-tight mb-2"
-            style={{ 
+            className="text-center mb-2"
+            style={{
+              fontSize: ds.typography.fontSize.largeTitle,
+              fontWeight: ds.typography.fontWeight.bold,
               fontFamily: ds.typography.fontFamily.system,
               color: ds.colors.text.primary,
               letterSpacing: ds.typography.letterSpacing.tight
@@ -169,54 +82,82 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
             {tea.name}
           </h2>
 
-          {/* Subtitle */}
-          <p 
-            className="text-lg mb-8 font-medium"
-            style={{ color: ds.colors.text.secondary }}
-          >
-            {tea.hersteller}
-          </p>
+          {/* Hersteller */}
+          {tea.hersteller && (
+            <p 
+              className="text-center mb-8"
+              style={{
+                fontSize: ds.typography.fontSize.body,
+                color: ds.colors.text.secondary,
+                fontFamily: ds.typography.fontFamily.system
+              }}
+            >
+              {tea.hersteller}
+            </p>
+          )}
 
-          {/* Inline Specs Row - PHASE 1: VoiceOver */}
-          <div 
-            className="flex items-center gap-6 mb-10"
-            style={{ color: ds.colors.text.secondary }}
-          >
-            <div className="flex items-center gap-2">
+          {/* Brewing Info */}
+          <div className="flex justify-center gap-8 mb-8">
+            <div className="flex flex-col items-center">
               <Thermometer 
-                className="w-5 h-5" 
-                strokeWidth={2}
+                className="w-6 h-6 mb-2" 
+                style={{ color: ds.colors.brand.gold }}
                 aria-hidden="true"
               />
-              <span className="text-base font-semibold">
-                {tea.bruehgrad}°C
+              <span 
+                className="text-2xl font-bold mb-1"
+                style={{ 
+                  color: ds.colors.text.primary,
+                  fontFamily: ds.typography.fontFamily.system
+                }}
+              >
+                {tea.bruehgrad}°
               </span>
-              <span className="sr-only">Brühtemperatur {tea.bruehgrad} Grad Celsius</span>
+              <span 
+                className="text-xs"
+                style={{ color: ds.colors.text.tertiary }}
+              >
+                Celsius
+              </span>
             </div>
-            <span style={{ color: ds.colors.text.tertiary }} aria-hidden="true">·</span>
-            <div className="flex items-center gap-2">
+
+            <div className="flex flex-col items-center">
               <Scale 
-                className="w-5 h-5" 
-                strokeWidth={2}
+                className="w-6 h-6 mb-2" 
+                style={{ color: ds.colors.brand.gold }}
                 aria-hidden="true"
               />
-              <span className="text-base font-semibold">
+              <span 
+                className="text-2xl font-bold mb-1"
+                style={{ 
+                  color: ds.colors.text.primary,
+                  fontFamily: ds.typography.fontFamily.system
+                }}
+              >
                 {tea.grammAnzahl}g
               </span>
-              <span className="sr-only">Teemenge {tea.grammAnzahl} Gramm</span>
+              <span 
+                className="text-xs"
+                style={{ color: ds.colors.text.tertiary }}
+              >
+                Gramm
+              </span>
             </div>
           </div>
 
-          {/* Füllstand Section - PHASE 1: Sentence Case */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-3">
+          {/* Füllstand Section */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-3">
               <span 
-                className="text-xs font-semibold tracking-wide"
-                style={{ color: ds.colors.text.secondary }}
+                className="text-sm font-medium"
+                style={{ 
+                  color: ds.colors.text.secondary,
+                  fontFamily: ds.typography.fontFamily.system
+                }}
               >
                 Füllstand
               </span>
-              <span 
+              <span
                 className="text-sm font-bold"
                 style={{ color: ds.colors.brand.gold }}
                 aria-label={`Füllstand ${fillPercentage} Prozent`}
@@ -225,7 +166,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
               </span>
             </div>
             
-            {/* PHASE 1: Progress Bar mit Design Tokens */}
+            {/* Progress Bar mit Spring Animation */}
             <div 
               style={progressBarStyles.container}
               role="progressbar"
@@ -246,14 +187,14 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
             </div>
           </div>
 
-          {/* PHASE 1: Buttons mit Design System */}
+          {/* Buttons - Apple HIG Style (NO SWIPE!) */}
           <div className="flex items-center gap-3 pt-6">
             {/* Skip Button - Secondary */}
             <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 haptic('light');
-                onSwipeLeft();
+                onSkip();
               }}
               whileTap={{ scale: 0.95, opacity: 0.85 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -267,12 +208,12 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
               Skip
             </motion.button>
 
-            {/* Ok Button - Primary (Flat Gold per HIG) */}
+            {/* Select Button - Primary */}
             <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 haptic('success');
-                onSwipeRight();
+                onSelect();
               }}
               whileTap={{ scale: 0.95, opacity: 0.85 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -290,7 +231,7 @@ export const SwipeTeaCard = ({ tea, onSwipeRight, onSwipeLeft, onTap }: SwipeTea
               }}
               aria-label="Diesen Tee auswählen"
             >
-              Ok
+              Auswählen
             </motion.button>
           </div>
         </div>

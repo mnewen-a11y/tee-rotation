@@ -96,7 +96,7 @@ interface TeaGridItemProps {
   isUsed?: boolean;
 }
 
-const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps) => {
+const TeaGridItem = ({ tea, index, onEdit, isUsed }: TeaGridItemProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -177,7 +177,7 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
         </div>
 
         {/* Füllstand */}
-        <div className="relative h-1 rounded-full overflow-hidden" style={{ background: ds.colors.neutral[200] }}>
+        <div className="relative h-1 rounded-full overflow-hidden" style={{ background: 'rgba(0, 0, 0, 0.1)' }}>
           <div 
             className="absolute inset-y-0 left-0 rounded-full"
             style={{ 
