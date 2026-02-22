@@ -40,6 +40,49 @@
 
 ---
 
+### ✅ FIX 9: JSONB Architecture Discovery (CRITICAL)
+
+**Date:** 2026-02-22 (during development)  
+**Files:** All Epic docs  
+**Issue:** Specs assumed relational DB, actual implementation uses JSONB  
+**Impact:** TASK-002 and TASK-003 are not needed
+
+**Discovery:**
+Database structure is fundamentally different:
+```sql
+-- ASSUMED (wrong):
+CREATE TABLE teas (id, name, dosierung_gross, dosierung_mittel, ...)
+
+-- ACTUAL (correct):
+CREATE TABLE royal_tea_sync (
+  id TEXT PRIMARY KEY,  -- Always 'shared'
+  teas JSONB,          -- Complete Tea[] array!
+  queue JSONB,
+  updated_at TIMESTAMPTZ
+);
+```
+
+**Impact on Tasks:**
+- ✅ TASK-001: TypeScript Interfaces → DONE (tea.ts updated)
+- ❌ TASK-002: Database Migration → CANCELLED (no migration needed)
+- ❌ TASK-003: Update Supabase Functions → CANCELLED (already works)
+- 🔨 TASK-004: Test Data Layer → NEXT (verify JSONB save/load)
+
+**Why no migration needed:**
+- `saveToSupabase(teas)` serializes entire Tea[] to JSONB
+- New fields automatically included in serialization
+- No ALTER TABLE or column mapping required
+- Backward compatible (old teas have undefined for new fields)
+
+**Documentation created:**
+- Added `ARCHITECTURE-UPDATE.md` explaining JSONB architecture
+- Updated TASK-LIST.md (marked TASK-002/003 as CANCELLED)
+- Updated FIX-SUMMARY.md (this entry)
+
+**Phase 1 time estimate:** 2-3h → 30min (just TASK-001 + TASK-004)
+
+---
+
 ## Fixes Applied
 
 ### ✅ FIX 1: Supabase Column Mapping (CRITICAL)
