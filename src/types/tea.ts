@@ -1,24 +1,82 @@
+// Fonts: Cormorant Garamond & Playfair Display — SIL OFL 1.1 (see ABOUT.md)
+
 // ============================================================
-// Royal-Tea – Type Definitions
-// Epic v1.1.0 – Dynamische Kannenauswahl
-// TASK-001: TypeScript Interfaces
+// BESTEHENDE TYPES (v1.0.8) — NICHT VERÄNDERN
 // ============================================================
 
-// ------------------------------------------------------------
-// Tea Types
-// ------------------------------------------------------------
+export type TeaType = 'schwarz' | 'grün' | 'oolong' | 'chai' | 'jasmin' | 'kräuter';
+export type SelectionMode = 'grid';
+export type TimeOfDay = 'morning' | 'midday' | 'afternoon' | 'evening';
 
-export type TeaType =
-  | 'Grüntee'
-  | 'Schwarztee'
-  | 'Oolong'
-  | 'Weißtee'
-  | 'Kräutertee'
-  | 'Früchtetee';
+export interface Tea {
+  id: string;
+  name: string;
+  hersteller?: string;
+  teeArt: TeaType;
+  bruehgrad: number;
+  grammAnzahl: number;
+  fuellstand: number;
+  zuletztGetrunken?: string;
+  isSelected?: boolean;
+  rating?: number;
+  bestTimeOfDay?: TimeOfDay[];
 
-// ------------------------------------------------------------
-// Pot Size Enum
-// ------------------------------------------------------------
+  // NEW v1.1.0 – Pot-specific dosages
+  dosierungGross?: number;   // g – default via DOSAGE_PRESETS
+  dosierungMittel?: number;  // g – default via DOSAGE_PRESETS
+  dosierungKlein?: number;   // g – default via DOSAGE_PRESETS
+}
+
+export interface AppSettings {
+  selectionMode: SelectionMode;
+}
+
+export const TEA_TYPE_DEFAULTS: Record<TeaType, { temp: number; gramm: number }> = {
+  schwarz:  { temp: 100, gramm: 8 },
+  grün:     { temp: 80,  gramm: 3 },
+  oolong:   { temp: 90,  gramm: 8 },
+  chai:     { temp: 90,  gramm: 8 },
+  jasmin:   { temp: 80,  gramm: 4 },
+  kräuter:  { temp: 100, gramm: 5 },
+};
+
+export const TEA_TYPE_COLORS: Record<TeaType, string> = {
+  schwarz:  '#8B4513',
+  grün:     '#4CAF50',
+  oolong:   '#DAA520',
+  chai:     '#A0522D',
+  jasmin:   '#C77DFF',
+  kräuter:  '#2E8B57',
+};
+
+export const TEA_TYPE_LABELS: Record<TeaType, string> = {
+  schwarz:  'Schwarztee',
+  grün:     'Grüntee',
+  oolong:   'Oolong',
+  chai:     'Chai',
+  jasmin:   'Jasmin',
+  kräuter:  'Kräuter',
+};
+
+export const TEA_TYPE_DEFAULT_TIMES: Record<TeaType, TimeOfDay[]> = {
+  schwarz:  ['morning', 'midday'],
+  grün:     ['midday', 'afternoon'],
+  oolong:   ['midday', 'afternoon'],
+  chai:     ['morning', 'midday'],
+  jasmin:   ['afternoon', 'evening'],
+  kräuter:  ['evening'],
+};
+
+export const TIME_OF_DAY_LABELS: Record<TimeOfDay, { label: string; emoji: string; icon: string }> = {
+  morning:   { label: 'Morgen',     emoji: '☀️', icon: 'sunrise' },
+  midday:    { label: 'Mittag',     emoji: '🌤️', icon: 'sun' },
+  afternoon: { label: 'Nachmittag', emoji: '☕', icon: 'sunhaze' },
+  evening:   { label: 'Abend',      emoji: '🌙', icon: 'moon' },
+};
+
+// ============================================================
+// NEU v1.1.0 – Pot Selection Types
+// ============================================================
 
 export enum PotSize {
   KLEIN  = 'klein',
@@ -26,70 +84,23 @@ export enum PotSize {
   GROSS  = 'gross',
 }
 
-// ------------------------------------------------------------
-// Tea Interface
-// ------------------------------------------------------------
-
-export interface Tea {
-  // Existing fields
-  id: string;
-  name: string;
-  brand: string;
-  type: TeaType;
-  temp: number;
-  fuellstand: number;
-  zuletztGetrunken?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-
-  // Pot-specific dosages (NEW in v1.1.0)
-  // dosierungGross replaces the previous 'dosierung' field
-  dosierungGross: number;    // g – required (default 8g)
-  dosierungMittel?: number;  // g – optional, falls back to DOSAGE_PRESETS
-  dosierungKlein?: number;   // g – optional, falls back to DOSAGE_PRESETS
-}
-
-// ------------------------------------------------------------
-// Dosage Presets
-// Source: UI-SPEC.md – Dosage Table
-//
-// | Tea Type    | Klein (400ml) | Mittel (700ml) | Groß (1L) |
-// |-------------|---------------|----------------|-----------|
-// | Grüntee     | 2.5g          | 5g             | 8g        |
-// | Schwarztee  | 3g            | 5g             | 8g        |
-// | Oolong      | 2.5g          | 5g             | 8g        |
-// | Weißtee     | 2.5g          | 5g             | 8g        |
-// | Kräutertee  | 3g            | 5.5g           | 9g        |
-// | Früchtetee  | 3g            | 5.5g           | 9g        |
-// ------------------------------------------------------------
-
 export const DOSAGE_PRESETS: Record<TeaType, Record<PotSize, number>> = {
-  'Grüntee':    { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
-  'Schwarztee': { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
-  'Oolong':     { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
-  'Weißtee':    { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
-  'Kräutertee': { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5.5, [PotSize.GROSS]: 9 },
-  'Früchtetee': { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5.5, [PotSize.GROSS]: 9 },
+  schwarz:  { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  grün:     { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  oolong:   { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  chai:     { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  jasmin:   { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  kräuter:  { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5.5, [PotSize.GROSS]: 9 },
 };
-
-// ------------------------------------------------------------
-// Pot Config
-// Helper type für UI-Rendering und Berechnungen
-// ------------------------------------------------------------
-
-export interface PotConfig {
-  size: PotSize;
-  volume: number;  // ml
-  dosage: number;  // g
-}
-
-// ------------------------------------------------------------
-// Pot Volume Lookup
-// Kanonische Volumen pro Größe (aus UI-SPEC.md)
-// ------------------------------------------------------------
 
 export const POT_VOLUMES: Record<PotSize, number> = {
   [PotSize.KLEIN]:  400,
   [PotSize.MITTEL]: 700,
   [PotSize.GROSS]:  1000,
 };
+
+export interface PotConfig {
+  size: PotSize;
+  volume: number;  // ml
+  dosage: number;  // g
+}
