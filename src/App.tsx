@@ -291,7 +291,7 @@ function App() {
               style={{ 
                 paddingTop: '0rem',
                 marginTop: '-2rem',
-                paddingBottom: '4rem',
+                paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0))',
                 minHeight: 'calc(100vh - 48px)',
                 overscrollBehavior: 'none',
                 WebkitOverflowScrolling: 'touch',
