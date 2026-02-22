@@ -94,11 +94,47 @@ const DOSAGE_PRESETS: Record<TeaType, {
 
 ---
 
+## Supabase Architecture
+
+### Current Setup (IST-Stand)
+
+**Infrastructure:**
+- ✅ Supabase Client: `src/lib/supabase.ts` (configured, working)
+- ❌ **NO Supabase CLI installed**
+- ❌ **NO `supabase/` directory exists**
+
+**Migration Strategy:**
+```
+1. Create migration file: supabase/migrations/XXX.sql
+2. Commit to Git (documentation/versioning)
+3. Execute SQL MANUALLY in Supabase Dashboard:
+   - Open Supabase Dashboard
+   - Go to SQL Editor
+   - Copy SQL content
+   - Execute
+4. Done ✓
+```
+
+**Why create file anyway?**
+- Governance: Track DB changes over time
+- Git versioning
+- Rollback reference
+- "Make it right" = Clean documentation
+
+**IMPORTANT:** Migrations are NOT automatically executed! No `supabase db push` available!
+
+---
+
 ## Database Schema
 
 ### Supabase Migration
 
-**File:** `migrations/007_add_pot_dosages.sql`
+**File:** `supabase/migrations/007_add_pot_dosages.sql`
+
+**Create directory first:**
+```bash
+mkdir -p supabase/migrations
+```
 
 ```sql
 -- Add new columns for pot-specific dosages
@@ -139,6 +175,14 @@ ALTER TABLE teas
   DROP COLUMN dosierung_klein,
   DROP COLUMN dosierung_mittel;
 ```
+
+**Execution Workflow:**
+1. Create file `supabase/migrations/007_add_pot_dosages.sql`
+2. Commit to Git
+3. **THEN:** Open Supabase Dashboard → SQL Editor
+4. Copy SQL content from file
+5. Execute manually
+6. Verify: `SELECT dosierung_klein, dosierung_mittel FROM teas LIMIT 5;`
 
 ---
 
