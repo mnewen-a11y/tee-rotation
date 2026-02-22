@@ -1,304 +1,122 @@
-# 👑 Royal-Tea v1.0.0
+# 👑 - Royal-Tea
 
-**A sophisticated tea rotation Progressive Web App**
+> **Premium Tea Rotation PWA for iOS**  
+> Eliminate decision fatigue. Enjoy every tea in your collection.
 
----
-
-## 🎯 **What is Royal-Tea?**
-
-Royal-Tea helps tea enthusiasts with 15+ teas solve the daily "which tea should I drink?" dilemma. The app uses a time-based rotation system to recommend teas based on the time of day, ensuring all your teas get enjoyed and none are forgotten.
-
-**Core Philosophy:** Decision fatigue elimination through intelligent rotation + Apple-level joy of use.
+**Version:** 1.0.8  
+**Live:** https://royaltea.mnwn.de  
+**Platform:** iOS 16+ Progressive Web App
 
 ---
 
-## ✨ **Features**
+## What is Royal-Tea?
 
-### **🔄 Rotation Tab**
-- Time-based recommendations (Morning/Afternoon/Evening)
-- One-tap selection with celebration animation
-- Skip moves tea to end of queue
-- Completion screen when all teas used
+Royal-Tea solves a specific problem: **You have 15+ teas, but always drink the same 3.**
 
-### **📦 Sammlung Tab**
-- 2-column grid view of all teas
-- Available vs. Used separation
-- One-tap reset for used teas
-- Inline editing
+Instead of choosing randomly or always picking favorites, Royal-Tea:
+- Tracks when you last drank each tea
+- Suggests the tea you haven't had in the longest time
+- Shows your entire collection at a glance
+- Remembers brewing temperature & time for each tea
 
-### **🎨 Design**
-- iOS 26 Liquid Glass aesthetic
-- 99% HIG conformance
-- WCAG AA accessibility
-- Rolex-inspired crown logo
-- Portrait-only experience
+**Result:** You enjoy your entire collection, nothing goes stale, decision fatigue eliminated.
 
 ---
 
-## 📊 **Quality Metrics**
+## Features
+
+### Rotation Tab
+- **Smart Suggestions:** See the tea you should drink next
+- **One-Tap Selection:** "Auswählen" to mark as consumed
+- **Skip Option:** "Weiter" if you don't feel like that tea right now
+- **Completion Celebration:** Animated checkmark when you've tried everything
+
+### Sammlung Tab
+- **Collection Overview:** All teas in a clean grid
+- **Visual Status:** Available teas vs. Used teas sections
+- **Quick Edit:** Tap icon to update details
+- **Füllstand Tracking:** Visual progress bars showing remaining tea (5g increments)
+- **One-Tap Reset:** "Zurücksetzen" button for used teas
+
+### Design
+- **Liquid Glass:** iOS 26 HIG-compliant glassmorphism
+- **Spring Animations:** Native iOS physics via Framer Motion
+- **Midnight Theme:** Elegant dark gradient with gold accents
+- **iOS Tab Bar:** Familiar navigation pattern
+- **VoiceOver Support:** Full accessibility
+
+---
+
+## Quality Metrics
 
 ```
-✅ HIG Conformance:     99%
-✅ WCAG Accessibility:  AA (4.5:1 contrast)
-✅ iOS Authenticity:    90%
-✅ Spring Animations:   Native physics
-✅ VoiceOver Support:   Complete
-```
-
----
-
-## 🚀 **Installation**
-
-### **iOS / Safari:**
-1. Visit [royal-tea.vercel.app](https://royal-tea.vercel.app)
-2. Tap Share (📤)
-3. "Zum Home-Bildschirm hinzufügen"
-4. Open from Home Screen
-
-### **Requirements:**
-- iOS 16+ / Safari 16+
-- ~2MB storage
-- Internet for sync (works offline after first load)
-
----
-
-## 🛠️ **Tech Stack**
-
-**Frontend:**
-- React 18 + TypeScript
-- Vite 5
-- Tailwind CSS
-- Framer Motion
-- Lucide React icons
-
-**Backend:**
-- Supabase (Realtime sync)
-- LocalStorage (Offline persistence)
-- Service Worker (PWA features)
-
-**Deployment:**
-- Vercel (Edge Network)
-- GitHub (Version control)
-
----
-
-## 📱 **Screenshots**
-
-```
-[Rotation Tab]        [Sammlung Tab]       [Success Screen]
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│  [Crown]    │      │ VERFÜGBAR   │      │   ✓         │
-│             │      │ [Tee Grid]  │      │ Perfekte    │
-│ Russian     │      │             │      │ Wahl!       │
-│ Breakfast   │      │ VERWENDET   │      │             │
-│             │      │ [Tee Grid]  │      │ Russian     │
-│ 🌡️ 100°    │      │             │      │ Breakfast   │
-│ ⚖️ 8g      │      │             │      │             │
-│             │      │             │      │ [Weiter]    │
-│ [Weiter]    │      └─────────────┘      └─────────────┘
-│ [Auswählen] │
-└─────────────┘
+HIG Conformance:       99%  ████████████████████
+WCAG Accessibility:    AA   ████████████████████
+iOS Auth Patterns:     90%  ██████████████████
+Minimum Contrast:      4.5:1 ███████████████████
 ```
 
 ---
 
-## 🎨 **Design System**
+## Installation (iOS)
 
-### **Colors:**
-```typescript
-background: linear-gradient(#1a1f3a → #0f172a)
-primary:    #FFFBF0 (Creme)
-accent:     #C9AE4D (Gold)
-contrast:   4.5:1 minimum
-```
+### Method 1: Add to Home Screen
+1. Open **Safari** on your iPhone
+2. Navigate to: https://royaltea.mnwn.de
+3. Tap **Share** button (square with arrow)
+4. Scroll and tap **"Add to Home Screen"**
+5. Tap **Add**
 
-### **Typography:**
-```
-font-family: SF Pro Display (system)
-sizes:      12px - 36px (8pt grid)
-weight:     400 (regular) - 700 (bold)
-spacing:    -0.02em (tight)
-```
+### Method 2: Direct Install (if supported)
+- Royal-Tea will prompt you to install when opened in Safari
+- Tap **Install** in the prompt
 
-### **Spacing:**
-```
-grid:        8pt
-touch:       44pt minimum
-safe-area:   env(safe-area-inset-*)
-```
-
-### **Animations:**
-```typescript
-spring: { stiffness: 400, damping: 25 }
-duration: 0.3s - 1.0s
-easing: ease-out
-```
+### Why Install?
+- ✅ **Full-screen experience** (no browser UI)
+- ✅ **App icon** on home screen
+- ✅ **Offline access** after first load
+- ✅ **Faster launch** than browser
+- ✅ **Native-like** experience
 
 ---
 
-## ♿ **Accessibility**
+## User Guide
 
-### **WCAG AA Compliance:**
-- ✅ VoiceOver labels on all interactive elements
-- ✅ 4.5:1 color contrast minimum
-- ✅ Keyboard navigation support
-- ✅ Semantic HTML structure
-- ✅ ARIA landmarks and regions
-- ✅ Focus indicators visible
+### Adding a Tea
+1. Tap **Sammlung** tab
+2. Scroll to bottom, tap **"+ Neuer Tee"**
+3. Fill in details
+4. Tap **"Hinzufügen"**
 
-### **Haptic Feedback:**
-- Light: Navigation actions
-- Medium: Secondary actions
-- Success: Primary confirmations
+### Selecting a Tea
+1. Open **Rotation** tab
+2. See the suggested tea
+3. Tap **"Auswählen"** or **"Weiter"**
 
----
-
-## 📖 **User Guide**
-
-### **Adding a Tea:**
-1. Tap Tab Bar "Sammlung"
-2. Scroll to bottom
-3. Tap "+" button
-4. Fill form (Name, Type, Temperature, Weight, Fill Level)
-5. Tap "Hinzufügen"
-
-### **Selecting a Tea:**
-1. Open app (Rotation tab)
-2. See recommendation
-3. Tap "Auswählen" (or "Weiter" to skip)
-4. Success screen appears
-5. Tap "Weiter" for next tea
-
-### **Resetting Used Teas:**
-1. Tap "Sammlung" tab
-2. Scroll to "VERWENDET" section
-3. Tap "Zurücksetzen" on any tea
-4. Tea moves back to "VERFÜGBAR"
-
-### **When All Teas Used:**
-1. Completion screen appears
-2. Tap "Zurücksetzen"
-3. All teas reset to available
-4. Rotation starts fresh
+### Resetting Used Teas
+1. Go to **Sammlung** tab
+2. Find **"VERWENDET"** section
+3. Tap **"Zurücksetzen"**
 
 ---
 
-## 🔧 **Development**
+## Roadmap
 
-### **Local Setup:**
-```bash
-# Clone repo
-git clone https://github.com/your-username/royal-tea.git
-cd royal-tea
+### v1.1.0 - Search & Filter
+- Search teas by name
+- Filter by tea type
+- Sort options
 
-# Install dependencies
-npm install
+### v1.2.0 - Card Flip
+- Flip for brewing info
+- Brewing timer
 
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### **Environment Variables:**
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
-```
-
-### **File Structure:**
-```
-src/
-├── components/      # React components
-├── design/          # Design tokens
-├── hooks/           # Custom hooks
-├── lib/             # Utilities
-├── types/           # TypeScript types
-└── main.tsx         # Entry point
-
-public/
-├── icons/           # PWA icons
-├── manifest.json    # PWA manifest
-└── sw.js            # Service Worker
-```
+### v1.3.0 - Insights
+- Usage statistics
+- Consumption calendar
+- Completion streaks
 
 ---
 
-## 🐛 **Known Issues**
-
-### **iOS Icon Cache:**
-- **Issue:** Old teapot icon may persist after update
-- **Fix:** Delete PWA → Clear Safari cache → Reinstall
-- **Prevention:** Icons renamed to `crown-*.png` for cache-busting
-
-### **Service Worker:**
-- **Issue:** May not auto-update immediately
-- **Fix:** Force refresh (Cmd+Shift+R) or wait 24h
-
----
-
-## 🚀 **Roadmap**
-
-**v1.1.0 - Search & Filter** (Q2 2026)
-- [ ] Search bar in Sammlung
-- [ ] Filter by tea type
-- [ ] Sort by name/fill level/last used
-
-**v1.2.0 - Card Flip** (Q3 2026)
-- [ ] Flip card to see details
-- [ ] Tasting notes on back
-- [ ] Manufacturer logo
-- [ ] AI-powered tea descriptions
-
-**v1.3.0 - Insights** (Q4 2026)
-- [ ] Statistics dashboard
-- [ ] Brewing history
-- [ ] Price tracking
-- [ ] Export to CSV
-
----
-
-## 📄 **License**
-
-MIT License - See LICENSE file
-
----
-
-## 🙏 **Credits**
-
-**Design Inspiration:**
-- Apple Human Interface Guidelines (iOS 26)
-- Rolex brand aesthetic
-- Premium apps: Instagram, Things 3, Clear
-
-**Built With:**
-- React Team
-- Vercel
-- Supabase
-- Framer Motion
-- Lucide Icons
-
----
-
-## 📞 **Support**
-
-**Issues:** Open a GitHub issue  
-**Feedback:** Use in-app thumbs down  
-**Updates:** Follow on GitHub  
-
----
-
-## 🎉 **Version**
-
-**Current:** v1.0.0 - Gold Master Release  
-**Released:** February 21, 2026  
-**Status:** Production Ready ✅  
-
-**HIG Score: 99% | WCAG: AA | iOS Auth: 90%**
-
----
-
-**Built with ❤️ and ☕ by tea enthusiasts, for tea enthusiasts.**
-
-👑 **Enjoy your Royal-Tea experience!**
+**Built with ❤️**  
+**Version 1.0.8 | February 2026**
