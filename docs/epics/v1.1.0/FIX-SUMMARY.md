@@ -14,6 +14,32 @@
 
 ---
 
+### ✅ FIX 8: Supabase Architecture Documentation (POST-REVIEW)
+
+**Files:** `DEV-SPEC.md`, `TASK-LIST.md` (TASK-002 + TASK-026)  
+**Issue:** Docs assumed Supabase CLI, but project uses manual Dashboard workflow  
+**Impact:** Team would try CLI commands that don't work
+
+**Fixed:**
+- Added "Supabase Architecture" section to DEV-SPEC.md
+- Clarified: NO CLI installed, manual execution required
+- Updated TASK-002: Correct path `supabase/migrations/`
+- Updated TASK-002: Manual workflow documented
+- Updated TASK-026: Dashboard execution instead of `supabase db push`
+- Added workflow steps for manual SQL execution
+
+**Migration Workflow (Correct):**
+```
+1. Create: supabase/migrations/XXX.sql
+2. Commit to Git
+3. Execute MANUALLY in Dashboard:
+   - Open Dashboard → SQL Editor
+   - Copy/paste SQL
+   - Execute
+```
+
+---
+
 ## Fixes Applied
 
 ### ✅ FIX 1: Supabase Column Mapping (CRITICAL)
