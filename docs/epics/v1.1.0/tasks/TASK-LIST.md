@@ -48,24 +48,51 @@ Update Tea interface to include pot-specific dosages.
 **Dependencies:** TASK-001
 
 **Description:**
-Create and test Supabase migration for new columns.
+Create Supabase migration file and document manual execution workflow.
+
+**IMPORTANT:** No Supabase CLI installed - migrations are executed MANUALLY in Dashboard!
 
 **Subtasks:**
-- [ ] Create migration file `007_add_pot_dosages.sql`
+- [ ] Create directory: `mkdir -p supabase/migrations`
+- [ ] Create migration file `supabase/migrations/007_add_pot_dosages.sql`
 - [ ] Add `dosierung_klein` column (DECIMAL(4,1))
 - [ ] Add `dosierung_mittel` column (DECIMAL(4,1))
-- [ ] Rename `dosierung` → `dosierung_gross`
+- [ ] Rename `dosierung` → `dosierung_gross` (or keep as `gramm_anzahl` - see Reality vs Specs)
 - [ ] Write backfill query for existing teas
-- [ ] Test migration on local Supabase
-- [ ] Verify rollback works
+- [ ] Write rollback script as comment
+- [ ] Commit to Git with clear message: "Manual execution required in Dashboard"
+- [ ] Document execution workflow in commit message
 
 **Files Changed:**
-- `migrations/007_add_pot_dosages.sql`
+- `supabase/migrations/007_add_pot_dosages.sql` (new - directory must be created first!)
+
+**Execution Workflow (AFTER commit):**
+```bash
+# 1. File is committed
+git add supabase/migrations/007_add_pot_dosages.sql
+git commit -m "feat: Add pot dosage migration (TASK-002)
+
+Migration must be executed MANUALLY:
+1. Open Supabase Dashboard
+2. SQL Editor
+3. Copy/paste SQL content
+4. Execute"
+
+# 2. THEN execute manually:
+# - Open Supabase Dashboard
+# - Go to SQL Editor  
+# - Copy SQL from file
+# - Execute
+# - Verify results
+```
 
 **Acceptance:**
-- ✅ Migration runs without errors
-- ✅ All existing teas have presets
-- ✅ Rollback works correctly
+- ✅ Directory `supabase/migrations/` exists
+- ✅ Migration file created with correct SQL
+- ✅ Backfill based on tea type
+- ✅ Rollback script included
+- ✅ Committed with workflow documentation
+- ✅ Manual execution workflow clear
 
 ---
 
@@ -672,11 +699,15 @@ Deploy v1.1.0 to production with correct migration sequence.
 **CRITICAL: Migration must run BEFORE code deploy!**
 
 **Subtasks:**
-- [ ] **STEP 1:** Run migration on production Supabase
-  ```bash
-  supabase db push migrations/007_add_pot_dosages.sql
+- [ ] **STEP 1:** Run migration on production Supabase (MANUALLY in Dashboard!)
   ```
-- [ ] **STEP 2:** Verify migration success
+  1. Open production Supabase Dashboard
+  2. Go to SQL Editor
+  3. Copy content from supabase/migrations/007_add_pot_dosages.sql
+  4. Execute SQL
+  ```
+  
+- [ ] **STEP 2:** Verify migration success (in Dashboard SQL Editor)
   ```sql
   -- Check columns exist
   SELECT column_name 
@@ -684,22 +715,27 @@ Deploy v1.1.0 to production with correct migration sequence.
   WHERE table_name = 'teas' 
   AND column_name IN ('dosierung_klein', 'dosierung_mittel', 'dosierung_gross');
   
-  -- Verify all teas have presets
+  -- Verify all teas have presets (or check if gramm_anzahl used)
   SELECT COUNT(*) FROM teas WHERE dosierung_klein IS NULL;
-  -- Should return 0
+  -- Should return 0 (or adjust based on your schema)
   ```
+  
 - [ ] **STEP 3:** ONLY AFTER migration verified → Push code to main branch
+
 - [ ] **STEP 4:** Monitor Vercel deployment logs
-- [ ] **STEP 5:** Verify deployment success (check build logs)
+
+- [ ] **STEP 5:** Verify deployment success (check Vercel build logs)
+
 - [ ] **STEP 6:** Quick smoke test on production URL
   - Select a tea
   - Flip card
   - Select pot
   - Confirm
   - Verify füllstand updates
+
 - [ ] **STEP 7:** Monitor for errors (first 30 minutes)
   - Check Vercel logs
-  - Check Supabase logs
+  - Check Supabase logs  
   - Check browser console (no errors)
 
 **Rollback Plan (if issues):**
@@ -708,8 +744,8 @@ Deploy v1.1.0 to production with correct migration sequence.
 git revert <commit-hash>
 git push origin main
 
-# Rollback migration (if needed)
-supabase db push migrations/007_rollback.sql
+# Rollback migration (manually in Dashboard if needed)
+# Run rollback SQL from migration file comments
 ```
 
 **Acceptance:**
