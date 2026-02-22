@@ -42,81 +42,43 @@ Update Tea interface to include pot-specific dosages.
 
 ---
 
-### TASK-002: Create Database Migration
-**Priority:** P0 (Must Have)  
-**Estimate:** 45min  
+### TASK-002: Database Migration
+**Priority:** ~~P0~~ → **CANCELLED**  
+**Estimate:** ~~45min~~ → N/A  
 **Dependencies:** TASK-001
 
-**Description:**
-Create Supabase migration file and document manual execution workflow.
+**⚠️ TASK CANCELLED - JSONB Architecture**
 
-**IMPORTANT:** No Supabase CLI installed - migrations are executed MANUALLY in Dashboard!
+**Reason:** The database uses JSONB storage (`royal_tea_sync` table with `teas` JSONB column), not relational tables with individual columns. New fields in the `Tea` interface are automatically serialized when saved - no migration needed.
 
-**Subtasks:**
-- [ ] Create directory: `mkdir -p supabase/migrations`
-- [ ] Create migration file `supabase/migrations/007_add_pot_dosages.sql`
-- [ ] Add `dosierung_klein` column (DECIMAL(4,1))
-- [ ] Add `dosierung_mittel` column (DECIMAL(4,1))
-- [ ] Rename `dosierung` → `dosierung_gross` (or keep as `gramm_anzahl` - see Reality vs Specs)
-- [ ] Write backfill query for existing teas
-- [ ] Write rollback script as comment
-- [ ] Commit to Git with clear message: "Manual execution required in Dashboard"
-- [ ] Document execution workflow in commit message
+**Original plan:** Create SQL migration to ADD COLUMN dosierung_klein, dosierung_mittel  
+**Actual reality:** Tea[] array stored as JSONB - new fields auto-saved  
 
-**Files Changed:**
-- `supabase/migrations/007_add_pot_dosages.sql` (new - directory must be created first!)
-
-**Execution Workflow (AFTER commit):**
-```bash
-# 1. File is committed
-git add supabase/migrations/007_add_pot_dosages.sql
-git commit -m "feat: Add pot dosage migration (TASK-002)
-
-Migration must be executed MANUALLY:
-1. Open Supabase Dashboard
-2. SQL Editor
-3. Copy/paste SQL content
-4. Execute"
-
-# 2. THEN execute manually:
-# - Open Supabase Dashboard
-# - Go to SQL Editor  
-# - Copy SQL from file
-# - Execute
-# - Verify results
-```
-
-**Acceptance:**
-- ✅ Directory `supabase/migrations/` exists
-- ✅ Migration file created with correct SQL
-- ✅ Backfill based on tea type
-- ✅ Rollback script included
-- ✅ Committed with workflow documentation
-- ✅ Manual execution workflow clear
+**What happens instead:** Proceed directly to TASK-004 (Testing)
 
 ---
 
-### TASK-003: Update Database Query Functions
-**Priority:** P0 (Must Have)  
-**Estimate:** 45min  
-**Dependencies:** TASK-002
+### TASK-003: Update Supabase Query Functions
+**Priority:** ~~P0~~ → **CANCELLED**  
+**Estimate:** ~~45min~~ → N/A  
+**Dependencies:** ~~TASK-002~~ → N/A
 
-**Description:**
-Update Supabase query functions to handle new columns.
+**⚠️ TASK CANCELLED - Already Works**
 
-**Subtasks:**
-- [ ] Update `getTeas()` to map new columns
-- [ ] Update `updateTea()` to handle new fields
-- [ ] Add helper function `getDosageForPot(tea, pot)`
-- [ ] Test queries return correct data
+**Reason:** `src/lib/supabase.ts` works generically with `Tea[]` type. It serializes/deserializes the entire array as JSONB. New fields are automatically included - no code changes needed.
 
-**Files Changed:**
-- `src/lib/supabase.ts` (or database utils)
+**Current implementation:**
+```typescript
+export const saveToSupabase = async (teas: Tea[]): Promise<boolean> => {
+  await supabase.from('royal_tea_sync').upsert({
+    id: 'shared',
+    teas,  // ← Entire Tea[] with new fields!
+    ...
+  });
+};
+```
 
-**Acceptance:**
-- ✅ Queries return all dosage fields
-- ✅ Updates persist correctly
-- ✅ Helper functions work as expected
+**What happens instead:** Proceed directly to TASK-004 (Testing)
 
 ---
 
@@ -757,13 +719,13 @@ git push origin main
 
 ## Summary
 
-**Total Tasks:** 26  
+**Total Tasks:** 24 (2 cancelled: TASK-002, TASK-003)  
 **Total Phases:** 7  
-**Total Estimate:** 14-19 hours
+**Total Estimate:** 12-16 hours (revised from 14-19h)
 
-### Critical Path
+### Critical Path (REVISED)
 ```
-TASK-001 → TASK-002 → TASK-003 → TASK-004
+TASK-001 (DONE) → TASK-004 (Testing)
    ↓
 TASK-005 → TASK-006 → TASK-007 → TASK-008
    ↓
@@ -779,10 +741,17 @@ TASK-024 → TASK-025 → TASK-026
 ```
 
 ### Priority Breakdown
-- **P0 (Must Have):** 19 tasks
+- **P0 (Must Have):** 17 tasks (was 19)
 - **P1 (Should Have):** 7 tasks
+- **CANCELLED:** 2 tasks (TASK-002, TASK-003)
+
+### Phase 1 Revision
+**Original estimate:** 2-3 hours  
+**Revised estimate:** 30 minutes  
+**Reason:** No database migration or query function updates needed (JSONB architecture)
 
 ---
 
-**Status:** ✅ Ready for Execution  
-**Last Updated:** 2026-02-22
+**Status:** ✅ Ready for Execution (with architectural updates)  
+**Last Updated:** 2026-02-22  
+**Major Change:** JSONB architecture discovered - 2 tasks cancelled
