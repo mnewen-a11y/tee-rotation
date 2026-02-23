@@ -199,15 +199,20 @@ function App() {
       />
       
       <div className="min-h-screen pb-8">
-        <header 
+<header 
           className="border-b border-white/10 sticky top-0 z-20"
           style={{
-  background: 'linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
-  backdropFilter: 'blur(40px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-  borderBottom: '0.5px solid rgba(0,0,0,0.08)',
-  boxShadow: '0 1px 0 0 rgba(255,255,255,0.5) inset',
-}}
+            background: activeTab === 'today' 
+              ? 'linear-gradient(to bottom, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.88) 100%)'
+              : 'linear-gradient(to bottom, rgba(245,240,225,0.95) 0%, rgba(255,255,255,0.90) 100%)',
+            backdropFilter: 'blur(50px) saturate(200%)',
+            WebkitBackdropFilter: 'blur(50px) saturate(200%)',
+            borderBottom: activeTab === 'today'
+              ? '0.5px solid rgba(0,0,0,0.08)'
+              : '1px solid rgba(201,174,77,0.15)',
+            boxShadow: '0 2px 12px -4px rgba(0,0,0,0.08), 0 1px 0 rgba(255,255,255,0.7) inset',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
         >
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
