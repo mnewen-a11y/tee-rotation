@@ -208,7 +208,6 @@ function App() {
   borderBottom: '0.5px solid rgba(0,0,0,0.08)',
   boxShadow: '0 1px 0 0 rgba(255,255,255,0.5) inset',
 }}
-          }}
         >
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
