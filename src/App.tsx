@@ -211,6 +211,35 @@ function App() {
           <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+  {/* NEU: + Button */}
+  <motion.button 
+    whileTap={{ scale: 0.9 }} 
+    onClick={() => { setIsFormOpen(true); setEditingTea(undefined); haptic('light'); }}
+    className="p-2 bg-gold hover:bg-gold/90 rounded-ios transition-colors shadow-md" 
+    aria-label="Neuen Tee hinzufügen"
+  >
+    <svg 
+      className="w-5 h-5 text-gold-text" 
+      fill="none" 
+      viewBox="0 0 24 24" 
+      stroke="currentColor" 
+      strokeWidth={2.5}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+  </motion.button>
+
+  <motion.button 
+    whileTap={{ scale: 0.9 }} 
+    onClick={() => { setIsInventoryOpen(true); haptic('light'); }}
+    className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors" 
+    aria-label="Inventar öffnen"
+  >
+    <LayoutGrid className="w-5 h-5 text-white" aria-hidden="true" />
+  </motion.button>
+  {/* Rest bleibt gleich */}
               <motion.button 
                 whileTap={{ scale: 0.9, opacity: 0.8 }} 
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
