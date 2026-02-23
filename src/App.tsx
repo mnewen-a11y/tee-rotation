@@ -6,7 +6,6 @@ import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getRecommendedTeaTypes } from '@/lib/timeOfDay';
 import { SwipeTeaCard } from '@/components/SwipeTeaCard';
-import { CardFlipper } from '@/components/CardFlipper';
 import { PotSelectionCard } from '@/components/PotSelectionCard';
 import { PotSize } from '@/types/tea';
 import { SuccessScreen } from '@/components/SuccessScreen';
@@ -35,7 +34,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabId>('today');
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [isLoading, setIsLoading] = useState(true);
-  const [isCardFlipped, setIsCardFlipped] = useState(false);
+  const [isPotSheetOpen, setIsPotSheetOpen] = useState(false);
 
   const { trigger: haptic } = useHaptic();
   const { updateAvailable, applyUpdate } = useServiceWorkerUpdate();
@@ -137,14 +136,14 @@ function App() {
   };
 
   const handleSkipTea = () => { 
-    setIsCardFlipped(false);
+    setIsPotSheetOpen(false);
     setCurrentIndex(prev => prev + 1);
     haptic('light'); 
   };
 
   const handleBackFromSuccess = () => {
     setSelectedTea(null);
-    setIsCardFlipped(false);
+    setIsPotSheetOpen(false);
     setCurrentIndex(0);
   };
 
@@ -414,34 +413,14 @@ function App() {
                 <>
                   {currentTea ? (
                     <AnimatePresence mode="wait">
-                      <CardFlipper
+                      <SwipeTeaCard
                         key={`${currentTea.id}-${currentIndex}`}
-                        isFlipped={isCardFlipped}
-                        front={
-                          <SwipeTeaCard
-                            tea={currentTea}
-                            onSelect={() => {
-                              haptic('light');
-                              setIsCardFlipped(true);
-                            }}
-                            onSkip={handleSkipTea}
-                          />
-                        }
-                        back={
-                          <PotSelectionCard
-                            tea={currentTea}
-                            onConfirm={(pot: PotSize) => {
-                              setIsCardFlipped(false);
-                              handleSelectTea(currentTea);
-                              // pot gespeichert für spätere Füllstand-Berechnung (TASK-008+)
-                              console.debug('[v1.1.0] Pot selected:', pot);
-                            }}
-                            onBack={() => {
-                              haptic('light');
-                              setIsCardFlipped(false);
-                            }}
-                          />
-                        }
+                        tea={currentTea}
+                        onSelect={() => {
+                          haptic('light');
+                          setIsPotSheetOpen(true);
+                        }}
+                        onSkip={handleSkipTea}
                       />
                     </AnimatePresence>
                   ) : (
@@ -508,6 +487,23 @@ function App() {
         onEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); setIsInventoryOpen(false); }} 
         onDelete={handleDeleteTea} 
         onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }} 
+      />
+
+      {/* Pot Selection Bottom Sheet */}
+      <PotSelectionCard
+        isOpen={isPotSheetOpen}
+        tea={currentTea}
+        onConfirm={(pot: PotSize) => {
+          setIsPotSheetOpen(false);
+          if (currentTea) {
+            console.debug('[v1.1.0] Pot selected:', pot);
+            handleSelectTea(currentTea);
+          }
+        }}
+        onBack={() => {
+          haptic('light');
+          setIsPotSheetOpen(false);
+        }}
       />
 
       {/* Install Prompt - nur im Browser */}
