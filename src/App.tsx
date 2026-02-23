@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info, RefreshCw } from 'lucide-react';
+import { Info, RefreshCw, LayoutGrid } from 'lucide-react';
 import { Tea, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
