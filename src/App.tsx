@@ -202,9 +202,12 @@ function App() {
         <header 
           className="border-b border-white/10 sticky top-0 z-20"
           style={{
-            background: 'rgba(15, 23, 42, 0.7)',
-            backdropFilter: 'blur(20px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+  background: 'linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
+  backdropFilter: 'blur(40px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+  borderBottom: '0.5px solid rgba(0,0,0,0.08)',
+  boxShadow: '0 1px 0 0 rgba(255,255,255,0.5) inset',
+}}
           }}
         >
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
