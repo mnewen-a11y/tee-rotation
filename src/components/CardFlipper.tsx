@@ -1,12 +1,13 @@
 // ============================================================
 // Royal-Tea – CardFlipper Component
 // Epic v1.1.0 – Dynamische Kannenauswahl
-// TASK-005: Create CardFlipper Component (Safari fix)
+// TASK-005: CardFlipper (Safari-fix v3)
 // ============================================================
-// Fix: CSS Grid stacking statt position:absolute
-// → Container-Höhe kollabiert nicht mehr auf 0px
-// Fix: Explizite -webkit- Prefixes für backface-visibility
-// → Kein gespiegelter Content in Safari
+// Safari-kompatibler Ansatz: KEIN preserve-3d auf dem Wrapper.
+// Front und Back animieren UNABHÄNGIG voneinander.
+// Front:  0deg → -180deg (dreht weg)
+// Back:   180deg → 0deg  (dreht rein)
+// Jedes Face hat eigenes backface-visibility: hidden.
 // ============================================================
 
 import React from 'react';
@@ -28,58 +29,60 @@ export const CardFlipper: React.FC<CardFlipperProps> = ({
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  const transition = reducedMotion
+    ? 'none'
+    : 'transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1)';
+
   return (
-    // Scene: perspective container, keine feste Breite – nimmt Parent-Breite
     <div
       className={className}
       style={{
-        perspective: 1000,
-        WebkitPerspective: 1000,
+        perspective: 1200,
+        WebkitPerspective: 1200,
         width: '100%',
+        position: 'relative',
       }}
     >
-      {/* Card: rotiert als Einheit */}
+      {/* ── FRONT ───────────────────────────────────────────
+          Normalzustand: rotateY(0deg)   → sichtbar
+          Geflippt:      rotateY(-180deg) → dreht weg, hidden
+      */}
       <div
         style={{
-          // CSS Grid: beide Faces stapeln sich in 1/1
-          display: 'grid',
-          transformStyle: 'preserve-3d',
-          WebkitTransformStyle: 'preserve-3d',
-          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-          transition: reducedMotion
-            ? 'none'
-            : 'transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1)',
-          WebkitTransition: reducedMotion
-            ? 'none'
-            : '-webkit-transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1)',
-          width: '100%',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: isFlipped ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          WebkitTransform: isFlipped ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          transition,
+          WebkitTransition: transition,
         }}
+        aria-hidden={isFlipped}
       >
-        {/* Front face */}
-        <div
-          style={{
-            gridArea: '1 / 1',
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-          }}
-          aria-hidden={isFlipped}
-        >
-          {front}
-        </div>
+        {front}
+      </div>
 
-        {/* Back face – vorgekippt um 180deg */}
-        <div
-          style={{
-            gridArea: '1 / 1',
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            WebkitTransform: 'rotateY(180deg)',
-          }}
-          aria-hidden={!isFlipped}
-        >
-          {back}
-        </div>
+      {/* ── BACK ────────────────────────────────────────────
+          Normalzustand: rotateY(180deg) → hidden (zeigt weg)
+          Geflippt:      rotateY(0deg)   → sichtbar
+          position: absolute → überlagert Front exakt
+      */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)',
+          WebkitTransform: isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)',
+          transition,
+          WebkitTransition: transition,
+        }}
+        aria-hidden={!isFlipped}
+      >
+        {back}
       </div>
     </div>
   );
