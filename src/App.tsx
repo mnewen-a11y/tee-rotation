@@ -211,7 +211,6 @@ function App() {
           <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2">
   {/* NEU: + Button */}
   <motion.button 
     whileTap={{ scale: 0.9 }} 
