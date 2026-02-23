@@ -229,15 +229,6 @@ function App() {
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
     </svg>
   </motion.button>
-
-  <motion.button 
-    whileTap={{ scale: 0.9 }} 
-    onClick={() => { setIsInventoryOpen(true); haptic('light'); }}
-    className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors" 
-    aria-label="Inventar öffnen"
-  >
-    <LayoutGrid className="w-5 h-5 text-white" aria-hidden="true" />
-  </motion.button>
   {/* Rest bleibt gleich */}
               <motion.button 
                 whileTap={{ scale: 0.9, opacity: 0.8 }} 
