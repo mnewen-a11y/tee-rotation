@@ -321,27 +321,33 @@ const RefillGridItem = ({ tea, index, onEdit, onRefill }: RefillGridItemProps) =
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-3 mt-4 justify-center">
               <button
                 onClick={() => setIsRefilling(false)}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium"
+                className="w-12 h-12 rounded-full flex items-center justify-center"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: ds.colors.text.secondary,
+                  background: 'rgba(0,0,0,0.08)',
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  minWidth: 44, minHeight: 44,
                 }}
+                aria-label="Abbrechen"
               >
-                Abbrechen
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1L13 13M13 1L1 13" stroke="rgba(0,0,0,0.45)" strokeWidth="1.75" strokeLinecap="round"/>
+                </svg>
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
+                className="w-12 h-12 rounded-full flex items-center justify-center"
                 style={{
-                  background: parseInt(inputValue) > 0 ? ds.colors.brand.gold : 'rgba(255,255,255,0.1)',
-                  color: parseInt(inputValue) > 0 ? ds.colors.text.inverse : ds.colors.text.tertiary,
+                  background: parseInt(inputValue) > 0 ? ds.colors.brand.gold : 'rgba(0,0,0,0.08)',
+                  minWidth: 44, minHeight: 44,
                 }}
+                aria-label="Auffüllen bestätigen"
               >
-                Auffüllen
+                <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                  <path d="M1 5L5 9L13 1" stroke={parseInt(inputValue) > 0 ? '#1a1a1a' : 'rgba(0,0,0,0.25)'} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
             </div>
           </motion.div>
