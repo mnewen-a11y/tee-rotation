@@ -256,7 +256,7 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
                         className="flex items-center justify-between w-full px-5 rounded-2xl"
                         style={{
                           minHeight: 72,
-                          border: `1px solid ${isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.28)'}`,
+                          border: `1.5px solid ${isCommitted ? ds.colors.brand.gold : 'rgba(0,0,0,0.18)'}`,
                         }}
                         aria-label={`${POT_LABELS[pot]}, ${volume}ml, ${dosages[pot]}g`}
                         disabled={!!committedPot}
