@@ -228,7 +228,7 @@ function App() {
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
                 aria-label="Neuen Tee hinzufügen"
               >
-                <Plus className="w-5 h-5 text-white" aria-hidden="true" />
+                <Plus className="w-5 h-5 text-gold-text" aria-hidden="true" />
               </motion.button>
 
               {/* Sync Button */}
