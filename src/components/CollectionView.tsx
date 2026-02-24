@@ -61,7 +61,6 @@ export const CollectionView = ({ teas, onTeaSelect, onTeaEdit, onTeaRefill }: Co
         <Section title={`Auffüllen (${emptyTeas.length})`}>
           {emptyTeas.map((tea, i) => (
             <RefillGridItem key={tea.id} tea={tea} index={i}
-              onEdit={() => onTeaEdit(tea)}
               onRefill={(newFuellstand) => onTeaRefill(tea, newFuellstand)}
             />
           ))}
@@ -189,11 +188,10 @@ const TeaGridItem = ({ tea, index, onSelect, onEdit, isUsed }: TeaGridItemProps)
 interface RefillGridItemProps {
   tea: Tea;
   index: number;
-  onEdit: () => void;
   onRefill: (newFuellstand: number) => void;
 }
 
-const RefillGridItem = ({ tea, index, onEdit, onRefill }: RefillGridItemProps) => {
+const RefillGridItem = ({ tea, index, onRefill }: RefillGridItemProps) => {
   const [isRefilling, setIsRefilling] = useState(false);
   const [inputValue, setInputValue] = useState('100');
   const inputRef = useRef<HTMLInputElement>(null);
