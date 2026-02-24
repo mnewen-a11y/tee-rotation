@@ -223,19 +223,27 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
             >
               <div className="p-8 h-full flex flex-col">
                 {/* Header */}
-                <div className="mb-6">
-                  <p
-                    className="text-sm font-medium mb-1"
-                    style={{ color: ds.colors.text.secondary, fontFamily: ds.typography.fontFamily.system }}
-                  >
-                    Kannengröße
-                  </p>
+                <div className="flex items-start justify-between mb-6">
                   <h2
                     className="text-2xl font-bold"
                     style={{ color: ds.colors.text.primary, fontFamily: ds.typography.fontFamily.system, letterSpacing: ds.typography.letterSpacing.tight }}
                   >
                     {tea.name}
                   </h2>
+                  <motion.button
+                    onClick={() => { setIsSelectingPot(false); setCommittedPot(null); }}
+                    whileTap={{ scale: 0.85 }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ml-3 mt-0.5"
+                    style={{
+                      background: 'rgba(0,0,0,0.08)',
+                      color: ds.colors.text.secondary,
+                    }}
+                    aria-label="Zurück zur Tee-Karte"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </motion.button>
                 </div>
 
                 {/* Pot Rows */}
@@ -249,14 +257,14 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
                         key={pot}
                         onClick={() => handlePotCommit(pot)}
                         animate={{
-                          background: isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.06)',
+                          background: isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.14)',
                           scale: isCommitted ? 1.02 : 1,
                         }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                        transition={{ duration: 0.2, ease: [0.4, 0.0, 0.2, 1] }}
                         className="flex items-center justify-between w-full px-5 rounded-2xl"
                         style={{
                           minHeight: 72,
-                          border: `1px solid ${isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.1)'}`,
+                          border: `1.5px solid ${isCommitted ? ds.colors.brand.gold : 'rgba(0,0,0,0.18)'}`,
                         }}
                         aria-label={`${POT_LABELS[pot]}, ${volume}ml, ${dosages[pot]}g`}
                         disabled={!!committedPot}
@@ -331,22 +339,7 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
                   })}
                 </div>
 
-                {/* Back Button */}
-                <div className="pt-6">
-                  <motion.button
-                    onClick={() => { setIsSelectingPot(false); setCommittedPot(null); }}
-                    whileTap={{ scale: 0.95, opacity: 0.85 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                    className="w-full"
-                    style={{
-                      ...buttonVariants.secondary,
-                      WebkitTapHighlightColor: 'transparent',
-                    }}
-                    aria-label="Zurück zur Tee-Karte"
-                  >
-                    Zurück
-                  </motion.button>
-                </div>
+
               </div>
             </motion.div>
           )}
