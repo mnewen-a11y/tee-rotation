@@ -39,7 +39,7 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const infoTriggerRef = useRef<HTMLButtonElement>(null);
 
-  const availableTeas = teas.filter(t => !t.zuletztGetrunken);
+  const availableTeas = teas.filter(t => !t.zuletztGetrunken && t.fuellstand > 0);
   const recommendedTypes = getRecommendedTeaTypes();
   const recommendedTeas = availableTeas.filter(t => recommendedTypes.includes(t.teeArt));
   const suggestedTeas = recommendedTeas.length > 0 ? recommendedTeas : availableTeas;
@@ -118,8 +118,12 @@ function App() {
     haptic('light');
   };
 
-  const handleSelectTea = (tea: Tea) => {
-    const updatedTeas = teas.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: new Date().toISOString() } : t);
+  const handleSelectTea = (tea: Tea, dosage?: number) => {
+    const updatedTeas = teas.map(t => t.id === tea.id ? {
+      ...t,
+      zuletztGetrunken: new Date().toISOString(),
+      fuellstand: dosage ? Math.max(0, t.fuellstand - dosage) : t.fuellstand,
+    } : t);
     const updatedQueue = [...queue.filter(id => id !== tea.id), tea.id];
     
     setTeas(updatedTeas);
@@ -136,6 +140,18 @@ function App() {
   const handleSkipTea = () => { 
     setCurrentIndex(prev => prev + 1);
     haptic('light'); 
+  };
+
+
+  const handleRefillTea = (tea: Tea, newFuellstand: number) => {
+    const updatedTeas = teas.map(t =>
+      t.id === tea.id
+        ? { ...t, fuellstand: newFuellstand, zuletztGetrunken: undefined }
+        : t
+    );
+    setTeas(updatedTeas);
+    saveData(updatedTeas, queue);
+    haptic('success');
   };
 
   const handleBackFromSuccess = () => {
@@ -417,7 +433,7 @@ function App() {
                         tea={currentTea}
                         onSelect={(pot: PotSize, dosage: number) => {
                           setSelectedPotInfo({ pot, dosage });
-                          handleSelectTea(currentTea);
+                          handleSelectTea(currentTea, dosage);
                         }}
                         onSkip={handleSkipTea}
                       />
@@ -450,6 +466,7 @@ function App() {
                 }
               }}
               onTeaEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); }}
+              onTeaRefill={handleRefillTea}
             />
           )}
         </main>
