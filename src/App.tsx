@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info, RefreshCw } from 'lucide-react';
+import { Info, RefreshCw, Plus } from 'lucide-react';
 import { Tea, TEA_TYPE_DEFAULT_TIMES, PotSize } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
@@ -43,25 +43,19 @@ function App() {
   const recommendedTypes = getRecommendedTeaTypes();
   const recommendedTeas = availableTeas.filter(t => recommendedTypes.includes(t.teeArt));
   const suggestedTeas = recommendedTeas.length > 0 ? recommendedTeas : availableTeas;
-  
   const currentTea = suggestedTeas.length > 0 ? suggestedTeas[currentIndex % suggestedTeas.length] : null;
 
   useEffect(() => {
     const initData = async () => {
       const supabaseData = await loadFromSupabase();
-      
       const migrateTeas = (teas: Tea[]): Tea[] => {
         return teas.map(tea => {
           if (!tea.bestTimeOfDay || tea.bestTimeOfDay.length === 0) {
-            return {
-              ...tea,
-              bestTimeOfDay: TEA_TYPE_DEFAULT_TIMES[tea.teeArt]
-            };
+            return { ...tea, bestTimeOfDay: TEA_TYPE_DEFAULT_TIMES[tea.teeArt] };
           }
           return tea;
         });
       };
-      
       if (supabaseData) {
         const migratedTeas = migrateTeas(supabaseData.teas);
         setTeas(migratedTeas);
@@ -125,23 +119,19 @@ function App() {
       fuellstand: dosage ? Math.max(0, t.fuellstand - dosage) : t.fuellstand,
     } : t);
     const updatedQueue = [...queue.filter(id => id !== tea.id), tea.id];
-    
     setTeas(updatedTeas);
     setQueue(updatedQueue);
     setSelectedTea(tea);
     haptic('success');
-    
-    // Sofort zu Supabase syncen (nicht warten)
     saveToSupabase(updatedTeas, updatedQueue).catch(err => {
       console.error('Supabase sync failed:', err);
     });
   };
 
-  const handleSkipTea = () => { 
+  const handleSkipTea = () => {
     setCurrentIndex(prev => prev + 1);
-    haptic('light'); 
+    haptic('light');
   };
-
 
   const handleRefillTea = (tea: Tea, newFuellstand: number) => {
     const updatedTeas = teas.map(t =>
@@ -209,16 +199,16 @@ function App() {
 
   return (
     <div className="min-h-screen bg-midnight text-white font-sans">
-      <input 
-        type="file" 
-        ref={fileInputRef} 
+      <input
+        type="file"
+        ref={fileInputRef}
         onChange={handleImport}
         accept="application/json"
-        className="hidden" 
+        className="hidden"
       />
-      
+
       <div className="min-h-screen pb-8">
-        <header 
+        <header
           className="border-b border-white/10 sticky top-0 z-20"
           style={{
             background: 'rgba(15, 23, 42, 0.7)',
@@ -230,8 +220,20 @@ function App() {
           <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
-              <motion.button 
-                whileTap={{ scale: 0.9, opacity: 0.8 }} 
+              {/* + Button */}
+              <motion.button
+                whileTap={{ scale: 0.9, opacity: 0.8 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                onClick={() => { haptic('light'); setEditingTea(undefined); setIsFormOpen(true); }}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
+                aria-label="Neuen Tee hinzufügen"
+              >
+                <Plus className="w-5 h-5 text-white" aria-hidden="true" />
+              </motion.button>
+
+              {/* Sync Button */}
+              <motion.button
+                whileTap={{ scale: 0.9, opacity: 0.8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 onClick={handleSync}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors disabled:opacity-50"
@@ -240,18 +242,19 @@ function App() {
                   syncStatus === 'syncing' ? 'Synchronisiere...' :
                   syncStatus === 'ok' ? 'Synchronisation erfolgreich' :
                   syncStatus === 'error' ? 'Synchronisation fehlgeschlagen' :
-                  teas.length === 0 ? 'Synchronisierung nicht verfügbar' :
                   'Mit Cloud synchronisieren'
                 }
               >
-                <RefreshCw 
-                  className={`w-5 h-5 transition-colors ${syncStatus === 'syncing' ? 'text-gold animate-spin' : syncStatus === 'ok' ? 'text-green-400' : syncStatus === 'error' ? 'text-red-400' : teas.length === 0 ? 'text-white/30' : 'text-white'}`} 
+                <RefreshCw
+                  className={`w-5 h-5 transition-colors ${syncStatus === 'syncing' ? 'text-gold animate-spin' : syncStatus === 'ok' ? 'text-green-400' : syncStatus === 'error' ? 'text-red-400' : teas.length === 0 ? 'text-white/30' : 'text-white'}`}
                   aria-hidden="true"
                 />
               </motion.button>
-              <motion.button 
-                ref={infoTriggerRef} 
-                whileTap={{ scale: 0.9, opacity: 0.8 }} 
+
+              {/* Info Button */}
+              <motion.button
+                ref={infoTriggerRef}
+                whileTap={{ scale: 0.9, opacity: 0.8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 onClick={() => { haptic('light'); setIsInfoOpen(true); }}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
@@ -287,27 +290,20 @@ function App() {
           )}
         </AnimatePresence>
 
-        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)] pb-28" style={{ 
+        <main className="max-w-3xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)] pb-28" style={{
           backgroundColor: '#FFFFF0',
           overscrollBehavior: 'none',
           WebkitOverflowScrolling: 'touch'
         }}>
           {isLoading ? (
-            <div 
-              className="flex items-center justify-center h-96"
-              role="status"
-              aria-label="Lädt Tee-Daten"
-            >
-              <div 
-                className="animate-spin w-8 h-8 border-4 border-gold border-t-transparent rounded-full"
-                aria-hidden="true"
-              />
+            <div className="flex items-center justify-center h-96" role="status" aria-label="Lädt Tee-Daten">
+              <div className="animate-spin w-8 h-8 border-4 border-gold border-t-transparent rounded-full" aria-hidden="true" />
               <span className="sr-only">Lädt Tee-Daten...</span>
             </div>
           ) : activeTab === 'today' ? (
-            <div 
-              className="flex flex-col touch-pan-x items-center justify-center overflow-y-auto" 
-              style={{ 
+            <div
+              className="flex flex-col touch-pan-x items-center justify-center overflow-y-auto"
+              style={{
                 paddingTop: '0rem',
                 marginTop: '-2rem',
                 paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0))',
@@ -317,74 +313,39 @@ function App() {
               }}
             >
               {availableTeas.length === 0 ? (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6 }}
                   className="flex flex-col items-center justify-center text-center px-8"
                   style={{ paddingTop: '4rem' }}
                 >
-                  {/* Minimalist Checkmark */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ 
-                      type: 'spring',
-                      stiffness: 200,
-                      damping: 20,
-                      delay: 0.2
-                    }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.2 }}
                     className="mb-12"
                   >
                     <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-                      <motion.circle
-                        cx="60"
-                        cy="60"
-                        r="58"
-                        stroke={ds.colors.brand.gold}
-                        strokeWidth="2"
-                        fill="none"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 1, delay: 0.3 }}
-                      />
-                      <motion.path
-                        d="M 35 60 L 52 77 L 85 44"
-                        stroke={ds.colors.brand.gold}
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        fill="none"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.6, delay: 0.8 }}
-                      />
+                      <motion.circle cx="60" cy="60" r="58" stroke={ds.colors.brand.gold} strokeWidth="2" fill="none"
+                        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 0.3 }} />
+                      <motion.path d="M 35 60 L 52 77 L 85 44" stroke={ds.colors.brand.gold} strokeWidth="3"
+                        strokeLinecap="round" strokeLinejoin="round" fill="none"
+                        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, delay: 0.8 }} />
                     </svg>
                   </motion.div>
-
-                  {/* Heading */}
                   <motion.h3
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.2 }}
+                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}
                     className="text-3xl font-bold mb-16"
-                    style={{
-                      fontFamily: ds.typography.fontFamily.system,
-                      color: ds.colors.text.primary,
-                      letterSpacing: '-0.02em'
-                    }}
+                    style={{ fontFamily: ds.typography.fontFamily.system, color: ds.colors.text.primary, letterSpacing: '-0.02em' }}
                   >
                     Rotation abgeschlossen
                   </motion.h3>
-
-                  {/* Action Button */}
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.4 }}
+                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}
                     className="w-full max-w-[280px]"
                   >
-                    <motion.button 
+                    <motion.button
                       whileTap={{ scale: 0.96 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => {
@@ -392,11 +353,7 @@ function App() {
                         setTeas(updatedTeas);
                         setCurrentIndex(0);
                         haptic('success');
-                        
-                        // Sofort zu Supabase syncen
-                        saveToSupabase(updatedTeas, queue).catch(err => {
-                          console.error('Supabase sync failed:', err);
-                        });
+                        saveToSupabase(updatedTeas, queue).catch(err => console.error('Supabase sync failed:', err));
                       }}
                       style={{
                         width: '100%',
@@ -418,7 +375,7 @@ function App() {
                   </motion.div>
                 </motion.div>
               ) : selectedTea ? (
-                <SuccessScreen 
+                <SuccessScreen
                   tea={selectedTea}
                   onBack={handleBackFromSuccess}
                   onPickAnother={handlePickAnother}
@@ -448,19 +405,14 @@ function App() {
               )}
             </div>
           ) : (
-            <CollectionView 
+            <CollectionView
               teas={teas}
               onTeaSelect={(tea) => {
                 if (tea.zuletztGetrunken) {
-                  // Reset used tea
                   const updatedTeas = teas.map(t => t.id === tea.id ? { ...t, zuletztGetrunken: undefined } : t);
                   setTeas(updatedTeas);
                   haptic('success');
-                  
-                  // Sofort zu Supabase syncen
-                  saveToSupabase(updatedTeas, queue).catch(err => {
-                    console.error('Supabase sync failed:', err);
-                  });
+                  saveToSupabase(updatedTeas, queue).catch(err => console.error('Supabase sync failed:', err));
                 } else {
                   handleSelectTea(tea);
                   setActiveTab('today');
@@ -473,40 +425,36 @@ function App() {
         </main>
       </div>
 
-      <TabBar 
+      <TabBar
         activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          haptic('light');
-        }}
+        onTabChange={(tab) => { setActiveTab(tab); haptic('light'); }}
         todayCount={availableTeas.length}
         collectionCount={teas.length}
       />
 
-      <TeaForm 
-        isOpen={isFormOpen} 
-        onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }} 
-        onSave={editingTea ? handleUpdateTea : handleAddTea} 
-        editTea={editingTea} 
+      <TeaForm
+        isOpen={isFormOpen}
+        onClose={() => { setIsFormOpen(false); setEditingTea(undefined); }}
+        onSave={editingTea ? handleUpdateTea : handleAddTea}
+        editTea={editingTea}
       />
-      <InfoModal 
-        isOpen={isInfoOpen} 
-        onClose={() => setIsInfoOpen(false)} 
-        triggerRef={infoTriggerRef} 
-        onExport={handleExport} 
-        onImport={() => fileInputRef.current?.click()} 
+      <InfoModal
+        isOpen={isInfoOpen}
+        onClose={() => setIsInfoOpen(false)}
+        triggerRef={infoTriggerRef}
+        onExport={handleExport}
+        onImport={() => fileInputRef.current?.click()}
       />
-      <InventorySheet 
-        isOpen={isInventoryOpen} 
-        onClose={() => setIsInventoryOpen(false)} 
-        teas={teas} 
-        queue={queue} 
-        onEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); setIsInventoryOpen(false); }} 
-        onDelete={handleDeleteTea} 
-        onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }} 
+      <InventorySheet
+        isOpen={isInventoryOpen}
+        onClose={() => setIsInventoryOpen(false)}
+        teas={teas}
+        queue={queue}
+        onEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); setIsInventoryOpen(false); }}
+        onDelete={handleDeleteTea}
+        onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }}
       />
 
-      {/* Install Prompt - nur im Browser */}
       <InstallPrompt />
     </div>
   );
