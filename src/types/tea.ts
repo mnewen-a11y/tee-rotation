@@ -1,5 +1,9 @@
 // Fonts: Cormorant Garamond & Playfair Display — SIL OFL 1.1 (see ABOUT.md)
 
+// ============================================================
+// BESTEHENDE TYPES (v1.0.8) — NICHT VERÄNDERN
+// ============================================================
+
 export type TeaType = 'schwarz' | 'grün' | 'oolong' | 'chai' | 'jasmin' | 'kräuter';
 export type SelectionMode = 'grid';
 export type TimeOfDay = 'morning' | 'midday' | 'afternoon' | 'evening';
@@ -14,8 +18,13 @@ export interface Tea {
   fuellstand: number;
   zuletztGetrunken?: string;
   isSelected?: boolean;
-  rating?: number; // 1–5, optional
-  bestTimeOfDay?: TimeOfDay[]; // Beste Tageszeiten für diesen Tee
+  rating?: number;
+  bestTimeOfDay?: TimeOfDay[];
+
+  // NEW v1.1.0 – Pot-specific dosages
+  dosierungGross?: number;
+  dosierungMittel?: number;
+  dosierungKlein?: number;
 }
 
 export interface AppSettings {
@@ -49,20 +58,49 @@ export const TEA_TYPE_LABELS: Record<TeaType, string> = {
   kräuter:  'Kräuter',
 };
 
-// Smart Defaults für beste Tageszeiten basierend auf Tee-Typ
 export const TEA_TYPE_DEFAULT_TIMES: Record<TeaType, TimeOfDay[]> = {
-  schwarz:  ['morning', 'midday'],     // Koffein: Morgen & Mittag
-  grün:     ['midday', 'afternoon'],   // Leichtes Koffein: Mittag & Nachmittag
-  oolong:   ['midday', 'afternoon'],   // Mittleres Koffein
-  chai:     ['morning', 'midday'],     // Stark: Morgen & Mittag
-  jasmin:   ['afternoon', 'evening'],  // Leicht/Koffeinfrei: Nachmittag & Abend
-  kräuter:  ['evening'],               // Koffeinfrei: Abend
+  schwarz:  ['morning', 'midday'],
+  grün:     ['midday', 'afternoon'],
+  oolong:   ['midday', 'afternoon'],
+  chai:     ['morning', 'midday'],
+  jasmin:   ['afternoon', 'evening'],
+  kräuter:  ['evening'],
 };
 
-// Labels für Tageszeiten
 export const TIME_OF_DAY_LABELS: Record<TimeOfDay, { label: string; emoji: string; icon: string }> = {
-  morning:   { label: 'Morgen',      emoji: '☀️', icon: 'sunrise' },
-  midday:    { label: 'Mittag',      emoji: '🌤️', icon: 'sun' },
-  afternoon: { label: 'Nachmittag',  emoji: '☕', icon: 'sunhaze' },
-  evening:   { label: 'Abend',       emoji: '🌙', icon: 'moon' },
+  morning:   { label: 'Morgen',     emoji: '☀️', icon: 'sunrise' },
+  midday:    { label: 'Mittag',     emoji: '🌤️', icon: 'sun' },
+  afternoon: { label: 'Nachmittag', emoji: '☕', icon: 'sunhaze' },
+  evening:   { label: 'Abend',      emoji: '🌙', icon: 'moon' },
 };
+
+// ============================================================
+// NEU v1.1.0 – Pot Selection Types
+// ============================================================
+
+export enum PotSize {
+  KLEIN  = 'klein',
+  MITTEL = 'mittel',
+  GROSS  = 'gross',
+}
+
+export const DOSAGE_PRESETS: Record<TeaType, Record<PotSize, number>> = {
+  schwarz:  { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  grün:     { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  oolong:   { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  chai:     { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  jasmin:   { [PotSize.KLEIN]: 2.5, [PotSize.MITTEL]: 5,   [PotSize.GROSS]: 8 },
+  kräuter:  { [PotSize.KLEIN]: 3,   [PotSize.MITTEL]: 5.5, [PotSize.GROSS]: 9 },
+};
+
+export const POT_VOLUMES: Record<PotSize, number> = {
+  [PotSize.KLEIN]:  400,
+  [PotSize.MITTEL]: 700,
+  [PotSize.GROSS]:  1000,
+};
+
+export interface PotConfig {
+  size: PotSize;
+  volume: number;  // ml
+  dosage: number;  // g
+}
