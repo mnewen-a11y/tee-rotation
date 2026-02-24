@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, RefreshCw } from 'lucide-react';
-import { Tea, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
+import { Tea, TEA_TYPE_DEFAULT_TIMES, PotSize } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getRecommendedTeaTypes } from '@/lib/timeOfDay';
@@ -25,6 +25,7 @@ function App() {
   const [queue, setQueue] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedTea, setSelectedTea] = useState<Tea | null>(null);
+  const [selectedPotInfo, setSelectedPotInfo] = useState<{ pot: PotSize; dosage: number } | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -139,6 +140,7 @@ function App() {
 
   const handleBackFromSuccess = () => {
     setSelectedTea(null);
+    setSelectedPotInfo(null);
     setCurrentIndex(0);
   };
 
@@ -199,39 +201,18 @@ function App() {
       />
       
       <div className="min-h-screen pb-8">
-<header 
-          className="sticky top-0 z-20"
+        <header 
+          className="border-b border-white/10 sticky top-0 z-20"
           style={{
-            background: 'linear-gradient(to bottom, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.80) 100%)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            boxShadow: '0 1px 0 0 rgba(255,255,255,0.03) inset, 0 4px 16px -4px rgba(0,0,0,0.25)',
+            background: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           }}
         >
           <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
             <RoyalTeaLogo size="sm" className="opacity-90" />
             <div className="flex items-center gap-2">
-  {/* NEU: + Button */}
-  <motion.button 
-    whileTap={{ scale: 0.9 }} 
-    onClick={() => { setIsFormOpen(true); setEditingTea(undefined); haptic('light'); }}
-    className="p-2 bg-gold hover:bg-gold/90 rounded-ios transition-colors shadow-md" 
-    aria-label="Neuen Tee hinzufügen"
-  >
-    <svg 
-      className="w-5 h-5 text-gold-text" 
-      fill="none" 
-      viewBox="0 0 24 24" 
-      stroke="currentColor" 
-      strokeWidth={2.5}
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-    </svg>
-  </motion.button>
-  {/* Rest bleibt gleich */}
               <motion.button 
                 whileTap={{ scale: 0.9, opacity: 0.8 }} 
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -424,6 +405,8 @@ function App() {
                   tea={selectedTea}
                   onBack={handleBackFromSuccess}
                   onPickAnother={handlePickAnother}
+                  selectedPot={selectedPotInfo?.pot}
+                  selectedDosage={selectedPotInfo?.dosage}
                 />
               ) : (
                 <>
@@ -431,8 +414,11 @@ function App() {
                     <AnimatePresence mode="wait">
                       <SwipeTeaCard
                         key={`${currentTea.id}-${currentIndex}`}
-                        tea={currentTea} 
-                        onSelect={() => handleSelectTea(currentTea)}
+                        tea={currentTea}
+                        onSelect={(pot: PotSize, dosage: number) => {
+                          setSelectedPotInfo({ pot, dosage });
+                          handleSelectTea(currentTea);
+                        }}
                         onSkip={handleSkipTea}
                       />
                     </AnimatePresence>
