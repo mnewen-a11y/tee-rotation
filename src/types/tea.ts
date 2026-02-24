@@ -22,9 +22,9 @@ export interface Tea {
   bestTimeOfDay?: TimeOfDay[];
 
   // NEW v1.1.0 – Pot-specific dosages
-  dosierungGross?: number;   // g – default via DOSAGE_PRESETS
-  dosierungMittel?: number;  // g – default via DOSAGE_PRESETS
-  dosierungKlein?: number;   // g – default via DOSAGE_PRESETS
+  dosierungGross?: number;
+  dosierungMittel?: number;
+  dosierungKlein?: number;
 }
 
 export interface AppSettings {
