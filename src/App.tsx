@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, RefreshCw } from 'lucide-react';
-import { Tea, TEA_TYPE_DEFAULT_TIMES } from '@/types/tea';
+import { Tea, TEA_TYPE_DEFAULT_TIMES, PotSize } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
 import { getRecommendedTeaTypes } from '@/lib/timeOfDay';
 import { SwipeTeaCard } from '@/components/SwipeTeaCard';
-import { PotSelectionCard } from '@/components/PotSelectionCard';
-import { PotSize } from '@/types/tea';
 import { SuccessScreen } from '@/components/SuccessScreen';
 import { TeaForm } from '@/components/TeaForm';
 import { RoyalTeaLogo } from '@/components/RoyalTeaLogo';
@@ -27,6 +25,7 @@ function App() {
   const [queue, setQueue] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedTea, setSelectedTea] = useState<Tea | null>(null);
+  const [selectedPotInfo, setSelectedPotInfo] = useState<{ pot: PotSize; dosage: number } | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTea, setEditingTea] = useState<Tea | undefined>();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -34,7 +33,6 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabId>('today');
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [isLoading, setIsLoading] = useState(true);
-  const [isPotSheetOpen, setIsPotSheetOpen] = useState(false);
 
   const { trigger: haptic } = useHaptic();
   const { updateAvailable, applyUpdate } = useServiceWorkerUpdate();
@@ -136,14 +134,13 @@ function App() {
   };
 
   const handleSkipTea = () => { 
-    setIsPotSheetOpen(false);
     setCurrentIndex(prev => prev + 1);
     haptic('light'); 
   };
 
   const handleBackFromSuccess = () => {
     setSelectedTea(null);
-    setIsPotSheetOpen(false);
+    setSelectedPotInfo(null);
     setCurrentIndex(0);
   };
 
@@ -408,6 +405,8 @@ function App() {
                   tea={selectedTea}
                   onBack={handleBackFromSuccess}
                   onPickAnother={handlePickAnother}
+                  selectedPot={selectedPotInfo?.pot}
+                  selectedDosage={selectedPotInfo?.dosage}
                 />
               ) : (
                 <>
@@ -416,9 +415,9 @@ function App() {
                       <SwipeTeaCard
                         key={`${currentTea.id}-${currentIndex}`}
                         tea={currentTea}
-                        onSelect={() => {
-                          haptic('light');
-                          setIsPotSheetOpen(true);
+                        onSelect={(pot: PotSize, dosage: number) => {
+                          setSelectedPotInfo({ pot, dosage });
+                          handleSelectTea(currentTea);
                         }}
                         onSkip={handleSkipTea}
                       />
@@ -487,23 +486,6 @@ function App() {
         onEdit={(tea) => { setEditingTea(tea); setIsFormOpen(true); setIsInventoryOpen(false); }} 
         onDelete={handleDeleteTea} 
         onAddNew={() => { setIsFormOpen(true); setEditingTea(undefined); setIsInventoryOpen(false); }} 
-      />
-
-      {/* Pot Selection Bottom Sheet */}
-      <PotSelectionCard
-        isOpen={isPotSheetOpen}
-        tea={currentTea}
-        onConfirm={(pot: PotSize) => {
-          setIsPotSheetOpen(false);
-          if (currentTea) {
-            console.debug('[v1.1.0] Pot selected:', pot);
-            handleSelectTea(currentTea);
-          }
-        }}
-        onBack={() => {
-          haptic('light');
-          setIsPotSheetOpen(false);
-        }}
       />
 
       {/* Install Prompt - nur im Browser */}
