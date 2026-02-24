@@ -260,15 +260,6 @@ const RefillGridItem = ({ tea, index, onEdit, onRefill }: RefillGridItemProps) =
             Auffüllen
           </button>
 
-          <button onClick={(e) => { e.stopPropagation(); onEdit(); }}
-            className="flex-shrink-0 p-1" style={{ color: ds.colors.brand.gold }}
-            aria-label="Tee bearbeiten">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-            </svg>
-          </button>
         </div>
       </div>
 
@@ -307,7 +298,7 @@ const RefillGridItem = ({ tea, index, onEdit, onRefill }: RefillGridItemProps) =
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleConfirm()}
-                  className="w-20 text-center text-2xl font-bold rounded-xl py-2 outline-none"
+                  className="w-16 text-center text-lg font-bold rounded-xl py-1.5 outline-none"
                   style={{
                     background: 'rgba(255,255,255,0.12)',
                     border: `1px solid ${ds.colors.brand.gold}`,
@@ -324,11 +315,11 @@ const RefillGridItem = ({ tea, index, onEdit, onRefill }: RefillGridItemProps) =
             <div className="flex gap-3 mt-4 justify-center">
               <button
                 onClick={() => setIsRefilling(false)}
-                className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+style={{
                   background: 'rgba(0,0,0,0.08)',
                   border: '1px solid rgba(0,0,0,0.12)',
-                  minWidth: 44, minHeight: 44,
+                  minWidth: 32, minHeight: 32,
                 }}
                 aria-label="Abbrechen"
               >
@@ -338,10 +329,10 @@ const RefillGridItem = ({ tea, index, onEdit, onRefill }: RefillGridItemProps) =
               </button>
               <button
                 onClick={handleConfirm}
-                className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+style={{
                   background: parseInt(inputValue) > 0 ? ds.colors.brand.gold : 'rgba(0,0,0,0.08)',
-                  minWidth: 44, minHeight: 44,
+                  minWidth: 32, minHeight: 32,
                 }}
                 aria-label="Auffüllen bestätigen"
               >
