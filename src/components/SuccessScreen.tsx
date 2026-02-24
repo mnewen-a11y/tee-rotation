@@ -5,7 +5,7 @@
 
 import { motion } from 'framer-motion';
 import { Check, Thermometer, Scale } from 'lucide-react';
-import { Tea } from '@/types/tea';
+import { Tea, PotSize, POT_VOLUMES } from '@/types/tea';
 import { designSystem as ds } from '@/design/design-tokens';
 import { buttonVariants } from '@/design/component-utils';
 
@@ -13,9 +13,11 @@ interface SuccessScreenProps {
   tea: Tea;
   onBack: () => void;
   onPickAnother: () => void;
+  selectedPot?: PotSize;
+  selectedDosage?: number;
 }
 
-export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps) => {
+export const SuccessScreen = ({ tea, onBack, onPickAnother, selectedPot, selectedDosage }: SuccessScreenProps) => {
   return (
     <div className="flex flex-col items-center justify-center" style={{ paddingTop: '0.5rem' }}>
       {/* Card mit Success Content - HÖHER positioniert (0.5rem) */}
@@ -82,6 +84,19 @@ export const SuccessScreen = ({ tea, onBack, onPickAnother }: SuccessScreenProps
             >
               {tea.hersteller}
             </p>
+
+            {/* Pot info – dezent unter Hersteller */}
+            {selectedPot && selectedDosage && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35 }}
+                className="text-sm mt-2 font-medium"
+                style={{ color: ds.colors.brand.gold }}
+              >
+                {selectedDosage}g · {POT_VOLUMES[selectedPot]} ml
+              </motion.p>
+            )}
           </motion.div>
 
           {/* Brüh-Info mit Icons */}
