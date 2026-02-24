@@ -18,7 +18,6 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
 import { designSystem as ds } from '@/design/design-tokens';
 
-type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error';
 
 function App() {
   const [teas, setTeas] = useState<Tea[]>([]);
@@ -31,7 +30,6 @@ function App() {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('today');
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [isLoading, setIsLoading] = useState(true);
 
   const { trigger: haptic } = useHaptic();
@@ -156,13 +154,6 @@ function App() {
     setCurrentIndex(prev => prev + 1);
   };
 
-  const handleSync = async () => {
-    if (teas.length === 0) { alert('⚠️ Keine Tees zum Synchronisieren vorhanden.'); return; }
-    setSyncStatus('syncing');
-    const ok = await saveToSupabase(teas, queue);
-    setSyncStatus(ok ? 'ok' : 'error');
-    setTimeout(() => setSyncStatus('idle'), 2000);
-  };
 
   const handleExport = () => {
     const data = JSON.stringify({ teas, queue }, null, 2);
