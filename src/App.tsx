@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info, RefreshCw, Plus } from 'lucide-react';
+import { Info, Plus } from 'lucide-react';
 import { Tea, TEA_TYPE_DEFAULT_TIMES, PotSize } from '@/types/tea';
 import { loadData, saveData, generateId } from '@/lib/storage';
 import { saveToSupabase, subscribeToSync, loadFromSupabase } from '@/lib/supabase';
@@ -231,26 +231,6 @@ function App() {
                 <Plus className="w-5 h-5" style={{ color: ds.colors.brand.gold }} aria-hidden="true" />
               </motion.button>
 
-              {/* Sync Button */}
-              <motion.button
-                whileTap={{ scale: 0.9, opacity: 0.8 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                onClick={handleSync}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors disabled:opacity-50"
-                disabled={syncStatus === 'syncing' || teas.length === 0}
-                aria-label={
-                  syncStatus === 'syncing' ? 'Synchronisiere...' :
-                  syncStatus === 'ok' ? 'Synchronisation erfolgreich' :
-                  syncStatus === 'error' ? 'Synchronisation fehlgeschlagen' :
-                  'Mit Cloud synchronisieren'
-                }
-              >
-                <RefreshCw
-                  className={`w-5 h-5 transition-colors ${syncStatus === 'syncing' ? 'text-gold animate-spin' : syncStatus === 'ok' ? 'text-green-400' : syncStatus === 'error' ? 'text-red-400' : teas.length === 0 ? 'text-white/30' : 'text-white'}`}
-                  aria-hidden="true"
-                />
-              </motion.button>
-
               {/* Info Button */}
               <motion.button
                 ref={infoTriggerRef}
@@ -260,7 +240,7 @@ function App() {
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-ios transition-colors"
                 aria-label="App-Informationen anzeigen"
               >
-                <Info className="w-5 h-5 text-white" aria-hidden="true" />
+                <Info className="w-5 h-5" style={{ color: ds.colors.brand.gold }} aria-hidden="true" />
               </motion.button>
             </div>
           </div>
