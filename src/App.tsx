@@ -150,7 +150,8 @@ function App() {
         : t
     );
     setTeas(updatedTeas);
-    saveData(updatedTeas, queue);
+    saveData({ teas: updatedTeas, queue });
+    saveToSupabase(updatedTeas, queue).catch(console.error);
     haptic('success');
   };
 
