@@ -224,18 +224,18 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
               <div className="p-8 h-full flex flex-col">
                 {/* Header */}
                 <div className="mb-6">
-                  <p
-                    className="text-sm font-medium mb-1"
-                    style={{ color: ds.colors.text.secondary, fontFamily: ds.typography.fontFamily.system }}
-                  >
-                    Kannengröße
-                  </p>
                   <h2
-                    className="text-2xl font-bold"
+                    className="text-2xl font-bold mb-1"
                     style={{ color: ds.colors.text.primary, fontFamily: ds.typography.fontFamily.system, letterSpacing: ds.typography.letterSpacing.tight }}
                   >
-                    {tea.name}
+                    Für welche Kanne?
                   </h2>
+                  <p
+                    className="text-sm"
+                    style={{ color: ds.colors.text.secondary, fontFamily: ds.typography.fontFamily.system }}
+                  >
+                    {tea.name}
+                  </p>
                 </div>
 
                 {/* Pot Rows */}
@@ -249,14 +249,14 @@ export const SwipeTeaCard = ({ tea, onSelect, onSkip }: SwipeTeaCardProps) => {
                         key={pot}
                         onClick={() => handlePotCommit(pot)}
                         animate={{
-                          background: isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.06)',
+                          background: isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.14)',
                           scale: isCommitted ? 1.02 : 1,
                         }}
                         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         className="flex items-center justify-between w-full px-5 rounded-2xl"
                         style={{
                           minHeight: 72,
-                          border: `1px solid ${isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.1)'}`,
+                          border: `1px solid ${isCommitted ? ds.colors.brand.gold : 'rgba(255,255,255,0.28)'}`,
                         }}
                         aria-label={`${POT_LABELS[pot]}, ${volume}ml, ${dosages[pot]}g`}
                         disabled={!!committedPot}
